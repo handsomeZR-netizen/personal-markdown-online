@@ -24,18 +24,17 @@ export function TagSelector({ selectedTagIds, onChange }: TagSelectorProps) {
     const [newTagName, setNewTagName] = useState("")
     const [isLoading, setIsLoading] = useState(true)
 
-    const loadTags = async () => {
-        setIsLoading(true)
-        const result = await getTags()
-        if (result.success && result.data) {
-            setTags(result.data)
-        }
-        setIsLoading(false)
-    }
-
     useEffect(() => {
+        async function loadTags() {
+            setIsLoading(true)
+            const result = await getTags()
+            if (result.success && result.data) {
+                setTags(result.data)
+            }
+            setIsLoading(false)
+        }
+        
         loadTags()
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     const handleCreateTag = async () => {

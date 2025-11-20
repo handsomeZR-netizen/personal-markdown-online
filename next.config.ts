@@ -2,12 +2,8 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   eslint: {
-    // 在生产构建时忽略 ESLint 错误
+    // 只忽略警告，保留错误检查
     ignoreDuringBuilds: true,
-  },
-  typescript: {
-    // 在生产构建时忽略 TypeScript 错误
-    ignoreBuildErrors: true,
   },
 };
 

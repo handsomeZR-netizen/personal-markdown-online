@@ -24,18 +24,17 @@ export function CategorySelector({ selectedCategoryId, onChange }: CategorySelec
     const [newCategoryName, setNewCategoryName] = useState("")
     const [isLoading, setIsLoading] = useState(true)
 
-    const loadCategories = async () => {
-        setIsLoading(true)
-        const result = await getCategories()
-        if (result.success && result.data) {
-            setCategories(result.data)
-        }
-        setIsLoading(false)
-    }
-
     useEffect(() => {
+        async function loadCategories() {
+            setIsLoading(true)
+            const result = await getCategories()
+            if (result.success && result.data) {
+                setCategories(result.data)
+            }
+            setIsLoading(false)
+        }
+        
         loadCategories()
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     const handleCreateCategory = async () => {
