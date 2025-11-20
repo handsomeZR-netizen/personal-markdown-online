@@ -14,7 +14,7 @@ export function PageTransition({ children }: PageTransitionProps) {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
       transition={{
-        type: "spring",
+        type: "spring" as const,
         stiffness: 260,
         damping: 20,
       }}

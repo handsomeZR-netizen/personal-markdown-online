@@ -23,7 +23,7 @@ export function AnimatedNoteCard({ note, index }: AnimatedNoteCardProps) {
       initial={{ opacity: 0, y: 50 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{
-        type: "spring",
+        type: "spring" as const,
         stiffness: 100,
         delay: index * 0.1,
       }}

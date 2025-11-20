@@ -181,7 +181,7 @@ export function WelcomeSection({ userName, noteCount }: WelcomeSectionProps) {
                   <motion.div 
                     className="mb-6"
                     whileHover={{ scale: 1.1, rotate: 5 }}
-                    transition={{ type: "spring", stiffness: 300 }}
+                    transition={{ type: "spring" as const, stiffness: 300 }}
                   >
                     <div className="w-12 h-12 rounded-xl bg-background group-hover:bg-primary flex items-center justify-center transition-all duration-300">
                       <feature.icon className="w-6 h-6 text-foreground group-hover:text-primary-foreground transition-colors duration-300" />
