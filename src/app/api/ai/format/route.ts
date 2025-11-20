@@ -2,7 +2,8 @@ import { NextRequest } from 'next/server'
 import { streamDeepSeekResponse } from '@/lib/ai/deepseek'
 import { auth } from '@/auth'
 
-export const runtime = 'edge'
+// 改用 Node.js runtime 以避免 Edge Function 大小限制
+export const runtime = 'nodejs'
 
 export async function POST(req: NextRequest) {
   try {
