@@ -61,7 +61,8 @@ export function RegisterForm() {
             router.push("/login")
         } catch (error: unknown) {
             console.error("注册错误:", error)
-            toast.error(error.message || t('errors.generic'))
+            const errorMessage = error instanceof Error ? error.message : t('errors.generic')
+            toast.error(errorMessage)
         }
     }
 
