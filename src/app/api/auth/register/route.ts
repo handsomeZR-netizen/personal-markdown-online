@@ -50,7 +50,7 @@ export async function POST(req: Request) {
     } catch (error) {
         console.error("注册失败 - 详细错误:", error)
         if (error instanceof z.ZodError) {
-            return NextResponse.json({ message: "验证失败: " + error.errors.map(e => e.message).join(", ") }, { status: 400 })
+            return NextResponse.json({ message: "验证失败: " + error.issues.map(e => e.message).join(", ") }, { status: 400 })
         }
         return NextResponse.json(
             { message: "服务器错误，请稍后重试" },
