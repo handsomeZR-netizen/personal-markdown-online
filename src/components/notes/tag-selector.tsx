@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { getTags, createTag } from "@/lib/actions/tags"
@@ -24,18 +24,19 @@ export function TagSelector({ selectedTagIds, onChange }: TagSelectorProps) {
     const [newTagName, setNewTagName] = useState("")
     const [isLoading, setIsLoading] = useState(true)
 
-    const loadTags = useCallback(async () => {
+    const loadTags = async () => {
         setIsLoading(true)
         const result = await getTags()
         if (result.success && result.data) {
             setTags(result.data)
         }
         setIsLoading(false)
-    }, [])
+    }
 
     useEffect(() => {
         loadTags()
-    }, [loadTags])
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
 
     const handleCreateTag = async () => {
         if (!newTagName.trim()) return
