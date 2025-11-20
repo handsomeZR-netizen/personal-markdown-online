@@ -8,15 +8,12 @@ export function APIStatusBadge() {
   const [isFree, setIsFree] = useState(true);
 
   useEffect(() => {
-    setIsFree(isUsingFreeAPI());
+    const checkFreeAPI = () => setIsFree(isUsingFreeAPI());
+    checkFreeAPI();
     
     // 监听storage变化
-    const handleStorageChange = () => {
-      setIsFree(isUsingFreeAPI());
-    };
-    
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
+    window.addEventListener('storage', checkFreeAPI);
+    return () => window.removeEventListener('storage', checkFreeAPI);
   }, []);
 
   if (isFree) {

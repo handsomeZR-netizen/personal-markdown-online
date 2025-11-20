@@ -59,7 +59,7 @@ export function RegisterForm() {
 
             toast.success(t('auth.registerSuccess'))
             router.push("/login")
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error("注册错误:", error)
             toast.error(error.message || t('errors.generic'))
         }

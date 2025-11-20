@@ -320,7 +320,7 @@ export function NoteEditor({ note }: NoteEditorProps) {
                                 // Process each suggested tag
                                 for (const tagName of tagNames) {
                                     // Check if tag exists
-                                    let existingTag = tagsResult.data.find(tag => tag.name === tagName)
+                                    const existingTag = tagsResult.data.find(tag => tag.name === tagName)
                                     let tagId = existingTag?.id
                                     
                                     // If tag doesn't exist, create it

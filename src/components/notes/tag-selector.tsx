@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { getTags, createTag } from "@/lib/actions/tags"
@@ -24,18 +24,18 @@ export function TagSelector({ selectedTagIds, onChange }: TagSelectorProps) {
     const [newTagName, setNewTagName] = useState("")
     const [isLoading, setIsLoading] = useState(true)
 
-    useEffect(() => {
-        loadTags()
-    }, [])
-
-    const loadTags = async () => {
+    const loadTags = useCallback(async () => {
         setIsLoading(true)
         const result = await getTags()
         if (result.success && result.data) {
             setTags(result.data)
         }
         setIsLoading(false)
-    }
+    }, [])
+
+    useEffect(() => {
+        loadTags()
+    }, [loadTags])
 
     const handleCreateTag = async () => {
         if (!newTagName.trim()) return

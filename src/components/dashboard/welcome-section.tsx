@@ -142,7 +142,7 @@ export function WelcomeSection({ userName, noteCount }: WelcomeSectionProps) {
                 <div className="pt-4 border-t border-primary-foreground/10">
                   <div className="flex items-start justify-between gap-2">
                     <p className="text-xs text-primary-foreground/70 leading-relaxed flex-1 group-hover:text-primary-foreground/90 transition-colors">
-                      "{quote}"
+                      &ldquo;{quote}&rdquo;
                     </p>
                     <motion.button
                       onClick={fetchQuote}

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { getCategories, createCategory, deleteCategory } from "@/lib/actions/categories"
@@ -24,18 +24,18 @@ export function CategorySelector({ selectedCategoryId, onChange }: CategorySelec
     const [newCategoryName, setNewCategoryName] = useState("")
     const [isLoading, setIsLoading] = useState(true)
 
-    useEffect(() => {
-        loadCategories()
-    }, [])
-
-    const loadCategories = async () => {
+    const loadCategories = useCallback(async () => {
         setIsLoading(true)
         const result = await getCategories()
         if (result.success && result.data) {
             setCategories(result.data)
         }
         setIsLoading(false)
-    }
+    }, [])
+
+    useEffect(() => {
+        loadCategories()
+    }, [loadCategories])
 
     const handleCreateCategory = async () => {
         if (!newCategoryName.trim()) return

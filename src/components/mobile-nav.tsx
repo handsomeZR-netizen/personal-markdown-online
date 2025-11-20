@@ -55,7 +55,8 @@ export function MobileNav() {
 
   // 路由变化时自动关闭抽屉
   useEffect(() => {
-    setOpen(false)
+    const timer = setTimeout(() => setOpen(false), 0)
+    return () => clearTimeout(timer)
   }, [pathname])
 
   // 阻止背景滚动
