@@ -3,8 +3,22 @@
  * 提供与 DeepSeek API 交互的工具函数
  */
 
-const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY;
-const DEEPSEEK_API_URL = process.env.DEEPSEEK_API_URL || 'https://api.deepseek.com/v1';
+import { getCurrentAIConfig } from './config';
+
+const DEEPSEEK_API_URL = 'https://api.deepseek.com/v1';
+
+/**
+ * 获取当前API配置（仅使用用户配置，不使用环境变量）
+ * 注意：不再自动使用开发者的 API Key
+ */
+function getAPIConfig() {
+  const config = getCurrentAIConfig();
+  return {
+    apiKey: config.apiKey || '', // 不再使用环境变量作为后备
+    apiUrl: config.apiUrl || DEEPSEEK_API_URL,
+    model: config.model || 'deepseek-chat',
+  };
+}
 
 export interface DeepSeekMessage {
   role: 'system' | 'user' | 'assistant';
@@ -60,12 +74,14 @@ export async function callDeepSeek(
   messages: DeepSeekMessage[],
   options: DeepSeekOptions = {}
 ): Promise<DeepSeekResponse> {
-  if (!DEEPSEEK_API_KEY) {
-    throw new DeepSeekError('DeepSeek API key 未配置');
+  const config = getAPIConfig();
+  
+  if (!config.apiKey) {
+    throw new DeepSeekError('API key 未配置，请在设置中配置');
   }
 
   const {
-    model = 'deepseek-chat',
+    model = config.model,
     temperature = 0.7,
     max_tokens = 2000,
     top_p = 1,
@@ -82,11 +98,11 @@ export async function callDeepSeek(
   };
 
   try {
-    const response = await fetch(`${DEEPSEEK_API_URL}/chat/completions`, {
+    const response = await fetch(`${config.apiUrl}/chat/completions`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${DEEPSEEK_API_KEY}`,
+        'Authorization': `Bearer ${config.apiKey}`,
       },
       body: JSON.stringify(requestBody),
     });
@@ -184,8 +200,10 @@ export async function streamDeepSeekResponse(
   prompt: string,
   systemPrompt?: string
 ): Promise<ReadableStream> {
-  if (!DEEPSEEK_API_KEY) {
-    throw new DeepSeekError('DeepSeek API key 未配置');
+  const config = getAPIConfig();
+  
+  if (!config.apiKey) {
+    throw new DeepSeekError('API key 未配置，请在设置中配置');
   }
 
   const messages: DeepSeekMessage[] = [];
@@ -196,14 +214,14 @@ export async function streamDeepSeekResponse(
 
   messages.push({ role: 'user', content: prompt });
 
-  const response = await fetch(`${DEEPSEEK_API_URL}/chat/completions`, {
+  const response = await fetch(`${config.apiUrl}/chat/completions`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${DEEPSEEK_API_KEY}`,
+      'Authorization': `Bearer ${config.apiKey}`,
     },
     body: JSON.stringify({
-      model: 'deepseek-chat',
+      model: config.model,
       messages,
       temperature: 0.7,
       max_tokens: 4000,

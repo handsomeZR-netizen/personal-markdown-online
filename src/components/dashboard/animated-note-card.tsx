@@ -29,7 +29,7 @@ export function AnimatedNoteCard({ note, index }: AnimatedNoteCardProps) {
       }}
       whileHover={{ y: -8, transition: { duration: 0.2 } }}
     >
-      <Card className="flex flex-col h-full hover:shadow-xl transition-shadow border-2 hover:border-primary/50">
+      <Card className="flex flex-col h-full hover:shadow-xl transition-shadow bg-card border hover:border-foreground/20">
         <Link href={`/notes/${note.id}`} className="flex-1 cursor-pointer">
           <CardHeader>
             <motion.div

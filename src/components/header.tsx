@@ -1,7 +1,7 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { auth, signOut } from "@/auth"
-import { LogOut, User, Sparkles, FileText, Plus, Home } from "lucide-react"
+import { LogOut, User, Sparkles, FileText, Plus, Home, Settings } from "lucide-react"
 import { t } from "@/lib/i18n"
 import { MobileNav } from "@/components/mobile-nav"
 import { ThemeToggle } from "@/components/theme-toggle"
@@ -16,8 +16,8 @@ export async function Header() {
     const session = await auth()
 
     return (
-        <header className="border-b sticky top-0 bg-background z-50" role="banner">
-            <div className="container mx-auto px-4 py-3">
+        <header className="border-b border-border sticky top-0 bg-background/70 backdrop-blur-xl backdrop-saturate-150 z-50 shadow-sm transition-all duration-300 supports-[backdrop-filter]:bg-background/60 dark:border-border" role="banner">
+            <div className="container mx-auto px-4 py-4">
                 <div className="flex items-center justify-between gap-4">
                     {/* Logo和标题 */}
                     <div className="flex items-center gap-2 flex-shrink-0">
@@ -58,6 +58,12 @@ export async function Header() {
                                     <Button variant="ghost" size="sm" aria-label={t('ai.aiFeatures')}>
                                         <Sparkles className="h-4 w-4 mr-2" aria-hidden="true" />
                                         {t('ai.aiFeatures')}
+                                    </Button>
+                                </Link>
+                                <Link href="/settings">
+                                    <Button variant="ghost" size="sm" aria-label="设置">
+                                        <Settings className="h-4 w-4 mr-2" aria-hidden="true" />
+                                        设置
                                     </Button>
                                 </Link>
                             </nav>

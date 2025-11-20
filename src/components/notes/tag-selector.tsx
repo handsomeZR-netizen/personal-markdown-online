@@ -52,16 +52,11 @@ export function TagSelector({ selectedTagIds, onChange }: TagSelectorProps) {
         }
     }
 
-    const handleToggleTag = (tagId: string) => {
-        if (selectedTagIds.includes(tagId)) {
-            onChange(selectedTagIds.filter(id => id !== tagId))
-        } else {
-            onChange([...selectedTagIds, tagId])
-        }
+    const handleRemoveTag = (tagId: string) => {
+        onChange(selectedTagIds.filter(id => id !== tagId))
     }
 
     const selectedTags = tags.filter(tag => selectedTagIds.includes(tag.id))
-    const availableTags = tags.filter(tag => !selectedTagIds.includes(tag.id))
 
     if (isLoading) {
         return <div className="text-sm text-muted-foreground">{t('common.loading')}</div>
@@ -69,45 +64,29 @@ export function TagSelector({ selectedTagIds, onChange }: TagSelectorProps) {
 
     return (
         <div className="space-y-3">
-            {/* Selected tags */}
-            {selectedTags.length > 0 && (
-                <div className="flex flex-wrap gap-2">
-                    {selectedTags.map(tag => (
+            {/* Selected tags display area */}
+            <div className="min-h-[42px] p-3 border border-neutral-200 rounded-lg bg-neutral-50 flex flex-wrap gap-2 items-start">
+                {selectedTags.length > 0 ? (
+                    selectedTags.map(tag => (
                         <div
                             key={tag.id}
-                            className="inline-flex items-center gap-1 px-2 py-1 text-sm bg-primary text-primary-foreground rounded-md"
+                            className="group inline-flex items-center gap-1.5 px-3 py-1.5 text-sm bg-neutral-900 text-white rounded-md hover:bg-neutral-800 transition-all"
                         >
                             <span>{tag.name}</span>
                             <button
                                 type="button"
-                                onClick={() => handleToggleTag(tag.id)}
-                                className="hover:bg-primary/80 rounded-sm"
+                                onClick={() => handleRemoveTag(tag.id)}
+                                className="opacity-0 group-hover:opacity-100 hover:bg-neutral-700 rounded-sm p-0.5 transition-all"
+                                aria-label={`删除标签 ${tag.name}`}
                             >
                                 <X className="h-3 w-3" />
                             </button>
                         </div>
-                    ))}
-                </div>
-            )}
-
-            {/* Available tags */}
-            {availableTags.length > 0 && (
-                <div className="space-y-2">
-                    <div className="text-sm font-medium">{t('tags.selectTags')}</div>
-                    <div className="flex flex-wrap gap-2">
-                        {availableTags.map(tag => (
-                            <button
-                                key={tag.id}
-                                type="button"
-                                onClick={() => handleToggleTag(tag.id)}
-                                className="px-2 py-1 text-sm border rounded-md hover:bg-accent hover:text-accent-foreground transition-colors"
-                            >
-                                {tag.name}
-                            </button>
-                        ))}
-                    </div>
-                </div>
-            )}
+                    ))
+                ) : (
+                    <span className="text-sm text-neutral-400">暂无标签，点击下方按钮创建或使用AI建议</span>
+                )}
+            </div>
 
             {/* Create new tag */}
             {!isCreating ? (
@@ -116,13 +95,13 @@ export function TagSelector({ selectedTagIds, onChange }: TagSelectorProps) {
                     variant="outline"
                     size="sm"
                     onClick={() => setIsCreating(true)}
-                    className="w-full"
+                    className="w-full sm:w-auto"
                 >
                     <Plus className="h-4 w-4 mr-2" />
                     {t('tags.createTag')}
                 </Button>
             ) : (
-                <div className="flex gap-2">
+                <div className="flex gap-2 flex-wrap">
                     <Input
                         value={newTagName}
                         onChange={(e) => setNewTagName(e.target.value)}
@@ -137,6 +116,7 @@ export function TagSelector({ selectedTagIds, onChange }: TagSelectorProps) {
                                 setNewTagName("")
                             }
                         }}
+                        className="flex-1 min-w-[200px]"
                         autoFocus
                     />
                     <Button

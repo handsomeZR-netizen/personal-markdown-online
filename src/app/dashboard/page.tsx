@@ -47,7 +47,7 @@ export default async function DashboardPage({
 
     return (
         <PullToRefresh>
-            <div className="container mx-auto p-4 max-w-7xl">
+            <div className="container mx-auto p-4 max-w-7xl bg-background min-h-screen pt-8">
                 {/* 欢迎区域 */}
                 <WelcomeSection 
                     userName={session.user.name} 
@@ -64,22 +64,22 @@ export default async function DashboardPage({
                     />
                 )}
 
-                {/* 搜索和操作栏 */}
-                <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                    <div className="flex-1 max-w-md">
-                        <Search placeholder={t('search.searchPlaceholder')} />
-                    </div>
-                    <Link href="/notes" className="w-full sm:w-auto">
-                        <Button variant="outline" className="w-full sm:w-auto min-h-[44px]">
-                            查看所有笔记
-                        </Button>
-                    </Link>
-                </div>
+
 
                 {/* 最近笔记 */}
                 {notes.length > 0 && (
                     <div className="mb-4">
-                        <h2 className="text-xl font-semibold mb-4">最近笔记</h2>
+                        <div className="flex justify-between items-end mb-6">
+                            <div>
+                                <h2 className="text-xl font-bold text-foreground mb-1">最近编辑</h2>
+                                <p className="text-sm text-muted-foreground">继续刚才的工作</p>
+                            </div>
+                            <Link href="/notes">
+                                <Button variant="ghost" className="text-sm font-medium text-muted-foreground hover:text-foreground">
+                                    查看全部
+                                </Button>
+                            </Link>
+                        </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                             {notes.map((note, index) => (
                                 <AnimatedNoteCard 

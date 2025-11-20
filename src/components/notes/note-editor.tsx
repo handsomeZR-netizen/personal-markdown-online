@@ -45,15 +45,42 @@ type SaveStatus = 'idle' | 'saving' | 'saved' | 'error'
 
 export function NoteEditor({ note }: NoteEditorProps) {
     const router = useRouter()
-    const cacheKey = note?.id ? `note-draft-${note.id}` : 'note-draft-new'
+    
+    // 获取当前用户 ID（从 session 或其他地方）
+    const [userId, setUserId] = useState<string | null>(null)
+    
+    useEffect(() => {
+        // 获取当前用户 ID
+        async function fetchUserId() {
+            try {
+                const response = await fetch('/api/auth/session')
+                const session = await response.json()
+                setUserId(session?.user?.id || null)
+            } catch (error) {
+                console.error('Failed to fetch user session:', error)
+            }
+        }
+        fetchUserId()
+    }, [])
+    
+    // 使用用户 ID 作为缓存键的一部分，确保不同用户的缓存隔离
+    const cacheKey = userId 
+        ? (note?.id ? `note-draft-${userId}-${note.id}` : `note-draft-${userId}-new`)
+        : null
     
     // 尝试从本地存储恢复草稿
     const [content, setContent] = useState(() => {
-        if (typeof window !== 'undefined') {
+        if (typeof window !== 'undefined' && cacheKey) {
             const cached = localStorage.getItem(cacheKey)
             if (cached) {
                 try {
                     const parsed = JSON.parse(cached)
+                    // 验证缓存的用户 ID 是否匹配
+                    if (parsed.userId !== userId) {
+                        // 用户不匹配，清除缓存
+                        localStorage.removeItem(cacheKey)
+                        return note?.content || ""
+                    }
                     // 如果缓存时间在 24 小时内，使用缓存
                     if (Date.now() - parsed.timestamp < 24 * 60 * 60 * 1000) {
                         // 只有当缓存内容与原内容不同时才提示
@@ -95,16 +122,17 @@ export function NoteEditor({ note }: NoteEditorProps) {
     const [debouncedTagIds] = useDebounce(selectedTagIds, 3000)
     const [debouncedCategoryId] = useDebounce(selectedCategoryId, 3000)
 
-    // 本地存储缓存 - 防止内容丢失
+    // 本地存储缓存 - 防止内容丢失（带用户 ID 验证）
     useEffect(() => {
-        if (typeof window !== 'undefined' && watchedContent) {
+        if (typeof window !== 'undefined' && watchedContent && cacheKey && userId) {
             localStorage.setItem(cacheKey, JSON.stringify({
                 content: watchedContent,
                 title: title,
+                userId: userId, // 保存用户 ID 用于验证
                 timestamp: Date.now()
             }))
         }
-    }, [watchedContent, title, cacheKey])
+    }, [watchedContent, title, cacheKey, userId])
 
     // Auto-save effect
     useEffect(() => {
@@ -151,7 +179,7 @@ export function NoteEditor({ note }: NoteEditorProps) {
             }
             
             // 清除本地缓存
-            if (typeof window !== 'undefined') {
+            if (typeof window !== 'undefined' && cacheKey) {
                 localStorage.removeItem(cacheKey)
             }
         } catch (error) {
@@ -260,7 +288,7 @@ export function NoteEditor({ note }: NoteEditorProps) {
                 />
 
                 {/* Tags selector */}
-                <div className="space-y-2">
+                <div className="space-y-3">
                     <FormLabel>{t('tags.tags')}</FormLabel>
                     <TagSelector
                         selectedTagIds={selectedTagIds}
@@ -274,8 +302,7 @@ export function NoteEditor({ note }: NoteEditorProps) {
                     <AITagSuggestions
                         content={watchedContent}
                         title={title}
-                        selectedTags={selectedTagIds}
-                        onSelectTag={async (tagName) => {
+                        onAddTags={async (tagNames) => {
                             try {
                                 // Import getTags and createTag from actions
                                 const { getTags, createTag } = await import('@/lib/actions/tags')
@@ -288,30 +315,39 @@ export function NoteEditor({ note }: NoteEditorProps) {
                                     return
                                 }
                                 
-                                // Check if tag exists
-                                let existingTag = tagsResult.data.find(tag => tag.name === tagName)
-                                let tagId = existingTag?.id
+                                const newTagIds = [...selectedTagIds]
                                 
-                                // If tag doesn't exist, create it
-                                if (!tagId) {
-                                    const result = await createTag(tagName)
-                                    if (result.success && result.data) {
-                                        tagId = result.data.id
-                                    } else {
-                                        toast.error(result.error || '创建标签失败')
-                                        return
+                                // Process each suggested tag
+                                for (const tagName of tagNames) {
+                                    // Check if tag exists
+                                    let existingTag = tagsResult.data.find(tag => tag.name === tagName)
+                                    let tagId = existingTag?.id
+                                    
+                                    // If tag doesn't exist, create it
+                                    if (!tagId) {
+                                        const result = await createTag(tagName)
+                                        if (result.success && result.data) {
+                                            tagId = result.data.id
+                                            // Add to local tags list for next iteration
+                                            tagsResult.data.push(result.data)
+                                        } else {
+                                            console.error(`创建标签失败: ${tagName}`)
+                                            continue
+                                        }
+                                    }
+                                    
+                                    // Add tag to selected tags if not already selected
+                                    if (tagId && !newTagIds.includes(tagId)) {
+                                        newTagIds.push(tagId)
                                     }
                                 }
                                 
-                                // Add tag to selected tags if not already selected
-                                if (tagId && !selectedTagIds.includes(tagId)) {
-                                    const newTagIds = [...selectedTagIds, tagId]
-                                    setSelectedTagIds(newTagIds)
-                                    form.setValue('tagIds', newTagIds)
-                                }
+                                // Update state
+                                setSelectedTagIds(newTagIds)
+                                form.setValue('tagIds', newTagIds)
                             } catch (error) {
-                                console.error('添加标签失败:', error)
-                                toast.error('添加标签失败')
+                                console.error('添加AI标签失败:', error)
+                                toast.error('添加AI标签失败')
                             }
                         }}
                     />

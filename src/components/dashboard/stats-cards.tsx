@@ -22,22 +22,22 @@ export function StatsCards({
       icon: FileText,
       label: "总笔记数",
       value: noteCount,
-      color: "text-blue-500",
-      bgColor: "bg-blue-500/10",
+      color: "text-foreground",
+      bgColor: "bg-muted",
     },
     {
       icon: Tag,
       label: "标签数",
       value: tagCount,
-      color: "text-green-500",
-      bgColor: "bg-green-500/10",
+      color: "text-foreground",
+      bgColor: "bg-muted",
     },
     {
       icon: FolderOpen,
       label: "分类数",
       value: categoryCount,
-      color: "text-purple-500",
-      bgColor: "bg-purple-500/10",
+      color: "text-foreground",
+      bgColor: "bg-muted",
     },
     {
       icon: Calendar,
@@ -48,8 +48,8 @@ export function StatsCards({
             day: "numeric",
           })
         : "暂无",
-      color: "text-orange-500",
-      bgColor: "bg-orange-500/10",
+      color: "text-foreground",
+      bgColor: "bg-muted",
     },
   ]
 
@@ -89,7 +89,7 @@ export function StatsCards({
           whileHover={{ scale: 1.05, y: -5 }}
           whileTap={{ scale: 0.95 }}
         >
-          <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+          <Card className="hover:shadow-lg transition-shadow cursor-pointer bg-card border">
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
