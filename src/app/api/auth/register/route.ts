@@ -11,6 +11,10 @@ const registerSchema = z.object({
 
 export async function POST(req: Request) {
     try {
+        // 🌟 加入环境变量打印
+        console.log("ENV DATABASE_URL:", process.env.DATABASE_URL)
+        console.log("ENV DIRECT_URL:", process.env.DIRECT_URL)
+
         console.log("收到注册请求")
         const body = await req.json()
         console.log("请求体:", body)
@@ -47,14 +51,11 @@ export async function POST(req: Request) {
         const { password: _, ...userWithoutPassword } = user
 
         return NextResponse.json(userWithoutPassword, { status: 201 })
-    } catch (error) {
+    } catch (error: any) {
         console.error("注册失败 - 详细错误:", error)
-        if (error instanceof z.ZodError) {
-            return NextResponse.json({ message: "验证失败: " + error.issues.map(e => e.message).join(", ") }, { status: 400 })
-        }
-        return NextResponse.json(
-            { message: "服务器错误，请稍后重试" },
-            { status: 500 }
-        )
+        return NextResponse.json({
+            message: "服务器错误",
+            error: JSON.stringify(error, Object.getOwnPropertyNames(error))
+        }, { status: 500 })
     }
 }
