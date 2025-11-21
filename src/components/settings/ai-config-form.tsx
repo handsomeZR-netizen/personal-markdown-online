@@ -11,6 +11,7 @@ import { Loader2, Check, AlertCircle, Eye, EyeOff, Sparkles } from 'lucide-react
 import { AIProvider, AIConfig, DEFAULT_CONFIGS, getAIConfig, saveAIConfig, testAIConfig } from '@/lib/ai/config';
 
 export function AIConfigForm() {
+  const [mounted, setMounted] = useState(false);
   const [provider, setProvider] = useState<AIProvider>('deepseek');
   const [apiKey, setApiKey] = useState('');
   const [apiUrl, setApiUrl] = useState('');
@@ -21,6 +22,7 @@ export function AIConfigForm() {
 
   // 加载保存的配置
   useEffect(() => {
+    setMounted(true);
     const config = getAIConfig();
     
     if (config && config.apiKey && config.apiKey.trim() !== '') {
@@ -36,6 +38,21 @@ export function AIConfigForm() {
       setApiKey('');
     }
   }, []);
+
+  // 避免水合不匹配
+  if (!mounted) {
+    return (
+      <Card className="w-full max-w-2xl">
+        <CardHeader>
+          <CardTitle>AI API 配置</CardTitle>
+          <CardDescription>加载中...</CardDescription>
+        </CardHeader>
+        <CardContent className="h-96 flex items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        </CardContent>
+      </Card>
+    );
+  }
 
   // 切换提供商时更新默认值
   const handleProviderChange = (newProvider: AIProvider) => {

@@ -13,12 +13,14 @@ interface WelcomeSectionProps {
 }
 
 export function WelcomeSection({ userName, noteCount }: WelcomeSectionProps) {
-  const [greeting, setGreeting] = useState('')
+  const [mounted, setMounted] = useState(false)
+  const [greeting, setGreeting] = useState('你好')
   const [quote, setQuote] = useState('保持渴望，保持愚蠢。 — 史蒂夫·乔布斯')
   const [focusScore] = useState(85)
   const [isRefreshing, setIsRefreshing] = useState(false)
 
   useEffect(() => {
+    setMounted(true)
     const hour = new Date().getHours()
     if (hour < 12) setGreeting('早上好')
     else if (hour < 18) setGreeting('下午好')

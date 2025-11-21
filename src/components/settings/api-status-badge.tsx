@@ -6,8 +6,10 @@ import { isUsingFreeAPI } from '@/lib/ai/config';
 
 export function APIStatusBadge() {
   const [isFree, setIsFree] = useState(true);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
     const checkFreeAPI = () => setIsFree(isUsingFreeAPI());
     checkFreeAPI();
     
@@ -15,6 +17,11 @@ export function APIStatusBadge() {
     window.addEventListener('storage', checkFreeAPI);
     return () => window.removeEventListener('storage', checkFreeAPI);
   }, []);
+
+  // 避免水合不匹配
+  if (!mounted) {
+    return null;
+  }
 
   if (isFree) {
     return (

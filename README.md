@@ -438,6 +438,24 @@ npm run test:ui
 
 ## 📦 部署指南
 
+### 🚨 重要：部署前必读
+
+如果你遇到"部署后组件空白"的问题，请先查看：
+- **[QUICK_FIX.md](./QUICK_FIX.md)** - 快速修复指南（⭐ 推荐）
+- **[修复总结.md](./修复总结.md)** - 问题原因和解决方案
+- **[DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md)** - 完整部署指南
+
+### 部署前检查
+
+```bash
+# 1. 检查环境变量配置
+npm run check:env
+
+# 2. 测试生产构建
+npm run build
+npm start
+```
+
 ### 部署到 Vercel（推荐）
 
 #### 方法一：通过 Vercel Dashboard
@@ -445,7 +463,7 @@ npm run test:ui
 1. 访问 [Vercel Dashboard](https://vercel.com/new)
 2. 导入 GitHub 仓库
 3. 设置根目录为 `note-app`
-4. 配置环境变量（参考 `.env.supabase.example`）
+4. **重要**：配置环境变量（参考 [QUICK_FIX.md](./QUICK_FIX.md)）
 5. 点击 Deploy
 
 #### 方法二：通过 Vercel CLI
@@ -465,7 +483,13 @@ vercel
 vercel --prod
 ```
 
-详细部署指南请查看：[VERCEL_DEPLOYMENT_GUIDE.md](./VERCEL_DEPLOYMENT_GUIDE.md)
+### 📚 部署相关文档
+
+- **[QUICK_FIX.md](./QUICK_FIX.md)** - 快速修复组件空白问题
+- **[DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md)** - 完整部署指南
+- **[check-deployment.md](./check-deployment.md)** - 部署后检查清单
+- **[VERCEL_DEPLOYMENT.md](./VERCEL_DEPLOYMENT.md)** - Vercel 技术细节
+- **[修复总结.md](./修复总结.md)** - 水合不匹配问题详解
 
 ### 部署到其他平台
 
