@@ -6,10 +6,8 @@ generator client {
 
 datasource db {
   provider  = "postgresql"
-  // 使用 Supabase Integration 自动提供的连接池变量 (端口 6543)
-  url       = env("POSTGRES_PRISMA_URL")
-  // 使用 Supabase Integration 自动提供的直连变量 (端口 5432)
-  directUrl = env("POSTGRES_URL_NON_POOLING")
+  url       = env("DATABASE_URL")  // ✅ 改为标准 Supabase 变量名
+  directUrl = env("DIRECT_URL")    // ✅ 改为标准 Supabase 变量名
 }
 
 model User {
