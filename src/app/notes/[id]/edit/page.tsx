@@ -1,13 +1,88 @@
-import { getNote } from "@/lib/actions/notes"
+"use client"
+
+import { useEffect, useState } from "react"
 import { NoteEditorLazy } from "@/components/notes/note-editor-lazy"
-import { notFound } from "next/navigation"
+import { notFound, useParams } from "next/navigation"
 import { t } from "@/lib/i18n"
+import { offlineStorageService } from "@/lib/offline/offline-storage-service"
+import { getNote } from "@/lib/actions/notes"
+import { Loader2 } from "lucide-react"
+import { useNetworkStatus } from "@/contexts/network-status-context"
 
-export default async function EditNotePage({ params }: { params: Promise<{ id: string }> }) {
-    const { id } = await params
-    const note = await getNote(id)
+type Note = {
+    id: string
+    title: string
+    content: string
+    tags?: Array<{ id: string; name: string }>
+    categoryId?: string | null
+}
 
-    if (!note) {
+export default function EditNotePage() {
+    const params = useParams()
+    const id = params.id as string
+    const { isOnline } = useNetworkStatus()
+    const [note, setNote] = useState<Note | null>(null)
+    const [loading, setLoading] = useState(true)
+    const [notFoundError, setNotFoundError] = useState(false)
+
+    useEffect(() => {
+        async function loadNote() {
+            try {
+                setLoading(true)
+                
+                // 优先从本地加载
+                const localNote = await offlineStorageService.getNote(id)
+                
+                if (localNote) {
+                    // 转换本地笔记格式为编辑器需要的格式
+                    setNote({
+                        id: localNote.id,
+                        title: localNote.title,
+                        content: localNote.content,
+                        tags: localNote.tags.map((name, index) => ({ 
+                            id: `tag-${index}`, 
+                            name 
+                        })),
+                        categoryId: localNote.categoryId || null,
+                    })
+                    setLoading(false)
+                    return
+                }
+                
+                // 如果本地没有且在线，从服务器获取
+                if (isOnline) {
+                    const serverNote = await getNote(id)
+                    if (serverNote) {
+                        setNote(serverNote)
+                    } else {
+                        setNotFoundError(true)
+                    }
+                } else {
+                    // 离线且本地没有数据
+                    setNotFoundError(true)
+                }
+            } catch (error) {
+                console.error('加载笔记失败:', error)
+                setNotFoundError(true)
+            } finally {
+                setLoading(false)
+            }
+        }
+
+        loadNote()
+    }, [id, isOnline])
+
+    if (loading) {
+        return (
+            <div className="container mx-auto p-4 max-w-6xl">
+                <div className="flex items-center justify-center min-h-[400px]">
+                    <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                </div>
+            </div>
+        )
+    }
+
+    if (notFoundError || !note) {
         notFound()
     }
 

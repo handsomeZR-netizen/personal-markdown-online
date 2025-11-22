@@ -8,6 +8,13 @@ import { KeyboardShortcutsProvider } from "@/components/keyboard-shortcuts-provi
 import { SkipToContent } from "@/components/skip-to-content";
 import { CacheCleanup } from "@/components/cache-cleanup";
 import { auth } from "@/auth";
+import { NetworkStatusProvider } from "@/contexts/network-status-context";
+import { NetworkStatusIndicator } from "@/components/offline/network-status-indicator";
+import { SyncProgressBar } from "@/components/offline/sync-progress-bar";
+import { StorageWarning } from "@/components/offline/storage-warning";
+import { DataRecovery } from "@/components/offline/data-recovery";
+import { UnloadWarning } from "@/components/offline/unload-warning";
+import { OfflineOnboardingDialog } from "@/components/offline/offline-onboarding-dialog";
 
 export const metadata: Metadata = {
   title: t('common.appName'),
@@ -30,15 +37,23 @@ export default async function RootLayout({
           enableSystem
           disableTransitionOnChange={false}
         >
-          <KeyboardShortcutsProvider>
-            <CacheCleanup userId={session?.user?.id || null} />
-            <SkipToContent />
-            <Header />
-            <main id="main-content" className="min-h-screen" role="main">
-              {children}
-            </main>
-            <Toaster />
-          </KeyboardShortcutsProvider>
+          <NetworkStatusProvider>
+            <DataRecovery />
+            <UnloadWarning />
+            <OfflineOnboardingDialog />
+            <NetworkStatusIndicator />
+            <SyncProgressBar />
+            <StorageWarning />
+            <KeyboardShortcutsProvider>
+              <CacheCleanup userId={session?.user?.id || null} />
+              <SkipToContent />
+              <Header />
+              <main id="main-content" className="min-h-screen" role="main">
+                {children}
+              </main>
+              <Toaster />
+            </KeyboardShortcutsProvider>
+          </NetworkStatusProvider>
         </ThemeProvider>
       </body>
     </html>

@@ -13,6 +13,11 @@ import { toast } from "sonner"
 import { useRouter } from "next/navigation"
 import { useState, useEffect } from "react"
 import { useDebounce } from "use-debounce"
+import { useDebouncedCallback } from "use-debounce"
+import { draftManager } from "@/lib/offline/draft-manager"
+import { DraftRecoveryDialog } from "@/components/offline/draft-recovery-dialog"
+import { OfflineSettingsManager } from "@/lib/offline/settings-manager"
+import type { DraftContent } from "@/types/offline"
 import { MarkdownPreview } from "./markdown-preview"
 import { EditorToolbar } from "./editor-toolbar"
 import { TagSelector } from "./tag-selector"
@@ -20,9 +25,11 @@ import { CategorySelector } from "./category-selector"
 import { AITagSuggestions } from "./ai-tag-suggestions"
 import { AIFormatButton } from "./ai-format-button"
 import { t } from "@/lib/i18n"
-import { Loader2, Check, Edit, Eye } from "lucide-react"
+import { Loader2, Check, Edit, Eye, WifiOff, Cloud } from "lucide-react"
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels"
 import { useKeyboardShortcut } from "@/hooks/use-keyboard-shortcuts"
+import { useNetworkStatus } from "@/contexts/network-status-context"
+import { offlineStorageService } from "@/lib/offline/offline-storage-service"
 
 const formSchema = z.object({
     title: z.string().min(1, t('notes.titleRequired')),
@@ -45,6 +52,7 @@ type SaveStatus = 'idle' | 'saving' | 'saved' | 'error'
 
 export function NoteEditor({ note }: NoteEditorProps) {
     const router = useRouter()
+    const { isOnline } = useNetworkStatus()
     
     // 获取当前用户 ID（从 session 或其他地方）
     const [userId, setUserId] = useState<string | null>(null)
@@ -63,45 +71,39 @@ export function NoteEditor({ note }: NoteEditorProps) {
         fetchUserId()
     }, [])
     
-    // 使用用户 ID 作为缓存键的一部分，确保不同用户的缓存隔离
-    const cacheKey = userId 
-        ? (note?.id ? `note-draft-${userId}-${note.id}` : `note-draft-${userId}-new`)
-        : null
-    
-    // 尝试从本地存储恢复草稿
-    const [content, setContent] = useState(() => {
-        if (typeof window !== 'undefined' && cacheKey) {
-            const cached = localStorage.getItem(cacheKey)
-            if (cached) {
-                try {
-                    const parsed = JSON.parse(cached)
-                    // 验证缓存的用户 ID 是否匹配
-                    if (parsed.userId !== userId) {
-                        // 用户不匹配，清除缓存
-                        localStorage.removeItem(cacheKey)
-                        return note?.content || ""
-                    }
-                    // 如果缓存时间在 24 小时内，使用缓存
-                    if (Date.now() - parsed.timestamp < 24 * 60 * 60 * 1000) {
-                        // 只有当缓存内容与原内容不同时才提示
-                        if (parsed.content !== note?.content) {
-                            setTimeout(() => {
-                                toast.info('已恢复未保存的草稿')
-                            }, 500)
-                        }
-                        return parsed.content || note?.content || ""
-                    }
-                } catch (e) {
-                    // 忽略解析错误
-                }
+    // 检查是否有草稿需要恢复
+    useEffect(() => {
+        if (!userId) return;
+        
+        const noteId = note?.id || 'new';
+        const draft = draftManager.getDraft(noteId);
+        
+        if (draft) {
+            // 检查草稿内容是否与当前笔记不同
+            const isDifferent = 
+                draft.title !== (note?.title || '') ||
+                draft.content !== (note?.content || '') ||
+                JSON.stringify(draft.tags) !== JSON.stringify(note?.tags?.map(t => t.id) || []) ||
+                draft.categoryId !== (note?.categoryId || undefined);
+            
+            if (isDifferent) {
+                setDraftToRecover(draft);
+                setShowDraftDialog(true);
             }
         }
-        return note?.content || ""
-    })
+    }, [userId, note])
+    
+
+    
+    const [content, setContent] = useState(note?.content || "")
     
     const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle')
     const [selectedTagIds, setSelectedTagIds] = useState<string[]>(note?.tags?.map(t => t.id) || [])
     const [selectedCategoryId, setSelectedCategoryId] = useState<string | undefined>(note?.categoryId || undefined)
+    
+    // 草稿恢复相关状态
+    const [draftToRecover, setDraftToRecover] = useState<DraftContent | null>(null)
+    const [showDraftDialog, setShowDraftDialog] = useState(false)
     
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -116,31 +118,110 @@ export function NoteEditor({ note }: NoteEditorProps) {
     const title = form.watch("title")
     const watchedContent = form.watch("content")
     
-    // Debounce the form values for auto-save (3 seconds)
-    const [debouncedTitle] = useDebounce(title, 3000)
-    const [debouncedContent] = useDebounce(watchedContent, 3000)
-    const [debouncedTagIds] = useDebounce(selectedTagIds, 3000)
-    const [debouncedCategoryId] = useDebounce(selectedCategoryId, 3000)
-
-    // 本地存储缓存 - 防止内容丢失（带用户 ID 验证）
+    // Get draft auto-save interval from settings
+    const [draftInterval, setDraftInterval] = useState(3000)
+    
     useEffect(() => {
-        if (typeof window !== 'undefined' && watchedContent && cacheKey && userId) {
-            localStorage.setItem(cacheKey, JSON.stringify({
-                content: watchedContent,
-                title: title,
-                userId: userId, // 保存用户 ID 用于验证
-                timestamp: Date.now()
-            }))
+        const settings = OfflineSettingsManager.getSettings()
+        setDraftInterval(settings.draftAutoSaveInterval)
+        
+        // Listen for settings changes
+        const unsubscribe = OfflineSettingsManager.onSettingsChange((newSettings) => {
+            setDraftInterval(newSettings.draftAutoSaveInterval)
+        })
+        
+        return unsubscribe
+    }, [])
+    
+    // Debounce the form values for auto-save (using settings interval)
+    const [debouncedTitle] = useDebounce(title, draftInterval)
+    const [debouncedContent] = useDebounce(watchedContent, draftInterval)
+    const [debouncedTagIds] = useDebounce(selectedTagIds, draftInterval)
+    const [debouncedCategoryId] = useDebounce(selectedCategoryId, draftInterval)
+
+    // 恢复草稿
+    const handleRecoverDraft = () => {
+        if (!draftToRecover) return;
+        
+        form.setValue('title', draftToRecover.title);
+        form.setValue('content', draftToRecover.content);
+        setContent(draftToRecover.content);
+        setSelectedTagIds(draftToRecover.tags);
+        form.setValue('tagIds', draftToRecover.tags);
+        
+        if (draftToRecover.categoryId) {
+            setSelectedCategoryId(draftToRecover.categoryId);
+            form.setValue('categoryId', draftToRecover.categoryId);
         }
-    }, [watchedContent, title, cacheKey, userId])
+        
+        setShowDraftDialog(false);
+        toast.success('已恢复草稿');
+    };
+    
+    // 放弃草稿
+    const handleDiscardDraft = () => {
+        const noteId = note?.id || 'new';
+        draftManager.deleteDraft(noteId);
+        setShowDraftDialog(false);
+        setDraftToRecover(null);
+        toast.info('已放弃草稿');
+    };
+    
+    // 使用 draft manager 自动保存草稿（使用设置中的间隔）
+    const saveDraftDebounced = useDebouncedCallback(() => {
+        if (!userId) return;
+        
+        const noteId = note?.id || 'new';
+        
+        draftManager.saveDraft(noteId, {
+            title: title,
+            content: watchedContent,
+            tags: selectedTagIds,
+            categoryId: selectedCategoryId,
+            savedAt: Date.now(),
+        });
+    }, draftInterval);
+
+    // 监听表单变化，触发自动保存
+    useEffect(() => {
+        if (title || watchedContent) {
+            saveDraftDebounced();
+        }
+    }, [title, watchedContent, selectedTagIds, selectedCategoryId, saveDraftDebounced])
 
     // Auto-save effect
     useEffect(() => {
         if (!note?.id) return // Only auto-save for existing notes
         if (!debouncedTitle) return
+        if (!userId) return
 
         const performAutoSave = async () => {
             setSaveStatus('saving')
+            
+            // 如果离线，保存到本地存储
+            if (!isOnline) {
+                try {
+                    await offlineStorageService.updateNote(
+                        note.id,
+                        {
+                            title: debouncedTitle,
+                            content: debouncedContent,
+                            tags: debouncedTagIds,
+                            categoryId: debouncedCategoryId,
+                        },
+                        userId
+                    )
+                    setSaveStatus('saved')
+                    setTimeout(() => setSaveStatus('idle'), 2000)
+                } catch (error) {
+                    console.error('离线自动保存失败:', error)
+                    setSaveStatus('error')
+                    setTimeout(() => setSaveStatus('idle'), 2000)
+                }
+                return
+            }
+
+            // 在线模式：使用原有的自动保存逻辑
             const result = await autoSaveNote(note.id, {
                 title: debouncedTitle,
                 content: debouncedContent,
@@ -158,9 +239,48 @@ export function NoteEditor({ note }: NoteEditorProps) {
         }
 
         performAutoSave()
-    }, [debouncedTitle, debouncedContent, debouncedTagIds, debouncedCategoryId, note])
+    }, [debouncedTitle, debouncedContent, debouncedTagIds, debouncedCategoryId, note, isOnline, userId])
 
     async function onSubmit(values: z.infer<typeof formSchema>) {
+        if (!userId) {
+            toast.error('用户未登录')
+            return
+        }
+
+        // 如果离线，保存到本地存储
+        if (!isOnline) {
+            try {
+                const result = await offlineStorageService.saveNote(
+                    {
+                        id: note?.id,
+                        title: values.title,
+                        content: values.content,
+                        tags: selectedTagIds,
+                        categoryId: selectedCategoryId,
+                    },
+                    userId
+                )
+
+                if (result.success) {
+                    toast.success(note ? '笔记已保存到本地，将在网络恢复后同步' : '笔记已创建并保存到本地，将在网络恢复后同步')
+                    
+                    // 清除草稿
+                    const noteId = note?.id || 'new';
+                    draftManager.deleteDraft(noteId);
+                    
+                    // 如果是新笔记，跳转到笔记列表
+                    if (!note) {
+                        router.push('/notes')
+                    }
+                }
+            } catch (error) {
+                console.error('离线保存失败:', error)
+                toast.error('保存失败')
+            }
+            return
+        }
+
+        // 在线模式：使用原有的服务器保存逻辑
         const formData = new FormData()
         formData.append("title", values.title)
         formData.append("content", values.content)
@@ -178,10 +298,9 @@ export function NoteEditor({ note }: NoteEditorProps) {
                 toast.success(t('notes.createSuccess'))
             }
             
-            // 清除本地缓存
-            if (typeof window !== 'undefined' && cacheKey) {
-                localStorage.removeItem(cacheKey)
-            }
+            // 清除草稿
+            const noteId = note?.id || 'new';
+            draftManager.deleteDraft(noteId);
         } catch (error) {
             toast.error(t('notes.createError'))
         }
@@ -271,8 +390,16 @@ export function NoteEditor({ note }: NoteEditorProps) {
     }, { ctrl: true })
 
     return (
-        <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4" aria-label={note ? t('notes.editNote') : t('notes.createNote')}>
+        <>
+            <DraftRecoveryDialog
+                draft={draftToRecover}
+                open={showDraftDialog}
+                onRecover={handleRecoverDraft}
+                onDiscard={handleDiscardDraft}
+            />
+            
+            <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4" aria-label={note ? t('notes.editNote') : t('notes.createNote')}>
                 <FormField
                     control={form.control}
                     name="title"
@@ -368,26 +495,35 @@ export function NoteEditor({ note }: NoteEditorProps) {
                 <div className="space-y-2">
                     <div className="flex items-center justify-between">
                         <FormLabel>{t('notes.content')}</FormLabel>
-                        {/* Save status indicator */}
-                        {note?.id && (
-                            <div className="flex items-center gap-2 text-sm" role="status" aria-live="polite">
-                                {saveStatus === 'saving' && (
-                                    <>
-                                        <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" aria-hidden="true" />
-                                        <span className="hidden sm:inline text-muted-foreground">{t('notes.autoSaving')}</span>
-                                    </>
-                                )}
-                                {saveStatus === 'saved' && (
-                                    <>
-                                        <Check className="h-4 w-4 text-green-600" aria-hidden="true" />
-                                        <span className="hidden sm:inline text-green-600">{t('notes.autoSaved')}</span>
-                                    </>
-                                )}
-                                {saveStatus === 'error' && (
-                                    <span className="text-destructive" role="alert">{t('common.error')}</span>
-                                )}
-                            </div>
-                        )}
+                        <div className="flex items-center gap-3">
+                            {/* Offline indicator */}
+                            {!isOnline && (
+                                <div className="flex items-center gap-2 text-sm text-amber-600" role="status" aria-live="polite">
+                                    <WifiOff className="h-4 w-4" aria-hidden="true" />
+                                    <span className="hidden sm:inline">离线模式</span>
+                                </div>
+                            )}
+                            {/* Save status indicator */}
+                            {note?.id && isOnline && (
+                                <div className="flex items-center gap-2 text-sm" role="status" aria-live="polite">
+                                    {saveStatus === 'saving' && (
+                                        <>
+                                            <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" aria-hidden="true" />
+                                            <span className="hidden sm:inline text-muted-foreground">{t('notes.autoSaving')}</span>
+                                        </>
+                                    )}
+                                    {saveStatus === 'saved' && (
+                                        <>
+                                            <Check className="h-4 w-4 text-green-600" aria-hidden="true" />
+                                            <span className="hidden sm:inline text-green-600">{t('notes.autoSaved')}</span>
+                                        </>
+                                    )}
+                                    {saveStatus === 'error' && (
+                                        <span className="text-destructive" role="alert">{t('common.error')}</span>
+                                    )}
+                                </div>
+                            )}
+                        </div>
                     </div>
                     <div className="flex items-center gap-2">
                         <EditorToolbar onInsert={insertMarkdown} />
@@ -501,5 +637,6 @@ export function NoteEditor({ note }: NoteEditorProps) {
                 </div>
             </form>
         </Form>
+        </>
     )
 }

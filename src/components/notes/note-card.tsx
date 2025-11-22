@@ -1,11 +1,19 @@
+"use client"
+
 import Link from "next/link"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { Edit, Trash2 } from "lucide-react"
 import { deleteNote } from "@/lib/actions/notes"
 import { t } from "@/lib/i18n"
 import { formatDate } from "@/lib/i18n/date-format"
+import { SyncStatusIcon } from "@/components/offline/sync-status-icon"
+import { SyncStatusDialog } from "@/components/offline/sync-status-dialog"
+import { useState, useEffect } from "react"
+import { indexedDBManager } from "@/lib/offline/indexeddb-manager"
+import type { SyncStatus } from "@/types/offline"
 
 type NoteCardProps = {
     note: {
@@ -21,21 +29,77 @@ type NoteCardProps = {
 }
 
 export function NoteCard({ note }: NoteCardProps) {
-    // 使用 AI 生成的摘要，如果没有则取前150个字符
-    const summary = note.summary || (note.content.length > 150 
-        ? note.content.substring(0, 150) + '...' 
+    const [syncStatus, setSyncStatus] = useState<SyncStatus>('synced')
+    const [showStatusDialog, setShowStatusDialog] = useState(false)
+
+    // 使用 AI 生成的摘要，如果没有则取前100个字符
+    const summary = note.summary || (note.content.length > 100 
+        ? note.content.substring(0, 100) + '...' 
         : note.content)
+    
+    // 判断是否为 AI 生成的摘要
+    const isAISummary = !!note.summary
+
+    // 从 IndexedDB 读取同步状态
+    useEffect(() => {
+        const loadSyncStatus = async () => {
+            try {
+                const localNote = await indexedDBManager.getNote(note.id)
+                if (localNote) {
+                    setSyncStatus(localNote.syncStatus)
+                }
+            } catch (error) {
+                // 如果读取失败，保持默认的 'synced' 状态
+                console.error('Failed to load sync status:', error)
+            }
+        }
+
+        loadSyncStatus()
+    }, [note.id])
+
+    const handleSyncStatusClick = () => {
+        setShowStatusDialog(true)
+    }
 
     return (
         <Card className="flex flex-col hover:shadow-lg transition-shadow" role="article" aria-labelledby={`note-title-${note.id}`}>
             <Link href={`/notes/${note.id}`} className="flex-1 cursor-pointer" aria-label={`查看笔记: ${note.title}`}>
                 <CardHeader>
-                    <CardTitle id={`note-title-${note.id}`} className="truncate">{note.title}</CardTitle>
+                    <div className="flex items-start justify-between gap-2">
+                        <CardTitle id={`note-title-${note.id}`} className="truncate flex-1">{note.title}</CardTitle>
+                        <div onClick={(e) => {
+                            e.preventDefault()
+                            handleSyncStatusClick()
+                        }}>
+                            <SyncStatusIcon status={syncStatus} />
+                        </div>
+                    </div>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                    <p className="text-muted-foreground line-clamp-3 text-sm">
-                        {summary}
-                    </p>
+                    {/* 摘要显示 - 限制2-3行，悬停显示完整摘要 */}
+                    <div className="space-y-1">
+                        <TooltipProvider>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <p className="text-muted-foreground line-clamp-2 text-sm leading-relaxed cursor-help">
+                                        {summary}
+                                    </p>
+                                </TooltipTrigger>
+                                <TooltipContent 
+                                    className="max-w-md p-3"
+                                    side="bottom"
+                                    align="start"
+                                >
+                                    <p className="text-sm whitespace-pre-wrap">{summary}</p>
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
+                        {isAISummary && (
+                            <span className="text-xs text-muted-foreground/70 italic">
+                                AI 生成
+                            </span>
+                        )}
+                    </div>
                     
                     {/* 标签 */}
                     {note.tags.length > 0 && (
@@ -77,22 +141,29 @@ export function NoteCard({ note }: NoteCardProps) {
                             <Edit className="h-4 w-4" aria-hidden="true" />
                         </Button>
                     </Link>
-                    <form action={async () => {
-                        "use server"
-                        await deleteNote(note.id)
-                    }}>
-                        <Button 
-                            variant="ghost" 
-                            size="icon" 
-                            className="text-destructive min-h-[44px] min-w-[44px]"
-                            title={t('notes.deleteNote')}
-                            aria-label={t('notes.deleteNote')}
-                        >
-                            <Trash2 className="h-4 w-4" aria-hidden="true" />
-                        </Button>
-                    </form>
+                    <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="text-destructive min-h-[44px] min-w-[44px]"
+                        title={t('notes.deleteNote')}
+                        aria-label={t('notes.deleteNote')}
+                        onClick={async () => {
+                            if (confirm(t('notes.confirmDelete'))) {
+                                await deleteNote(note.id)
+                            }
+                        }}
+                    >
+                        <Trash2 className="h-4 w-4" aria-hidden="true" />
+                    </Button>
                 </div>
             </CardFooter>
+
+            {/* 同步状态详情对话框 */}
+            <SyncStatusDialog
+                noteId={note.id}
+                open={showStatusDialog}
+                onOpenChange={setShowStatusDialog}
+            />
         </Card>
     )
 }

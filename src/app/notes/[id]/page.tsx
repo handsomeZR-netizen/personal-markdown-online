@@ -79,16 +79,21 @@ export default async function NotePage({ params }: { params: Promise<{ id: strin
 
                 {/* Summary */}
                 {note.summary && (
-                    <div className="border-l-4 border-primary pl-4 py-2 bg-muted/30 rounded-r">
+                    <div className="border-l-4 border-primary pl-4 py-3 bg-muted/30 rounded-r">
                         <div className="flex items-start justify-between gap-4">
-                            <div className="flex-1">
-                                <div className="flex items-center gap-2 mb-2">
+                            <div className="flex-1 space-y-2">
+                                <div className="flex items-center gap-2">
                                     <FileText className="h-4 w-4 text-muted-foreground" />
                                     <span className="text-sm font-medium text-muted-foreground">
                                         {t('notes.summary')}
                                     </span>
+                                    <Badge variant="secondary" className="text-xs">
+                                        AI 生成
+                                    </Badge>
                                 </div>
-                                <p className="text-sm">{note.summary}</p>
+                                <p className="text-sm text-muted-foreground italic leading-relaxed">
+                                    {note.summary}
+                                </p>
                             </div>
                             <RegenerateSummaryButton noteId={note.id} />
                         </div>

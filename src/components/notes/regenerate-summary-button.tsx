@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { RefreshCw, Loader2 } from 'lucide-react';
-import { regenerateNoteSummary } from '@/lib/actions/notes';
 import { toast } from 'sonner';
 import { t } from '@/lib/i18n';
 import { useRouter } from 'next/navigation';
@@ -19,16 +18,25 @@ export function RegenerateSummaryButton({ noteId }: RegenerateSummaryButtonProps
   const handleRegenerate = async () => {
     setIsLoading(true);
     try {
-      const result = await regenerateNoteSummary(noteId);
+      const response = await fetch(`/api/notes/${noteId}/summary`, {
+        method: 'POST',
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || '重新生成摘要失败');
+      }
+
+      const result = await response.json();
       
       if (result.success) {
         toast.success('摘要已重新生成');
         router.refresh();
       } else {
-        toast.error(result.error);
+        toast.error('重新生成摘要失败');
       }
     } catch (error) {
-      toast.error('重新生成摘要失败');
+      toast.error(error instanceof Error ? error.message : '重新生成摘要失败');
     } finally {
       setIsLoading(false);
     }
