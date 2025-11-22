@@ -80,20 +80,20 @@ export function isUsingFreeAPI(): boolean {
 }
 
 /**
- * 获取当前使用的API配置（仅使用用户配置）
- * 注意：不再自动使用环境变量中的 API Key
+ * 获取当前使用的API配置
+ * 优先使用用户配置，如果没有则使用服务器端的默认配置
  */
 export function getCurrentAIConfig(): AIConfig {
-  // 只使用用户自定义配置
+  // 优先使用用户自定义配置
   const userConfig = getAIConfig();
   if (userConfig && userConfig.apiKey) {
     return userConfig;
   }
   
-  // 返回默认配置（无API Key）
+  // 返回默认配置（标记为使用服务器端 API）
   return {
     provider: 'deepseek',
-    apiKey: '',
+    apiKey: 'USE_SERVER_DEFAULT', // 特殊标记，表示使用服务器端配置
     apiUrl: 'https://api.deepseek.com/v1',
     model: 'deepseek-chat',
   };

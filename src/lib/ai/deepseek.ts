@@ -8,13 +8,13 @@ import { getCurrentAIConfig } from './config';
 const DEEPSEEK_API_URL = 'https://api.deepseek.com/v1';
 
 /**
- * 获取当前API配置（仅使用用户配置，不使用环境变量）
- * 注意：不再自动使用开发者的 API Key
+ * 获取当前API配置
+ * 优先使用用户配置，如果用户未配置则标记为使用服务器端默认配置
  */
 function getAPIConfig() {
   const config = getCurrentAIConfig();
   return {
-    apiKey: config.apiKey || '', // 不再使用环境变量作为后备
+    apiKey: config.apiKey || 'USE_SERVER_DEFAULT', // 标记使用服务器端配置
     apiUrl: config.apiUrl || DEEPSEEK_API_URL,
     model: config.model || 'deepseek-chat',
   };
@@ -76,6 +76,11 @@ export async function callDeepSeek(
 ): Promise<DeepSeekResponse> {
   const config = getAPIConfig();
   
+  // 如果使用服务器端默认配置，通过 API 路由调用
+  if (config.apiKey === 'USE_SERVER_DEFAULT') {
+    return callDeepSeekViaAPI(messages, options);
+  }
+  
   if (!config.apiKey) {
     throw new DeepSeekError('API key 未配置，请在设置中配置');
   }
@@ -111,6 +116,46 @@ export async function callDeepSeek(
       const errorData = await response.json().catch(() => ({}));
       throw new DeepSeekError(
         errorData.error?.message || `API 请求失败: ${response.status}`,
+        response.status,
+        errorData
+      );
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    if (error instanceof DeepSeekError) {
+      throw error;
+    }
+    throw new DeepSeekError(
+      `DeepSeek API 调用失败: ${error instanceof Error ? error.message : '未知错误'}`
+    );
+  }
+}
+
+/**
+ * 通过服务器端 API 路由调用 DeepSeek（使用服务器端默认配置）
+ */
+async function callDeepSeekViaAPI(
+  messages: DeepSeekMessage[],
+  options: DeepSeekOptions = {}
+): Promise<DeepSeekResponse> {
+  try {
+    const response = await fetch('/api/ai/chat', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        messages,
+        options,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new DeepSeekError(
+        errorData.error || `API 请求失败: ${response.status}`,
         response.status,
         errorData
       );
@@ -202,6 +247,11 @@ export async function streamDeepSeekResponse(
 ): Promise<ReadableStream> {
   const config = getAPIConfig();
   
+  // 如果使用服务器端默认配置，通过 API 路由调用
+  if (config.apiKey === 'USE_SERVER_DEFAULT') {
+    return streamDeepSeekViaAPI(prompt, systemPrompt);
+  }
+  
   if (!config.apiKey) {
     throw new DeepSeekError('API key 未配置，请在设置中配置');
   }
@@ -283,4 +333,36 @@ export async function streamDeepSeekResponse(
       }
     },
   });
+}
+
+/**
+ * 通过服务器端 API 路由进行流式调用（使用服务器端默认配置）
+ */
+async function streamDeepSeekViaAPI(
+  prompt: string,
+  systemPrompt?: string
+): Promise<ReadableStream> {
+  const messages: DeepSeekMessage[] = [];
+
+  if (systemPrompt) {
+    messages.push({ role: 'system', content: systemPrompt });
+  }
+
+  messages.push({ role: 'user', content: prompt });
+
+  const response = await fetch('/api/ai/stream', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      messages,
+    }),
+  });
+
+  if (!response.ok) {
+    throw new DeepSeekError(`API 请求失败: ${response.status}`);
+  }
+
+  return response.body || new ReadableStream();
 }

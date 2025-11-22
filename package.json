@@ -12,6 +12,8 @@
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
     "check:env": "node scripts/check-env.js",
+    "vercel:env": "bash vercel-env-setup.sh",
+    "vercel:env:win": "powershell -ExecutionPolicy Bypass -File vercel-env-setup.ps1",
     "db:migrate": "prisma migrate dev",
     "db:generate": "prisma generate",
     "db:studio": "prisma studio",

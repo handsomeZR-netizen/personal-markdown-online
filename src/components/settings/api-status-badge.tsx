@@ -25,17 +25,17 @@ export function APIStatusBadge() {
 
   if (isFree) {
     return (
-      <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-medium">
+      <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 text-xs font-medium">
         <Sparkles className="h-3 w-3" />
-        免费体验API
+        使用默认免费 API
       </div>
     );
   }
 
   return (
-    <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-100 text-green-700 text-xs font-medium">
+    <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-green-100 to-emerald-100 text-green-700 text-xs font-medium">
       <Key className="h-3 w-3" />
-      自定义API
+      使用自定义 API
     </div>
   );
 }

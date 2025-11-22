@@ -140,10 +140,13 @@ export function AIConfigForm() {
             <Sparkles className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
             <div className="flex-1">
               <h4 className="font-semibold text-blue-900 mb-1">
-                🔑 配置您的 AI API
+                ✨ AI 功能说明
               </h4>
+              <p className="text-sm text-blue-700 leading-relaxed mb-2">
+                本应用提供了默认的免费 AI API 供您体验（标签建议、格式优化等功能）。
+              </p>
               <p className="text-sm text-blue-700 leading-relaxed">
-                要使用 AI 功能（标签建议、格式优化等），您需要配置自己的 API Key。
+                如果您想获得更好的体验和更高的使用限额，可以配置自己的 API Key。
                 我们推荐使用 DeepSeek API，性价比高且效果好。
               </p>
             </div>
@@ -267,13 +270,14 @@ export function AIConfigForm() {
         {/* 提示信息 */}
         <div className="rounded-lg bg-neutral-50 border border-neutral-200 p-4">
           <p className="text-sm text-neutral-600 mb-2">
-            <strong>安全说明：</strong>
+            <strong>使用说明：</strong>
           </p>
           <ul className="text-sm text-neutral-600 space-y-1 list-disc list-inside">
+            <li><strong>不配置 API Key</strong>：使用默认的免费 API（有使用限制）</li>
+            <li><strong>配置自己的 API Key</strong>：无限制使用，更快的响应速度</li>
             <li>您的 API Key 保存在浏览器本地，不会上传到服务器</li>
             <li>API Key 仅在您的浏览器中使用，开发者无法获取</li>
             <li>建议定期更换 API Key 以确保安全</li>
-            <li>如果不再使用，可以在浏览器中清除本地存储</li>
           </ul>
         </div>
       </CardContent>

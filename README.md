@@ -440,10 +440,17 @@ npm run test:ui
 
 ### 🚨 重要：部署前必读
 
-如果你遇到"部署后组件空白"的问题，请先查看：
-- **[QUICK_FIX.md](./QUICK_FIX.md)** - 快速修复指南（⭐ 推荐）
-- **[修复总结.md](./修复总结.md)** - 问题原因和解决方案
-- **[DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md)** - 完整部署指南
+**常见部署问题快速修复**：
+
+| 问题 | 文档 | 解决时间 |
+|------|------|---------|
+| 🔥 Vercel 环境变量未配置 | [紧急修复-Vercel环境变量.md](./紧急修复-Vercel环境变量.md) | 5 分钟 |
+| 🚨 MissingSecret 错误 | [紧急修复-AUTH_SECRET.md](./紧急修复-AUTH_SECRET.md) | 5 分钟 |
+| 🚨 注册/登录 500 错误 | [修复-注册500错误.md](./修复-注册500错误.md) | 10 分钟 |
+| 📦 组件空白 | [QUICK_FIX.md](./QUICK_FIX.md) | 10 分钟 |
+| 📘 完整部署教程 | [DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md) | 30 分钟 |
+| 🔧 问题诊断 | [TROUBLESHOOTING.md](./TROUBLESHOOTING.md) | 按需 |
+| 📚 所有文档 | [文档导航.md](./文档导航.md) | - |
 
 ### 部署前检查
 

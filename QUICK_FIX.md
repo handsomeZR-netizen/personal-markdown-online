@@ -19,6 +19,8 @@ git push
 
 ### 2. 在 Vercel 配置环境变量
 
+⚠️ **重要**：如果你看到 `MissingSecret` 错误，请先查看 [VERCEL_AUTH_FIX.md](./VERCEL_AUTH_FIX.md)
+
 登录 Vercel → 项目 → Settings → Environment Variables
 
 **复制粘贴以下变量**（全部环境：Production, Preview, Development）：
@@ -47,9 +49,17 @@ DEEPSEEK_API_URL=https://api.deepseek.com/v1
 - ✅ 组件正常显示
 - ✅ 无红色错误
 
-## 🐛 如果还是空白
+## 🐛 常见错误
 
-### 检查 1: 浏览器缓存
+### 错误 1: MissingSecret
+如果看到 `[auth][error] MissingSecret`：
+- 📖 查看 [VERCEL_AUTH_FIX.md](./VERCEL_AUTH_FIX.md) 获取详细解决方案
+- 确保在 Vercel 配置了 `AUTH_SECRET` 环境变量
+- 配置后必须重新部署
+
+### 错误 2: 组件空白
+
+#### 检查 1: 浏览器缓存
 ```
 按 Ctrl+Shift+R (Windows) 或 Cmd+Shift+R (Mac) 强制刷新
 ```
