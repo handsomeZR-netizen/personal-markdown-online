@@ -53,9 +53,16 @@ export default async function NotesPage({
         getCategories()
     ])
 
-    const { notes, totalCount, totalPages, currentPage } = notesData
-    const tags = (tagsResult.success ? tagsResult.data : []) as Array<{ id: string; name: string }>
-    const categories = (categoriesResult.success ? categoriesResult.data : []) as Array<{ id: string; name: string }>
+    // 安全解构，提供默认值
+    const { 
+        notes = [], 
+        totalCount = 0, 
+        totalPages = 0, 
+        currentPage = 1 
+    } = notesData || {}
+    
+    const tags = (tagsResult?.success ? tagsResult.data : []) as Array<{ id: string; name: string }>
+    const categories = (categoriesResult?.success ? categoriesResult.data : []) as Array<{ id: string; name: string }>
 
     return (
         <PullToRefresh>
