@@ -7,6 +7,7 @@ import { MobileNav } from "@/components/mobile-nav"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { KeyboardShortcutsHelp } from "@/components/keyboard-shortcuts-help"
 import { SearchBar } from "@/components/search-bar"
+import { Suspense } from "react"
 
 /**
  * 全局Header组件
@@ -70,7 +71,9 @@ export async function Header() {
 
                             {/* 搜索栏 - 在桌面端显示 */}
                             <div className="hidden md:block flex-1 max-w-md">
-                                <SearchBar />
+                                <Suspense fallback={<div className="h-10 w-full bg-muted/20 animate-pulse rounded-md" />}>
+                                    <SearchBar />
+                                </Suspense>
                             </div>
 
                             {/* 用户信息和操作 */}
@@ -119,7 +122,9 @@ export async function Header() {
                 {/* 移动端搜索栏 - 在移动端显示在第二行 */}
                 {session?.user && (
                     <div className="md:hidden mt-3">
-                        <SearchBar />
+                        <Suspense fallback={<div className="h-10 w-full bg-muted/20 animate-pulse rounded-md" />}>
+                            <SearchBar />
+                        </Suspense>
                     </div>
                 )}
             </div>
