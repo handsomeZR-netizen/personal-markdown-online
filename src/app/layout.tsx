@@ -38,8 +38,8 @@ export default async function RootLayout({
           disableTransitionOnChange={false}
         >
           <NetworkStatusProvider>
-            <DataRecovery />
-            <UnloadWarning />
+            <DataRecovery userId={session?.user?.id} />
+            <UnloadWarning userId={session?.user?.id} />
             <OfflineOnboardingDialog />
             <NetworkStatusIndicator />
             <SyncProgressBar />

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/auth';
-import { prisma } from '@/lib/prisma';
+import { getNoteById, updateNote, deleteNote } from '@/lib/supabase-notes';
 import { updateNoteSchema, deleteNoteSchema } from '@/lib/validations/notes';
 import { validateData, isValidCuid } from '@/lib/validation-utils';
 import { generateEmbedding } from '@/lib/actions/ai';
@@ -34,29 +34,11 @@ export async function GET(
     }
 
     // 获取笔记
-    const note = await prisma.note.findUnique({
-      where: { id, userId: session.user.id },
-      select: {
-        id: true,
-        title: true,
-        content: true,
-        summary: true,
-        updatedAt: true,
-        createdAt: true,
-        userId: true,
-        categoryId: true,
-        tags: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
-      },
-    });
+    const { data: note, error } = await getNoteById(id, session.user.id);
 
-    if (!note) {
+    if (error || !note) {
       return NextResponse.json(
-        { error: 'Note not found' },
+        { error: error || 'Note not found' },
         { status: 404 }
       );
     }
@@ -125,11 +107,9 @@ export async function PUT(
     const validatedFields = validation.data;
 
     // 验证笔记所有权
-    const existingNote = await prisma.note.findUnique({
-      where: { id, userId: session.user.id },
-    });
+    const { data: existingNote, error: checkError } = await getNoteById(id, session.user.id);
 
-    if (!existingNote) {
+    if (checkError || !existingNote) {
       return NextResponse.json(
         { error: 'Note not found' },
         { status: 404 }
@@ -159,24 +139,8 @@ export async function PUT(
       }
     }
 
-    // 先断开所有标签
-    await prisma.note.update({
-      where: { id, userId: session.user.id },
-      data: {
-        tags: {
-          set: [],
-        },
-      },
-    });
-
     // 构建更新数据
-    const updateData: any = {
-      tags: validatedFields.tagIds
-        ? {
-            connect: validatedFields.tagIds.map((id) => ({ id })),
-          }
-        : undefined,
-    };
+    const updateData: any = {};
 
     if (validatedFields.title !== undefined) {
       updateData.title = validatedFields.title;
@@ -195,18 +159,18 @@ export async function PUT(
     }
 
     // 更新笔记
-    // @ts-ignore - Prisma Client type generation issue with summary field
-    const note = await prisma.note.update({
-      where: { id, userId: session.user.id },
-      data: updateData,
-      select: {
-        id: true,
-        title: true,
-        content: true,
-        summary: true,
-        updatedAt: true,
-      },
-    });
+    const { data: note, error: updateError } = await updateNote(
+      id,
+      session.user.id,
+      updateData
+    );
+
+    if (updateError || !note) {
+      return NextResponse.json(
+        { error: updateError || 'Failed to update note' },
+        { status: 500 }
+      );
+    }
 
     return NextResponse.json(note);
   } catch (error) {
@@ -246,10 +210,8 @@ export async function DELETE(
       );
     }
 
-    // 验证笔记所有权
-    const note = await prisma.note.findUnique({
-      where: { id, userId: session.user.id },
-    });
+    // 验证笔记所有权并删除
+    const { data: note } = await getNoteById(id, session.user.id);
 
     if (!note) {
       return NextResponse.json(
@@ -259,9 +221,14 @@ export async function DELETE(
     }
 
     // 删除笔记
-    await prisma.note.delete({
-      where: { id, userId: session.user.id },
-    });
+    const { error: deleteError } = await deleteNote(id, session.user.id);
+
+    if (deleteError) {
+      return NextResponse.json(
+        { error: deleteError },
+        { status: 500 }
+      );
+    }
 
     return NextResponse.json({ success: true });
   } catch (error) {

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/auth';
-import { prisma } from '@/lib/prisma';
+import { createNote, updateNote, deleteNote, getNoteById } from '@/lib/supabase-notes';
 import { SyncOperation } from '@/types/offline';
 import { isValidCuid } from '@/lib/validation-utils';
 import { summarizeNote as generateSummary, generateEmbedding } from '@/lib/actions/ai';
@@ -208,25 +208,21 @@ async function handleCreateOperation(
     }
 
     // 创建笔记
-    // @ts-ignore - Prisma Client type generation issue with summary field
-    const note = await prisma.note.create({
-      data: {
-        title,
-        content,
-        summary,
-        embedding,
-        userId,
-        tags: tags
-          ? {
-              connect: tags.map((id) => ({ id })),
-            }
-          : undefined,
-        categoryId: categoryId || null,
-      },
-      select: {
-        id: true,
-      },
+    const { data: note, error } = await createNote({
+      title,
+      content,
+      summary,
+      embedding,
+      userId,
+      categoryId: categoryId || null,
     });
+
+    if (error || !note) {
+      return {
+        success: false,
+        error: error || 'Failed to create note',
+      };
+    }
 
     return {
       success: true,
@@ -259,11 +255,9 @@ async function handleUpdateOperation(
     }
 
     // 验证笔记所有权
-    const existingNote = await prisma.note.findUnique({
-      where: { id: noteId, userId },
-    });
+    const { data: existingNote, error: checkError } = await getNoteById(noteId, userId);
 
-    if (!existingNote) {
+    if (checkError || !existingNote) {
       return {
         success: false,
         error: 'Note not found',
@@ -293,24 +287,8 @@ async function handleUpdateOperation(
       }
     }
 
-    // 先断开所有标签
-    await prisma.note.update({
-      where: { id: noteId, userId },
-      data: {
-        tags: {
-          set: [],
-        },
-      },
-    });
-
     // 构建更新数据
-    const updateData: any = {
-      tags: tags
-        ? {
-            connect: tags.map((id) => ({ id })),
-          }
-        : undefined,
-    };
+    const updateData: any = {};
 
     if (title !== undefined) {
       updateData.title = title;
@@ -329,11 +307,14 @@ async function handleUpdateOperation(
     }
 
     // 更新笔记
-    // @ts-ignore - Prisma Client type generation issue with summary field
-    await prisma.note.update({
-      where: { id: noteId, userId },
-      data: updateData,
-    });
+    const { error: updateError } = await updateNote(noteId, userId, updateData);
+
+    if (updateError) {
+      return {
+        success: false,
+        error: updateError,
+      };
+    }
 
     return {
       success: true,
@@ -365,10 +346,8 @@ async function handleDeleteOperation(
       };
     }
 
-    // 验证笔记所有权
-    const note = await prisma.note.findUnique({
-      where: { id: noteId, userId },
-    });
+    // 验证笔记所有权并删除
+    const { data: note } = await getNoteById(noteId, userId);
 
     if (!note) {
       return {
@@ -378,9 +357,14 @@ async function handleDeleteOperation(
     }
 
     // 删除笔记
-    await prisma.note.delete({
-      where: { id: noteId, userId },
-    });
+    const { error: deleteError } = await deleteNote(noteId, userId);
+
+    if (deleteError) {
+      return {
+        success: false,
+        error: deleteError,
+      };
+    }
 
     return {
       success: true,

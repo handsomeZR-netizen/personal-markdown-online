@@ -1,18 +1,19 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useSession } from 'next-auth/react';
 import { syncQueueManager } from '@/lib/offline/sync-queue-manager';
 
 /**
  * 页面卸载警告组件
  * 当用户尝试关闭页面且有未同步数据时显示警告
  */
-export function UnloadWarning() {
-  const { data: session } = useSession();
+interface UnloadWarningProps {
+  userId?: string;
+}
 
+export function UnloadWarning({ userId }: UnloadWarningProps) {
   useEffect(() => {
-    if (!session?.user?.id) return;
+    if (!userId) return;
 
     const handleBeforeUnload = async (e: BeforeUnloadEvent) => {
       try {
@@ -39,7 +40,7 @@ export function UnloadWarning() {
     return () => {
       window.removeEventListener('beforeunload', handleBeforeUnload);
     };
-  }, [session?.user?.id]);
+  }, [userId]);
 
   return null;
 }

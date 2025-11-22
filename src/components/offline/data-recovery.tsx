@@ -1,17 +1,19 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useSession } from 'next-auth/react';
 import { indexedDBManager } from '@/lib/offline/indexeddb-manager';
 import { syncQueueManager } from '@/lib/offline/sync-queue-manager';
 import { toast } from 'sonner';
 
-export function DataRecovery() {
-  const { data: session } = useSession();
+interface DataRecoveryProps {
+  userId?: string;
+}
+
+export function DataRecovery({ userId }: DataRecoveryProps) {
   const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
-    if (!session?.user?.id || isInitialized) return;
+    if (!userId || isInitialized) return;
 
     const initializeOfflineData = async () => {
       try {
@@ -43,7 +45,7 @@ export function DataRecovery() {
     };
 
     initializeOfflineData();
-  }, [session?.user?.id, isInitialized]);
+  }, [userId, isInitialized]);
 
   return null;
 }

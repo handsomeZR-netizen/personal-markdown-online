@@ -1,7 +1,6 @@
 "use server"
 
-import { prisma } from "@/lib/prisma"
-import bcrypt from "bcryptjs"
+import { signUp } from "@/lib/supabase-auth"
 import { registerSchema, loginSchema, type RegisterInput, type LoginInput } from "@/lib/validations/auth"
 import { validateData } from "@/lib/validation-utils"
 import { signIn } from "@/auth"
@@ -28,36 +27,21 @@ export async function registerUser(data: unknown): Promise<ActionResult<{ userId
     const { name, email, password } = validation.data
     console.log("验证通过，准备创建用户:", { name, email })
 
-    // 检查邮箱是否已存在
-    const existingUser = await prisma.user.findUnique({
-      where: { email },
-    })
+    // 使用 Supabase 创建用户
+    const { data: user, error } = await signUp({ email, password, name })
 
-    if (existingUser) {
-      console.log("邮箱已存在:", email)
+    if (error) {
+      console.log("创建用户失败:", error)
       return {
         success: false,
-        error: "该邮箱已被注册",
+        error: error === 'User already exists' ? "该邮箱已被注册" : "注册失败，请稍后重试",
       }
     }
 
-    // 加密密码
-    const hashedPassword = await bcrypt.hash(password, 10)
-    console.log("密码加密完成")
-
-    // 创建用户
-    const user = await prisma.user.create({
-      data: {
-        name,
-        email,
-        password: hashedPassword,
-      },
-    })
-
-    console.log("用户创建成功:", user.id)
+    console.log("用户创建成功:", user?.id)
     return {
       success: true,
-      data: { userId: user.id },
+      data: { userId: user!.id },
     }
   } catch (error) {
     console.error("注册失败 - 详细错误:", error)

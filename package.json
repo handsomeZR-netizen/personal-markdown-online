@@ -16,10 +16,15 @@
     "vercel:env:win": "powershell -ExecutionPolicy Bypass -File vercel-env-setup.ps1",
     "db:migrate": "prisma migrate dev",
     "db:generate": "prisma generate",
-    "db:studio": "prisma studio",
+    "db:studio": "dotenv -e .env -- prisma studio",
     "db:push": "prisma db push",
+    "db:test": "dotenv -e .env.local -- node scripts/test-db-connection.js",
+    "supabase:test": "dotenv -e .env.local -- node scripts/test-supabase-connection.js",
     "db:migrate:supabase": "npx tsx scripts/migrate-to-supabase.ts",
-    "supabase:setup": "cp prisma/schema.supabase.prisma prisma/schema.prisma && npm run db:migrate -- --name init_supabase && npm run db:generate"
+    "supabase:setup": "cp prisma/schema.supabase.prisma prisma/schema.prisma && npm run db:migrate -- --name init_supabase && npm run db:generate",
+    "verify:sync": "dotenv -e .env -- node scripts/verify-sync-functionality.js",
+    "verify:network": "powershell -ExecutionPolicy Bypass -File scripts/diagnose-connection.ps1",
+    "verify:quick": "dotenv -e .env -- node scripts/quick-verify.js"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.1",
@@ -67,6 +72,7 @@
     "@types/react-dom": "^19",
     "@vitejs/plugin-react": "^5.1.1",
     "@vitest/ui": "^4.0.10",
+    "dotenv-cli": "^11.0.0",
     "eslint": "^9",
     "eslint-config-next": "16.0.3",
     "jsdom": "^27.2.0",

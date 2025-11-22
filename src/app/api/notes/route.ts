@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/auth';
-import { prisma } from '@/lib/prisma';
+import { createNote, getUserNotes } from '@/lib/supabase-notes';
 import { createNoteSchema } from '@/lib/validations/notes';
 import { validateData } from '@/lib/validation-utils';
 import { generateEmbedding } from '@/lib/actions/ai';
@@ -67,36 +67,60 @@ export async function POST(request: NextRequest) {
     }
 
     // 创建笔记
-    // @ts-ignore - Prisma Client type generation issue with summary field
-    const note = await prisma.note.create({
-      data: {
-        title: validatedFields.title,
-        content: validatedFields.content,
-        summary,
-        embedding,
-        userId: session.user.id,
-        tags: validatedFields.tagIds
-          ? {
-              connect: validatedFields.tagIds.map((id) => ({ id })),
-            }
-          : undefined,
-        categoryId: validatedFields.categoryId || null,
-      },
-      select: {
-        id: true,
-        title: true,
-        content: true,
-        summary: true,
-        createdAt: true,
-        updatedAt: true,
-      },
+    const { data: note, error } = await createNote({
+      title: validatedFields.title,
+      content: validatedFields.content,
+      summary,
+      embedding,
+      userId: session.user.id,
+      categoryId: validatedFields.categoryId || null,
     });
+
+    if (error || !note) {
+      return NextResponse.json(
+        { error: error || 'Failed to create note' },
+        { status: 500 }
+      );
+    }
 
     return NextResponse.json(note, { status: 201 });
   } catch (error) {
     console.error('创建笔记失败:', error);
     return NextResponse.json(
       { error: 'Failed to create note' },
+      { status: 500 }
+    );
+  }
+}
+
+/**
+ * GET /api/notes
+ * 获取用户的所有笔记
+ */
+export async function GET() {
+  try {
+    const session = await auth();
+    if (!session?.user?.id) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+
+    const { data: notes, error } = await getUserNotes(session.user.id);
+
+    if (error) {
+      return NextResponse.json(
+        { error },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json(notes || []);
+  } catch (error) {
+    console.error('获取笔记失败:', error);
+    return NextResponse.json(
+      { error: 'Failed to fetch notes' },
       { status: 500 }
     );
   }
