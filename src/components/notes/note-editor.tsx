@@ -225,8 +225,6 @@ export function NoteEditor({ note }: NoteEditorProps) {
             const result = await autoSaveNote(note.id, {
                 title: debouncedTitle,
                 content: debouncedContent,
-                tagIds: debouncedTagIds,
-                categoryId: debouncedCategoryId,
             })
 
             if (result.success) {

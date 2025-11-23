@@ -46,8 +46,6 @@ export default async function NotesPage({
             sortBy,
             sortOrder,
             query,
-            tagIds,
-            categoryId,
         }),
         getTags(),
         getCategories()

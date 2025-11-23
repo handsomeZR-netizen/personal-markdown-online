@@ -31,6 +31,9 @@ export function OfflineOnboardingDialog() {
   const [enableAutoSync, setEnableAutoSync] = useState(true);
 
   useEffect(() => {
+    // Only run on client side
+    if (typeof window === 'undefined') return;
+    
     // Check if user has already seen the onboarding
     const hasSeenOnboarding = localStorage.getItem(ONBOARDING_KEY);
     if (!hasSeenOnboarding) {
@@ -43,6 +46,8 @@ export function OfflineOnboardingDialog() {
   }, []);
 
   const handleComplete = () => {
+    if (typeof window === 'undefined') return;
+    
     // Save settings
     const settings = {
       offlineEnabled: enableOffline,
@@ -57,6 +62,8 @@ export function OfflineOnboardingDialog() {
   };
 
   const handleSkip = () => {
+    if (typeof window === 'undefined') return;
+    
     localStorage.setItem(ONBOARDING_KEY, 'true');
     setOpen(false);
   };

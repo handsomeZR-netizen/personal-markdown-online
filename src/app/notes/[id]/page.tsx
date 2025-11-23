@@ -60,7 +60,7 @@ export default async function NotePage({ params }: { params: Promise<{ id: strin
                     <div className="flex items-start gap-2">
                         <TagIcon className="h-4 w-4 mt-1 text-muted-foreground" />
                         <div className="flex flex-wrap gap-2">
-                            {note.tags.map((tag) => (
+                            {note.tags.map((tag: { id: string; name: string }) => (
                                 <Badge key={tag.id} variant="secondary">
                                     {tag.name}
                                 </Badge>

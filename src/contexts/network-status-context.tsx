@@ -148,13 +148,20 @@ export function NetworkStatusProvider({ children }: NetworkStatusProviderProps) 
 
 /**
  * Hook to access network status
- * @throws Error if used outside NetworkStatusProvider
+ * Returns default values if used outside NetworkStatusProvider (e.g., during SSR)
  */
 export function useNetworkStatus(): NetworkStatusContextValue {
   const context = useContext(NetworkStatusContext);
   
+  // Return default values during SSR or when outside provider
   if (context === undefined) {
-    throw new Error('useNetworkStatus must be used within a NetworkStatusProvider');
+    return {
+      isOnline: true,
+      checkConnection: async () => true,
+      lastOnlineTime: null,
+      lastOfflineTime: null,
+      isSyncing: false,
+    };
   }
   
   return context;

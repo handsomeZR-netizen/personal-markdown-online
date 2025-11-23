@@ -47,11 +47,15 @@ export function StorageWarning() {
   const handleDismiss = () => {
     setShowWarning(false);
     // 保存到 localStorage，24 小时内不再显示
-    localStorage.setItem('storage-warning-dismissed', Date.now().toString());
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('storage-warning-dismissed', Date.now().toString());
+    }
   };
 
   // 检查是否在 24 小时内已经关闭过警告
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
     const dismissed = localStorage.getItem('storage-warning-dismissed');
     if (dismissed) {
       const dismissedTime = parseInt(dismissed, 10);
