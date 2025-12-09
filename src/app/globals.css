@@ -225,3 +225,726 @@ html {
   animation: rainbow-border 3s linear infinite;
   border-radius: inherit;
 }
+
+/* 移动端底部导航安全区域支持 (Requirements 13.1, 13.4) */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .safe-area-inset-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+/* 确保底部导航在滚动时保持固定 */
+.bottom-nav-fixed {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 40;
+}
+
+/* ============================================
+   移动端响应式样式 (Requirements 12.1, 13.1, 14.1)
+   ============================================ */
+
+/* 移动端字体大小优化 */
+@media (max-width: 640px) {
+  html {
+    font-size: 14px; /* 基础字体稍小，适合小屏幕 */
+  }
+  
+  body {
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+  
+  h1 {
+    font-size: 1.75rem; /* 28px */
+    line-height: 1.3;
+  }
+  
+  h2 {
+    font-size: 1.5rem; /* 24px */
+    line-height: 1.35;
+  }
+  
+  h3 {
+    font-size: 1.25rem; /* 20px */
+    line-height: 1.4;
+  }
+  
+  h4 {
+    font-size: 1.125rem; /* 18px */
+    line-height: 1.45;
+  }
+  
+  /* 小文本保持可读性 */
+  small, .text-sm {
+    font-size: 0.875rem; /* 14px */
+  }
+  
+  .text-xs {
+    font-size: 0.75rem; /* 12px */
+  }
+}
+
+/* 触摸目标最小尺寸 44x44px (WCAG 2.1 AAA) */
+@media (max-width: 640px) {
+  /* 按钮最小触摸区域 */
+  button,
+  a[role="button"],
+  [role="button"],
+  input[type="button"],
+  input[type="submit"],
+  input[type="reset"] {
+    min-height: 44px;
+    min-width: 44px;
+    padding: 0.625rem 1rem; /* 10px 16px */
+  }
+  
+  /* 小按钮也要保证触摸区域 */
+  .btn-sm,
+  button.h-8,
+  button.h-9 {
+    min-height: 44px;
+    padding: 0.5rem 0.75rem;
+  }
+  
+  /* 图标按钮 */
+  button[aria-label],
+  button:has(svg:only-child) {
+    min-height: 44px;
+    min-width: 44px;
+    padding: 0.625rem;
+  }
+  
+  /* 链接触摸区域 */
+  a {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0;
+  }
+  
+  /* 导航链接 */
+  nav a,
+  [role="navigation"] a {
+    min-height: 44px;
+    padding: 0.625rem 1rem;
+  }
+  
+  /* 表单输入框 */
+  input,
+  textarea,
+  select {
+    min-height: 44px;
+    font-size: 16px; /* 防止 iOS 自动缩放 */
+    padding: 0.625rem 0.75rem;
+  }
+  
+  /* 复选框和单选按钮 */
+  input[type="checkbox"],
+  input[type="radio"] {
+    min-height: 24px;
+    min-width: 24px;
+    margin: 10px; /* 增加周围点击区域 */
+  }
+  
+  /* 下拉菜单项 */
+  [role="menuitem"],
+  [role="option"] {
+    min-height: 44px;
+    padding: 0.625rem 1rem;
+  }
+}
+
+/* 移动端间距优化 */
+@media (max-width: 640px) {
+  /* 减少页面边距，最大化内容区域 */
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  /* 卡片间距 */
+  .card,
+  [class*="card"] {
+    margin-bottom: 0.75rem;
+  }
+  
+  /* 列表项间距 */
+  li {
+    margin-bottom: 0.5rem;
+  }
+  
+  /* 段落间距 */
+  p {
+    margin-bottom: 0.75rem;
+  }
+}
+
+/* 移动端滚动优化 */
+@media (max-width: 640px) {
+  /* 平滑滚动 */
+  * {
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* 防止过度滚动 */
+  body {
+    overscroll-behavior-y: contain;
+  }
+  
+  /* 隐藏滚动条但保持功能 */
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* 移动端手势支持 */
+@media (max-width: 640px) {
+  /* 禁用文本选择（在需要手势的区域） */
+  .gesture-area {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+  }
+  
+  /* 启用硬件加速 */
+  .hardware-accelerated {
+    transform: translateZ(0);
+    will-change: transform;
+  }
+}
+
+/* 移动端键盘适配 */
+@media (max-width: 640px) {
+  /* 防止 iOS 键盘弹出时缩放 */
+  input,
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+  
+  /* 键盘弹出时的视口调整 */
+  .keyboard-visible {
+    height: 100vh;
+    height: 100dvh; /* 动态视口高度 */
+  }
+}
+
+/* 移动端性能优化 */
+@media (max-width: 640px) {
+  /* 减少动画复杂度 */
+  @media (prefers-reduced-motion: no-preference) {
+    * {
+      animation-duration: 0.2s !important;
+      transition-duration: 0.2s !important;
+    }
+  }
+  
+  /* 禁用悬停效果（触摸设备不需要） */
+  @media (hover: none) {
+    *:hover {
+      /* 移除悬停样式 */
+    }
+  }
+}
+
+/* 移动端安全区域 */
+@media (max-width: 640px) {
+  /* 顶部安全区域（刘海屏） */
+  .safe-area-top {
+    padding-top: env(safe-area-inset-top);
+  }
+  
+  /* 底部安全区域（Home Indicator） */
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  
+  /* 左右安全区域 */
+  .safe-area-left {
+    padding-left: env(safe-area-inset-left);
+  }
+  
+  .safe-area-right {
+    padding-right: env(safe-area-inset-right);
+  }
+  
+  /* 全方位安全区域 */
+  .safe-area-inset {
+    padding-top: env(safe-area-inset-top);
+    padding-right: env(safe-area-inset-right);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
+  }
+}
+
+/* 平板设备优化 (640px - 1024px) */
+@media (min-width: 640px) and (max-width: 1024px) {
+  html {
+    font-size: 15px;
+  }
+  
+  /* 平板触摸目标稍小但仍然舒适 */
+  button,
+  a[role="button"],
+  [role="button"] {
+    min-height: 40px;
+    min-width: 40px;
+  }
+  
+  .container {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+/* 横屏模式优化 */
+@media (max-width: 640px) and (orientation: landscape) {
+  /* 横屏时减少垂直间距 */
+  .container {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+  }
+  
+  /* 横屏时隐藏不必要的元素 */
+  .hide-landscape {
+    display: none;
+  }
+  
+  /* 横屏时调整字体 */
+  html {
+    font-size: 13px;
+  }
+}
+
+/* ============================================
+   移动端编辑器优化 (Requirement 20.5)
+   ============================================ */
+
+/* Tiptap 编辑器移动端样式 */
+@media (max-width: 640px) {
+  /* 编辑器容器 */
+  .ProseMirror {
+    padding: 1rem 0.75rem !important; /* 减少内边距 */
+    min-height: 200px;
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+  
+  /* 编辑器内的标题 */
+  .ProseMirror h1 {
+    font-size: 1.75rem;
+    margin-top: 1.5rem;
+    margin-bottom: 0.75rem;
+  }
+  
+  .ProseMirror h2 {
+    font-size: 1.5rem;
+    margin-top: 1.25rem;
+    margin-bottom: 0.625rem;
+  }
+  
+  .ProseMirror h3 {
+    font-size: 1.25rem;
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  /* 编辑器内的段落 */
+  .ProseMirror p {
+    margin-bottom: 0.75rem;
+  }
+  
+  /* 编辑器内的列表 */
+  .ProseMirror ul,
+  .ProseMirror ol {
+    padding-left: 1.5rem;
+    margin-bottom: 0.75rem;
+  }
+  
+  .ProseMirror li {
+    margin-bottom: 0.375rem;
+  }
+  
+  /* 编辑器内的代码块 */
+  .ProseMirror pre {
+    padding: 0.75rem;
+    margin-bottom: 0.75rem;
+    border-radius: 0.375rem;
+    overflow-x: auto;
+    font-size: 0.875rem;
+  }
+  
+  .ProseMirror code {
+    font-size: 0.875rem;
+    padding: 0.125rem 0.25rem;
+  }
+  
+  /* 编辑器内的引用 */
+  .ProseMirror blockquote {
+    padding-left: 1rem;
+    margin-bottom: 0.75rem;
+    border-left-width: 3px;
+  }
+  
+  /* 编辑器内的图片优化 */
+  .ProseMirror img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 0.5rem;
+    margin: 0.75rem 0;
+    display: block;
+  }
+  
+  /* 图片加载占位符 */
+  .ProseMirror img[data-loading="true"] {
+    opacity: 0.5;
+    filter: blur(4px);
+  }
+  
+  /* 编辑器占位符文本 */
+  .ProseMirror p.is-editor-empty:first-child::before {
+    color: var(--muted-foreground);
+    content: attr(data-placeholder);
+    float: left;
+    height: 0;
+    pointer-events: none;
+    font-size: 1rem;
+  }
+  
+  /* 编辑器焦点状态 */
+  .ProseMirror:focus {
+    outline: none;
+  }
+  
+  /* 选中文本样式 */
+  .ProseMirror ::selection {
+    background-color: var(--accent);
+  }
+}
+
+/* 移动端图片灯箱优化 */
+@media (max-width: 640px) {
+  /* 灯箱容器 */
+  .image-lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    background-color: rgba(0, 0, 0, 0.95);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  }
+  
+  /* 灯箱图片 */
+  .image-lightbox img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    border-radius: 0;
+  }
+  
+  /* 灯箱关闭按钮 */
+  .image-lightbox-close {
+    position: absolute;
+    top: calc(1rem + env(safe-area-inset-top));
+    right: calc(1rem + env(safe-area-inset-right));
+    min-height: 44px;
+    min-width: 44px;
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+/* 移动端编辑器工具栏优化 */
+@media (max-width: 640px) {
+  /* 工具栏容器 */
+  .editor-toolbar {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background-color: var(--background);
+    border-bottom: 1px solid var(--border);
+  }
+  
+  /* 工具栏按钮 */
+  .editor-toolbar button {
+    min-height: 36px;
+    min-width: 36px;
+    padding: 0.5rem;
+  }
+  
+  /* 工具栏分隔符 */
+  .editor-toolbar .separator {
+    height: 20px;
+    width: 1px;
+    background-color: var(--border);
+    margin: 0 0.25rem;
+  }
+}
+
+/* 移动端编辑器加载状态 */
+@media (max-width: 640px) {
+  .editor-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 200px;
+    color: var(--muted-foreground);
+  }
+  
+  .editor-skeleton {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+  
+  @keyframes pulse {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
+  }
+}
+
+/* ============================================
+   移动端文件夹树优化 (Requirements 4.2, 12.1)
+   ============================================ */
+
+@media (max-width: 640px) {
+  /* 文件夹树容器 */
+  .folder-tree {
+    padding: 0.5rem;
+  }
+  
+  /* 文件夹项 - 增加触摸目标 */
+  .folder-item > div > div {
+    min-height: 44px !important;
+    padding: 0.75rem 0.5rem !important;
+    margin-bottom: 0.25rem;
+  }
+  
+  /* 文件夹项图标 */
+  .folder-item svg {
+    height: 20px !important;
+    width: 20px !important;
+    flex-shrink: 0;
+  }
+  
+  /* 文件夹项文本 */
+  .folder-item span {
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+  
+  /* 展开/折叠按钮 - 增加触摸区域 */
+  .folder-item button {
+    min-height: 44px;
+    min-width: 44px;
+    padding: 0.625rem;
+    margin: -0.625rem;
+  }
+  
+  /* 拖动手柄 - 移动端隐藏 */
+  .folder-item .group-hover\:opacity-100 {
+    display: none;
+  }
+  
+  /* 文件夹层级缩进 - 减少以节省空间 */
+  .folder-item > div > div[style*="paddingLeft"] {
+    padding-left: calc(var(--level, 0) * 12px + 8px) !important;
+  }
+  
+  /* 拖放指示器 - 增加可见性 */
+  .folder-item .absolute.h-0\.5 {
+    height: 3px !important;
+  }
+  
+  /* 选中状态 - 增强视觉反馈 */
+  .folder-item .bg-accent {
+    background-color: var(--accent) !important;
+    border-left: 3px solid var(--primary);
+  }
+  
+  /* 悬停状态 - 移动端使用点击反馈 */
+  .folder-item .hover\:bg-accent:active {
+    background-color: var(--accent);
+    transform: scale(0.98);
+    transition: transform 0.1s ease;
+  }
+}
+
+/* 移动端文件夹树手势支持 */
+@media (max-width: 640px) {
+  /* 滑动手势区域 */
+  .folder-item-swipeable {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  /* 滑动显示的操作按钮 */
+  .folder-item-actions {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0 0.5rem;
+    background-color: var(--destructive);
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+  }
+  
+  .folder-item-swipeable.swiped .folder-item-actions {
+    transform: translateX(0);
+  }
+  
+  /* 操作按钮 */
+  .folder-item-actions button {
+    min-height: 36px;
+    min-width: 36px;
+    padding: 0.5rem;
+    background-color: transparent;
+    color: white;
+  }
+}
+
+/* 移动端文件夹树加载状态 */
+@media (max-width: 640px) {
+  .folder-tree-loading {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.5rem;
+  }
+  
+  .folder-tree-skeleton-item {
+    height: 44px;
+    background-color: var(--muted);
+    border-radius: 0.5rem;
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+}
+
+/* 移动端文件夹树空状态 */
+@media (max-width: 640px) {
+  .folder-tree-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+    text-align: center;
+    color: var(--muted-foreground);
+  }
+  
+  .folder-tree-empty svg {
+    height: 48px;
+    width: 48px;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+  }
+  
+  .folder-tree-empty p {
+    font-size: 0.875rem;
+    margin-bottom: 1rem;
+  }
+  
+  .folder-tree-empty button {
+    min-height: 44px;
+    padding: 0.75rem 1.5rem;
+  }
+}
+
+/* 移动端面包屑导航优化 */
+@media (max-width: 640px) {
+  /* 面包屑容器 */
+  .breadcrumbs {
+    padding: 0.75rem 1rem;
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* 隐藏滚动条 */
+  .breadcrumbs::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .breadcrumbs {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  /* 面包屑项 */
+  .breadcrumbs a,
+  .breadcrumbs span {
+    display: inline-flex;
+    align-items: center;
+    min-height: 32px;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+  }
+  
+  /* 面包屑分隔符 */
+  .breadcrumbs svg {
+    height: 16px;
+    width: 16px;
+    margin: 0 0.25rem;
+    flex-shrink: 0;
+  }
+  
+  /* 面包屑省略号 */
+  .breadcrumbs .truncate {
+    max-width: 120px;
+  }
+}
+
+/* 移动端侧边栏文件夹树 */
+@media (max-width: 640px) {
+  /* 侧边栏容器 */
+  .sidebar-folder-tree {
+    height: 100%;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* 侧边栏标题 */
+  .sidebar-folder-tree-header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background-color: var(--background);
+    padding: 1rem;
+    border-bottom: 1px solid var(--border);
+  }
+  
+  .sidebar-folder-tree-header h2 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin: 0;
+  }
+  
+  /* 侧边栏内容 */
+  .sidebar-folder-tree-content {
+    padding: 0.5rem;
+  }
+  
+  /* 侧边栏底部安全区域 */
+  .sidebar-folder-tree-footer {
+    height: env(safe-area-inset-bottom);
+  }
+}

@@ -8,6 +8,7 @@ import { AnimatedNoteCard } from "@/components/dashboard/animated-note-card"
 import { FloatingActionButton } from "@/components/dashboard/floating-action-button"
 import Link from "next/link"
 import { t } from "@/lib/i18n"
+import { Grid, Sparkles, FileText } from "lucide-react"
 
 export default async function DashboardPage({
     searchParams,
@@ -71,6 +72,60 @@ export default async function DashboardPage({
                         recentNoteDate={recentNoteDate}
                     />
                 )}
+
+                {/* 功能快捷入口 */}
+                <div className="mb-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {/* 主要功能卡片 */}
+                    <Link href="/features" className="group">
+                        <div className="p-6 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent rounded-lg border border-primary/20 hover:border-primary/40 hover:shadow-lg transition-all duration-300 hover:scale-[1.02] h-full">
+                            <div className="flex items-start gap-3">
+                                <div className="p-2 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                                    <Grid className="h-5 w-5 text-primary" />
+                                </div>
+                                <div className="flex-1">
+                                    <h3 className="font-bold mb-1 group-hover:text-primary transition-colors">全部功能</h3>
+                                    <p className="text-sm text-muted-foreground">
+                                        探索所有可用功能
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </Link>
+
+                    {/* AI 功能 */}
+                    <Link href="/ai" className="group">
+                        <div className="p-6 bg-gradient-to-br from-violet-500/10 via-violet-500/5 to-transparent rounded-lg border border-violet-500/20 hover:border-violet-500/40 hover:shadow-lg transition-all duration-300 hover:scale-[1.02] h-full">
+                            <div className="flex items-start gap-3">
+                                <div className="p-2 rounded-lg bg-violet-500/10 group-hover:bg-violet-500/20 transition-colors">
+                                    <Sparkles className="h-5 w-5 text-violet-500" />
+                                </div>
+                                <div className="flex-1">
+                                    <h3 className="font-bold mb-1 group-hover:text-violet-500 transition-colors">AI 助手</h3>
+                                    <p className="text-sm text-muted-foreground">
+                                        智能摘要、标签生成
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </Link>
+
+                    {/* 模板 */}
+                    <Link href="/templates" className="group">
+                        <div className="p-6 bg-gradient-to-br from-indigo-500/10 via-indigo-500/5 to-transparent rounded-lg border border-indigo-500/20 hover:border-indigo-500/40 hover:shadow-lg transition-all duration-300 hover:scale-[1.02] h-full">
+                            <div className="flex items-start gap-3">
+                                <div className="p-2 rounded-lg bg-indigo-500/10 group-hover:bg-indigo-500/20 transition-colors">
+                                    <FileText className="h-5 w-5 text-indigo-500" />
+                                </div>
+                                <div className="flex-1">
+                                    <h3 className="font-bold mb-1 group-hover:text-indigo-500 transition-colors">笔记模板</h3>
+                                    <p className="text-sm text-muted-foreground">
+                                        快速创建结构化笔记
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </Link>
+                </div>
 
 
 

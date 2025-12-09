@@ -21,6 +21,8 @@ import {
 import { validateData, isValidCuid } from "@/lib/validation-utils"
 import { t } from "@/lib/i18n"
 import { summarizeNote as generateSummary, generateEmbedding } from "./ai"
+import { triggerNoteCreated, triggerNoteUpdated, triggerNoteDeleted } from "@/lib/webhooks/webhook-triggers"
+import { saveNoteVersion } from "@/lib/versions/version-manager"
 
 type ActionResult<T = void> = 
   | { success: true; data: T }
@@ -148,11 +150,20 @@ export async function deleteNote(id: string): Promise<ActionResult> {
         return validation
     }
 
+    // Get note title before deletion for webhook
+    const { data: note } = await getNoteById(id, session.user.id)
+    const noteTitle = note?.title || 'Untitled'
+
     const { error } = await deleteNoteSupabase(id, session.user.id)
 
     if (error) {
         return { success: false, error: t('notes.deleteError') }
     }
+
+    // Trigger webhook for note deletion
+    triggerNoteDeleted(id, noteTitle, session.user.id).catch(err => {
+        console.error('Webhook trigger failed:', err)
+    })
 
     revalidatePath("/dashboard")
     revalidatePath("/notes")
@@ -181,6 +192,8 @@ export async function createNote(formData: FormData): Promise<never> {
         throw new Error(validation.error)
     }
 
+    let noteId: string | undefined
+
     try {
         let summary: string | null = null
         if (content.length >= 50) {
@@ -199,7 +212,7 @@ export async function createNote(formData: FormData): Promise<never> {
             console.error('生成嵌入失败:', error)
         }
 
-        const { error } = await createNoteSupabase({
+        const { data, error } = await createNoteSupabase({
             title,
             content,
             summary,
@@ -209,6 +222,15 @@ export async function createNote(formData: FormData): Promise<never> {
 
         if (error) {
             throw new Error(error)
+        }
+
+        noteId = data?.id
+
+        // Trigger webhook for note creation
+        if (noteId) {
+            triggerNoteCreated(noteId, title, session.user.id).catch(err => {
+                console.error('Webhook trigger failed:', err)
+            })
         }
 
         revalidatePath("/dashboard")
@@ -247,6 +269,9 @@ export async function updateNote(id: string, formData: FormData): Promise<never>
     }
 
     try {
+        // Get the current note before updating to save as version
+        const { data: currentNote } = await getNoteById(id, session.user.id)
+        
         let summary: string | null = null
         if (content && content.length >= 50) {
             const summaryResult = await generateSummary(content)
@@ -278,6 +303,23 @@ export async function updateNote(id: string, formData: FormData): Promise<never>
             throw new Error(error)
         }
 
+        // Save version after successful update (save the previous state)
+        if (currentNote) {
+            await saveNoteVersion(
+                id,
+                currentNote.title,
+                currentNote.content,
+                session.user.id
+            ).catch(err => {
+                console.error('Failed to save version:', err)
+            })
+        }
+
+        // Trigger webhook for note update
+        triggerNoteUpdated(id, title, session.user.id).catch(err => {
+            console.error('Webhook trigger failed:', err)
+        })
+
         revalidatePath("/dashboard")
         revalidatePath("/notes")
         revalidatePath(`/notes/${id}`)
@@ -305,6 +347,9 @@ export async function autoSaveNote(
         return validation
     }
 
+    // Get the current note before updating to save as version
+    const { data: currentNote } = await getNoteById(id, session.user.id)
+
     const { error } = await updateNoteSupabase(id, session.user.id, {
         title: data.title,
         content: data.content,
@@ -314,11 +359,44 @@ export async function autoSaveNote(
         return { success: false, error: t('notes.updateError') }
     }
 
+    // Save version after successful update (save the previous state)
+    // Only save version if there's a significant change (not on every keystroke)
+    if (currentNote && shouldSaveVersion(currentNote, data)) {
+        await saveNoteVersion(
+            id,
+            currentNote.title,
+            currentNote.content,
+            session.user.id
+        ).catch(err => {
+            console.error('Failed to save version:', err)
+        })
+    }
+
+    // Trigger webhook for note update
+    triggerNoteUpdated(id, data.title, session.user.id).catch(err => {
+        console.error('Webhook trigger failed:', err)
+    })
+
     revalidatePath("/dashboard")
     revalidatePath("/notes")
     revalidatePath(`/notes/${id}`)
     
     return { success: true, data: undefined }
+}
+
+/**
+ * Determine if a version should be saved
+ * Only save if there's a significant change (e.g., more than 100 characters difference)
+ */
+function shouldSaveVersion(
+    currentNote: { title: string; content: string },
+    newData: { title: string; content: string }
+): boolean {
+    const titleChanged = currentNote.title !== newData.title
+    const contentDiff = Math.abs(currentNote.content.length - newData.content.length)
+    const significantContentChange = contentDiff > 100
+    
+    return titleChanged || significantContentChange
 }
 
 /**
@@ -330,6 +408,148 @@ export async function searchNotes(params: {
     pageSize?: number
 }) {
     return getNotes(params)
+}
+
+/**
+ * 统一搜索文件夹和笔记
+ * Validates: Requirements 21.1, 21.2
+ */
+export async function searchAll(params: {
+    query?: string
+    page?: number
+    pageSize?: number
+}) {
+    const session = await auth()
+    if (!session?.user?.id) {
+        return {
+            folders: [],
+            notes: [],
+            totalCount: 0,
+            totalPages: 0,
+            currentPage: 1,
+        }
+    }
+
+    const query = params.query?.toLowerCase() || ''
+    const page = params.page || 1
+    const pageSize = params.pageSize || 20
+
+    if (!query.trim()) {
+        return {
+            folders: [],
+            notes: [],
+            totalCount: 0,
+            totalPages: 0,
+            currentPage: page,
+        }
+    }
+
+    try {
+        // Import prisma to use in server action
+        const { prisma } = await import('@/lib/prisma')
+
+        // Search folders
+        const folders = await prisma.folder.findMany({
+            where: {
+                userId: session.user.id,
+                name: {
+                    contains: query,
+                    mode: 'insensitive',
+                },
+            },
+            include: {
+                parent: true,
+                _count: {
+                    select: {
+                        children: true,
+                        notes: true,
+                    },
+                },
+            },
+            orderBy: { name: 'asc' },
+        })
+
+        // Search notes
+        const notes = await prisma.note.findMany({
+            where: {
+                AND: [
+                    {
+                        OR: [
+                            { userId: session.user.id },
+                            { ownerId: session.user.id },
+                            {
+                                collaborators: {
+                                    some: {
+                                        userId: session.user.id,
+                                    },
+                                },
+                            },
+                        ],
+                    },
+                    {
+                        OR: [
+                            {
+                                title: {
+                                    contains: query,
+                                    mode: 'insensitive',
+                                },
+                            },
+                            {
+                                content: {
+                                    contains: query,
+                                    mode: 'insensitive',
+                                },
+                            },
+                        ],
+                    },
+                ],
+            },
+            include: {
+                folder: true,
+                tags: true,
+                category: true,
+            },
+            orderBy: { updatedAt: 'desc' },
+        })
+
+        // Calculate total and pagination
+        const totalCount = folders.length + notes.length
+        const totalPages = Math.ceil(totalCount / pageSize)
+        const skip = (page - 1) * pageSize
+
+        // Combine and paginate
+        const allResults = [
+            ...folders.map((f: any) => ({ type: 'folder' as const, data: f })),
+            ...notes.map((n: any) => ({ type: 'note' as const, data: n })),
+        ]
+
+        const paginatedResults = allResults.slice(skip, skip + pageSize)
+
+        // Separate back
+        const paginatedFolders = paginatedResults
+            .filter((r: any) => r.type === 'folder')
+            .map((r: any) => r.data)
+        const paginatedNotes = paginatedResults
+            .filter((r: any) => r.type === 'note')
+            .map((r: any) => r.data)
+
+        return {
+            folders: paginatedFolders,
+            notes: paginatedNotes,
+            totalCount,
+            totalPages,
+            currentPage: page,
+        }
+    } catch (error) {
+        console.error('Search error:', error)
+        return {
+            folders: [],
+            notes: [],
+            totalCount: 0,
+            totalPages: 0,
+            currentPage: page,
+        }
+    }
 }
 
 /**

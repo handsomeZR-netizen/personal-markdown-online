@@ -19,9 +19,12 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { t } from "@/lib/i18n"
 import { loginSchema, type LoginInput } from "@/lib/validations/auth"
+import { LoadingButton } from "@/components/ui/loading-button"
+import { useState } from "react"
 
 export function LoginForm() {
     const router = useRouter()
+    const [isLoading, setIsLoading] = useState(false)
     const form = useForm<LoginInput>({
         resolver: zodResolver(loginSchema),
         defaultValues: {
@@ -31,6 +34,7 @@ export function LoginForm() {
     })
 
     async function onSubmit(values: LoginInput) {
+        setIsLoading(true)
         try {
             // 客户端验证已通过，调用 NextAuth 登录
             const result = await signIn("credentials", {
@@ -49,6 +53,8 @@ export function LoginForm() {
             router.refresh()
         } catch (error) {
             toast.error(t('errors.generic'))
+        } finally {
+            setIsLoading(false)
         }
     }
 
@@ -86,7 +92,15 @@ export function LoginForm() {
                                 </FormItem>
                             )}
                         />
-                        <Button type="submit" className="w-full">{t('auth.login')}</Button>
+                        <LoadingButton 
+                            type="submit" 
+                            className="w-full"
+                            loading={isLoading}
+                            loaderVariant="pulse"
+                            loadingText="登录中..."
+                        >
+                            {t('auth.login')}
+                        </LoadingButton>
                     </form>
                 </Form>
             </CardContent>

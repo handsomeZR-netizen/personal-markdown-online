@@ -1,7 +1,7 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { auth, signOut } from "@/auth"
-import { LogOut, User, Sparkles, FileText, Plus, Home, Settings } from "lucide-react"
+import { LogOut, User, Sparkles, FileText, Plus, Home, Settings, Grid, HelpCircle } from "lucide-react"
 import { t } from "@/lib/i18n"
 import { MobileNav } from "@/components/mobile-nav"
 import { ThemeToggle } from "@/components/theme-toggle"
@@ -35,7 +35,7 @@ export async function Header() {
 
                     {session?.user ? (
                         <>
-                            {/* 桌面端导航链接 */}
+                            {/* 桌面端导航链接 - 仅在桌面端显示 (Requirements 13.1, 13.4) */}
                             <nav className="hidden lg:flex items-center gap-1" aria-label="主导航">
                                 <Link href="/dashboard">
                                     <Button variant="ghost" size="sm" aria-label={t('navigation.dashboard')}>
@@ -55,10 +55,22 @@ export async function Header() {
                                         {t('notes.newNote')}
                                     </Button>
                                 </Link>
+                                <Link href="/features">
+                                    <Button variant="ghost" size="sm" aria-label="功能导航">
+                                        <Grid className="h-4 w-4 mr-2" aria-hidden="true" />
+                                        功能
+                                    </Button>
+                                </Link>
                                 <Link href="/ai">
                                     <Button variant="ghost" size="sm" aria-label={t('ai.aiFeatures')}>
                                         <Sparkles className="h-4 w-4 mr-2" aria-hidden="true" />
                                         {t('ai.aiFeatures')}
+                                    </Button>
+                                </Link>
+                                <Link href="/help">
+                                    <Button variant="ghost" size="sm" aria-label="帮助">
+                                        <HelpCircle className="h-4 w-4 mr-2" aria-hidden="true" />
+                                        帮助
                                     </Button>
                                 </Link>
                                 <Link href="/settings">

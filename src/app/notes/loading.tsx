@@ -1,31 +1,24 @@
-import { NoteListSkeleton } from "@/components/notes/note-card-skeleton"
-import { Skeleton } from "@/components/ui/skeleton"
+import { NoteListSkeleton } from '@/components/loading/note-list-skeleton';
 
 export default function NotesLoading() {
   return (
     <div className="container mx-auto p-4">
-      {/* Header skeleton */}
-      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <Skeleton className="h-8 w-32" />
-        <Skeleton className="h-10 w-32" />
-      </div>
-
-      {/* Search and filters skeleton */}
-      <div className="mb-6 space-y-4">
-        <Skeleton className="h-10 w-full" />
-        <div className="flex gap-2">
-          <Skeleton className="h-10 w-32" />
-          <Skeleton className="h-10 w-32" />
+      {/* 头部骨架 */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6">
+        <div className="space-y-2">
+          <div className="h-8 w-32 bg-gray-200 dark:bg-gray-700 animate-pulse rounded" />
+          <div className="h-4 w-48 bg-gray-200 dark:bg-gray-700 animate-pulse rounded" />
         </div>
+        <div className="h-10 w-full sm:w-32 bg-gray-200 dark:bg-gray-700 animate-pulse rounded" />
       </div>
 
-      {/* Notes list skeleton */}
+      {/* 搜索栏骨架 */}
+      <div className="mb-6">
+        <div className="h-10 w-full bg-gray-200 dark:bg-gray-700 animate-pulse rounded" />
+      </div>
+
+      {/* 笔记列表骨架 */}
       <NoteListSkeleton count={6} />
-
-      {/* Pagination skeleton */}
-      <div className="mt-6 flex justify-center">
-        <Skeleton className="h-10 w-64" />
-      </div>
     </div>
-  )
+  );
 }

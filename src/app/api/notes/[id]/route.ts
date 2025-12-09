@@ -5,6 +5,7 @@ import { updateNoteSchema, deleteNoteSchema } from '@/lib/validations/notes';
 import { validateData, isValidCuid } from '@/lib/validation-utils';
 import { generateEmbedding } from '@/lib/actions/ai';
 import { summaryService } from '@/lib/ai/summary-service';
+import { checkNotePermissions } from '@/lib/permissions';
 
 /**
  * GET /api/notes/[id]
@@ -30,6 +31,15 @@ export async function GET(
       return NextResponse.json(
         { error: 'Invalid note ID' },
         { status: 400 }
+      );
+    }
+
+    // Check permissions
+    const permissions = await checkNotePermissions(id, session.user.id);
+    if (!permissions.hasAccess) {
+      return NextResponse.json(
+        { error: 'Access denied' },
+        { status: 403 }
       );
     }
 
@@ -105,6 +115,15 @@ export async function PUT(
     }
 
     const validatedFields = validation.data;
+
+    // Check edit permissions
+    const permissions = await checkNotePermissions(id, session.user.id);
+    if (!permissions.canEdit) {
+      return NextResponse.json(
+        { error: 'You do not have permission to edit this note' },
+        { status: 403 }
+      );
+    }
 
     // 验证笔记所有权
     const { data: existingNote, error: checkError } = await getNoteById(id, session.user.id);
@@ -207,6 +226,15 @@ export async function DELETE(
       return NextResponse.json(
         { error: validation.error },
         { status: 400 }
+      );
+    }
+
+    // Check delete permissions
+    const permissions = await checkNotePermissions(id, session.user.id);
+    if (!permissions.canDelete) {
+      return NextResponse.json(
+        { error: 'You do not have permission to delete this note' },
+        { status: 403 }
       );
     }
 

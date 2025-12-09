@@ -1,7 +1,10 @@
 "use client"
 
 import ReactMarkdown from 'react-markdown'
+import remarkMath from 'remark-math'
+import rehypeKatex from 'rehype-katex'
 import { sanitizeMarkdown } from '@/lib/security-utils'
+import 'katex/dist/katex.min.css'
 
 interface MarkdownPreviewProps {
   content: string
@@ -22,6 +25,9 @@ export function MarkdownPreview({ content }: MarkdownPreviewProps) {
   return (
     <div className="prose prose-sm dark:prose-invert max-w-none">
       <ReactMarkdown
+        // 添加数学公式支持
+        remarkPlugins={[remarkMath]}
+        rehypePlugins={[rehypeKatex]}
         // 禁用 HTML 渲染，只允许 Markdown
         disallowedElements={['script', 'iframe', 'object', 'embed']}
         unwrapDisallowed={true}

@@ -1,0 +1,25 @@
+// Mock for lucide-react icons
+export const ChevronRight = () => null;
+export const ChevronDown = () => null;
+export const Folder = () => null;
+export const FolderOpen = () => null;
+export const FileText = () => null;
+export const GripVertical = () => null;
+export const Home = () => null;
+export const Loader2 = () => null;
+export const X = () => null;
+export const ChevronLeft = () => null;
+export const AlertCircle = () => null;
+export const Bold = () => null;
+export const Italic = () => null;
+export const Strikethrough = () => null;
+export const Code = () => null;
+export const Heading1 = () => null;
+export const Heading2 = () => null;
+export const Heading3 = () => null;
+export const List = () => null;
+export const ListOrdered = () => null;
+export const Quote = () => null;
+export const Undo = () => null;
+export const Redo = () => null;
+export const Image = () => null;

@@ -1,5 +1,5 @@
-import { NoteDetailSkeleton } from "@/components/notes/note-detail-skeleton"
+import { NoteDetailSkeleton } from '@/components/loading/note-list-skeleton';
 
-export default function NoteLoading() {
-  return <NoteDetailSkeleton />
+export default function NoteDetailLoading() {
+  return <NoteDetailSkeleton />;
 }

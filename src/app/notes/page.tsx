@@ -8,6 +8,7 @@ import { SearchBar } from "@/components/search-bar"
 import { FilterPanel } from "@/components/filters/filter-panel"
 import { MobileFilterDrawer } from "@/components/filters/mobile-filter-drawer"
 import { PullToRefresh } from "@/components/pull-to-refresh"
+import { FolderSidebar } from "@/components/notes/folder-sidebar"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { Plus } from "lucide-react"
@@ -91,11 +92,14 @@ export default async function NotesPage({
                 <MobileFilterDrawer tags={tags} categories={categories} />
             </div>
 
-            {/* 主内容区域 - 筛选面板和笔记列表 */}
+            {/* 主内容区域 - 文件夹、筛选面板和笔记列表 */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                {/* 左侧筛选面板 - 桌面端显示 */}
-                <aside className="hidden lg:block lg:col-span-3 xl:col-span-2" aria-label="筛选面板">
-                    <div className="sticky top-20">
+                {/* 左侧文件夹和筛选面板 - 桌面端显示 */}
+                <aside className="hidden lg:block lg:col-span-3 xl:col-span-2" aria-label="侧边栏">
+                    <div className="sticky top-20 space-y-6">
+                        <div className="border rounded-lg p-4 bg-card">
+                            <FolderSidebar />
+                        </div>
                         <FilterPanel tags={tags} categories={categories} />
                     </div>
                 </aside>

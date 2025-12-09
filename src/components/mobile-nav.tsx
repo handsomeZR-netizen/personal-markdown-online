@@ -8,6 +8,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 import { Menu, Home, FileText, Plus, Sparkles } from "lucide-react"
 import { t } from "@/lib/i18n"
 import { cn } from "@/lib/utils"
+import { useGestureHandler } from "@/hooks/use-gesture-handler"
 
 /**
  * 移动端导航组件
@@ -20,10 +21,30 @@ import { cn } from "@/lib/utils"
  * - Touch-friendly tap targets (min 44x44px)
  * - Automatic close on navigation
  * - Overlay/backdrop for focus
+ * - Edge swipe gestures to open/close (Requirements 12.1, 12.2)
  */
 export function MobileNav() {
   const [open, setOpen] = useState(false)
   const pathname = usePathname()
+
+  // 手势处理器：边缘滑动打开/关闭侧边栏
+  const { handlers, getEdgeSwipeDirection } = useGestureHandler({
+    onSwipeRight: () => {
+      // 从左边缘向右滑动打开侧边栏
+      const edgeDirection = getEdgeSwipeDirection()
+      if (edgeDirection === 'left' && !open) {
+        setOpen(true)
+      }
+    },
+    onSwipeLeft: () => {
+      // 向左滑动关闭侧边栏
+      if (open) {
+        setOpen(false)
+      }
+    },
+    edgeSwipeThreshold: 30, // 边缘检测阈值 30px
+    minSwipeDistance: 50, // 最小滑动距离 50px
+  })
 
   // 导航项配置
   const navItems = [
@@ -72,19 +93,20 @@ export function MobileNav() {
   }, [open])
 
   return (
-    <Sheet open={open} onOpenChange={setOpen}>
-      <SheetTrigger asChild>
-        <Button 
-          variant="ghost" 
-          size="icon" 
-          className="lg:hidden min-h-[44px] min-w-[44px]"
-          aria-label={open ? t('accessibility.closeMenu') : t('accessibility.openMenu')}
-          aria-expanded={open}
-        >
-          <Menu className="h-5 w-5" aria-hidden="true" />
-        </Button>
-      </SheetTrigger>
-      <SheetContent side="left" className="w-[280px] sm:w-[320px] p-0">
+    <div {...handlers}>
+      <Sheet open={open} onOpenChange={setOpen}>
+        <SheetTrigger asChild>
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="lg:hidden min-h-[44px] min-w-[44px]"
+            aria-label={open ? t('accessibility.closeMenu') : t('accessibility.openMenu')}
+            aria-expanded={open}
+          >
+            <Menu className="h-5 w-5" aria-hidden="true" />
+          </Button>
+        </SheetTrigger>
+        <SheetContent side="left" className="w-[280px] sm:w-[320px] p-0">
         <SheetHeader className="p-6 pb-4 border-b">
           <SheetTitle className="text-left">{t('navigation.menu')}</SheetTitle>
         </SheetHeader>
@@ -134,5 +156,6 @@ export function MobileNav() {
         </div>
       </SheetContent>
     </Sheet>
+    </div>
   )
 }

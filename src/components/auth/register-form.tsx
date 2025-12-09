@@ -19,9 +19,12 @@ import Link from "next/link"
 import { t } from "@/lib/i18n"
 import { registerSchema, type RegisterInput } from "@/lib/validations/auth"
 import { registerUser } from "@/lib/actions/auth"
+import { LoadingButton } from "@/components/ui/loading-button"
+import { useState } from "react"
 
 export function RegisterForm() {
     const router = useRouter()
+    const [isLoading, setIsLoading] = useState(false)
     const form = useForm<RegisterInput>({
         resolver: zodResolver(registerSchema),
         defaultValues: {
@@ -33,6 +36,7 @@ export function RegisterForm() {
     })
 
     async function onSubmit(values: RegisterInput) {
+        setIsLoading(true)
         try {
             console.log("提交注册表单:", values)
             
@@ -63,6 +67,8 @@ export function RegisterForm() {
             console.error("注册错误:", error)
             const errorMessage = error instanceof Error ? error.message : t('errors.generic')
             toast.error(errorMessage)
+        } finally {
+            setIsLoading(false)
         }
     }
 
@@ -126,7 +132,15 @@ export function RegisterForm() {
                                 </FormItem>
                             )}
                         />
-                        <Button type="submit" className="w-full">{t('auth.register')}</Button>
+                        <LoadingButton 
+                            type="submit" 
+                            className="w-full"
+                            loading={isLoading}
+                            loaderVariant="pulse"
+                            loadingText="注册中..."
+                        >
+                            {t('auth.register')}
+                        </LoadingButton>
                     </form>
                 </Form>
             </CardContent>

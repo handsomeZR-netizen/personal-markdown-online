@@ -21,7 +21,18 @@ export default auth((req) => {
   }
 
   // 定义受保护的路由
-  const protectedRoutes = ['/dashboard', '/notes', '/ai']
+  const protectedRoutes = [
+    '/dashboard', 
+    '/notes', 
+    '/ai', 
+    '/features', 
+    '/help', 
+    '/settings',
+    '/templates',
+    '/search',
+    '/test-navigation',
+    '/test-loading'
+  ]
   const isProtectedRoute = protectedRoutes.some(route => 
     nextUrl.pathname.startsWith(route)
   )

@@ -26,10 +26,14 @@ import { AITagSuggestions } from "./ai-tag-suggestions"
 import { AIFormatButton } from "./ai-format-button"
 import { t } from "@/lib/i18n"
 import { Loader2, Check, Edit, Eye, WifiOff, Cloud } from "lucide-react"
+import { NoteActionsToolbar } from "./note-actions-toolbar"
+import { LoadingButton } from "@/components/ui/loading-button"
+import { useLoading } from "@/hooks/use-loading"
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels"
 import { useKeyboardShortcut } from "@/hooks/use-keyboard-shortcuts"
 import { useNetworkStatus } from "@/contexts/network-status-context"
 import { offlineStorageService } from "@/lib/offline/offline-storage-service"
+import { ImageUploadZone } from "./image-upload-zone"
 
 const formSchema = z.object({
     title: z.string().min(1, t('notes.titleRequired')),
@@ -46,30 +50,33 @@ interface NoteEditorProps {
         tags?: Array<{ id: string; name: string }>
         categoryId?: string | null
     }
+    userId?: string | null
 }
 
 type SaveStatus = 'idle' | 'saving' | 'saved' | 'error'
 
-export function NoteEditor({ note }: NoteEditorProps) {
+export function NoteEditor({ note, userId: propUserId }: NoteEditorProps) {
     const router = useRouter()
     const { isOnline } = useNetworkStatus()
+    const { showLoading, hideLoading } = useLoading()
+    const [isSubmitting, setIsSubmitting] = useState(false)
     
-    // 获取当前用户 ID（从 session 或其他地方）
-    const [userId, setUserId] = useState<string | null>(null)
+    // 使用传入的 userId 或从 localStorage 获取
+    const [userId, setUserId] = useState<string | null>(propUserId || null)
     
     useEffect(() => {
-        // 获取当前用户 ID
-        async function fetchUserId() {
+        if (!userId) {
+            // 尝试从 localStorage 获取（如果之前保存过）
             try {
-                const response = await fetch('/api/auth/session')
-                const session = await response.json()
-                setUserId(session?.user?.id || null)
+                const storedUserId = localStorage.getItem('userId')
+                if (storedUserId) {
+                    setUserId(storedUserId)
+                }
             } catch (error) {
-                console.error('Failed to fetch user session:', error)
+                console.error('Failed to get user ID:', error)
             }
         }
-        fetchUserId()
-    }, [])
+    }, [userId])
     
     // 检查是否有草稿需要恢复
     useEffect(() => {
@@ -245,9 +252,12 @@ export function NoteEditor({ note }: NoteEditorProps) {
             return
         }
 
-        // 如果离线，保存到本地存储
-        if (!isOnline) {
-            try {
+        setIsSubmitting(true)
+        showLoading(note ? '正在保存笔记...' : '正在创建笔记...', 'orbit')
+
+        try {
+            // 如果离线，保存到本地存储
+            if (!isOnline) {
                 const result = await offlineStorageService.saveNote(
                     {
                         id: note?.id,
@@ -271,36 +281,33 @@ export function NoteEditor({ note }: NoteEditorProps) {
                         router.push('/notes')
                     }
                 }
-            } catch (error) {
-                console.error('离线保存失败:', error)
-                toast.error('保存失败')
-            }
-            return
-        }
-
-        // 在线模式：使用原有的服务器保存逻辑
-        const formData = new FormData()
-        formData.append("title", values.title)
-        formData.append("content", values.content)
-        formData.append("tagIds", JSON.stringify(selectedTagIds))
-        if (selectedCategoryId) {
-            formData.append("categoryId", selectedCategoryId)
-        }
-
-        try {
-            if (note) {
-                await updateNote(note.id, formData)
-                toast.success(t('notes.updateSuccess'))
             } else {
-                await createNote(formData)
-                toast.success(t('notes.createSuccess'))
+                // 在线模式：使用原有的服务器保存逻辑
+                const formData = new FormData()
+                formData.append("title", values.title)
+                formData.append("content", values.content)
+                formData.append("tagIds", JSON.stringify(selectedTagIds))
+                if (selectedCategoryId) {
+                    formData.append("categoryId", selectedCategoryId)
+                }
+
+                if (note) {
+                    await updateNote(note.id, formData)
+                    toast.success(t('notes.updateSuccess'))
+                } else {
+                    await createNote(formData)
+                    toast.success(t('notes.createSuccess'))
+                }
+                
+                // 清除草稿
+                const noteId = note?.id || 'new';
+                draftManager.deleteDraft(noteId);
             }
-            
-            // 清除草稿
-            const noteId = note?.id || 'new';
-            draftManager.deleteDraft(noteId);
         } catch (error) {
-            toast.error(t('notes.createError'))
+            toast.error(note ? t('notes.updateError') : t('notes.createError'))
+        } finally {
+            setIsSubmitting(false)
+            hideLoading()
         }
     }
 
@@ -523,7 +530,7 @@ export function NoteEditor({ note }: NoteEditorProps) {
                             )}
                         </div>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-wrap border-b pb-3">
                         <EditorToolbar onInsert={insertMarkdown} />
                         <AIFormatButton 
                             content={watchedContent}
@@ -531,6 +538,11 @@ export function NoteEditor({ note }: NoteEditorProps) {
                                 form.setValue("content", formattedContent)
                                 setContent(formattedContent)
                             }}
+                        />
+                        <NoteActionsToolbar 
+                            noteId={note?.id || 'new'}
+                            noteTitle={title}
+                            noteContent={watchedContent}
                         />
                     </div>
                     
@@ -548,26 +560,41 @@ export function NoteEditor({ note }: NoteEditorProps) {
                                 </TabsTrigger>
                             </TabsList>
                             <TabsContent value="editor" className="mt-4">
-                                <FormField
-                                    control={form.control}
-                                    name="content"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormControl>
-                                                <Textarea
-                                                    placeholder={t('notes.content')}
-                                                    className="min-h-[500px] font-mono resize-none"
-                                                    {...field}
-                                                    onChange={(e) => {
-                                                        field.onChange(e)
-                                                        setContent(e.target.value)
-                                                    }}
-                                                />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
+                                <ImageUploadZone
+                                    noteId={note?.id}
+                                    onImageInsert={(url) => {
+                                        const textarea = document.querySelector('textarea[name="content"]') as HTMLTextAreaElement
+                                        if (!textarea) return
+                                        const start = textarea.selectionStart
+                                        const end = textarea.selectionEnd
+                                        const text = textarea.value
+                                        const imageMarkdown = `\n![image](${url})\n`
+                                        const newText = text.substring(0, start) + imageMarkdown + text.substring(end)
+                                        form.setValue("content", newText)
+                                        setContent(newText)
+                                    }}
+                                >
+                                    <FormField
+                                        control={form.control}
+                                        name="content"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormControl>
+                                                    <Textarea
+                                                        placeholder={t('notes.content') + '\n\n💡 提示：可以直接粘贴或拖拽图片到这里'}
+                                                        className="min-h-[500px] font-mono resize-none"
+                                                        {...field}
+                                                        onChange={(e) => {
+                                                            field.onChange(e)
+                                                            setContent(e.target.value)
+                                                        }}
+                                                    />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </ImageUploadZone>
                             </TabsContent>
                             <TabsContent value="preview" className="mt-4" role="tabpanel">
                                 <div className="min-h-[500px] border rounded-md p-4 overflow-auto bg-muted/30" aria-label="Markdown预览">
@@ -586,26 +613,42 @@ export function NoteEditor({ note }: NoteEditorProps) {
                                     <div className="text-sm font-medium text-muted-foreground mb-2">
                                         {t('notes.editor')}
                                     </div>
-                                    <FormField
-                                        control={form.control}
-                                        name="content"
-                                        render={({ field }) => (
-                                            <FormItem className="flex-1">
-                                                <FormControl>
-                                                    <Textarea
-                                                        placeholder={t('notes.content')}
-                                                        className="h-full min-h-[500px] font-mono resize-none"
-                                                        {...field}
-                                                        onChange={(e) => {
-                                                            field.onChange(e)
-                                                            setContent(e.target.value)
-                                                        }}
-                                                    />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
+                                    <ImageUploadZone
+                                        noteId={note?.id}
+                                        onImageInsert={(url) => {
+                                            const textarea = document.querySelector('textarea[name="content"]') as HTMLTextAreaElement
+                                            if (!textarea) return
+                                            const start = textarea.selectionStart
+                                            const end = textarea.selectionEnd
+                                            const text = textarea.value
+                                            const imageMarkdown = `\n![image](${url})\n`
+                                            const newText = text.substring(0, start) + imageMarkdown + text.substring(end)
+                                            form.setValue("content", newText)
+                                            setContent(newText)
+                                        }}
+                                        className="flex-1"
+                                    >
+                                        <FormField
+                                            control={form.control}
+                                            name="content"
+                                            render={({ field }) => (
+                                                <FormItem className="h-full">
+                                                    <FormControl>
+                                                        <Textarea
+                                                            placeholder={t('notes.content') + '\n\n💡 提示：可以直接粘贴或拖拽图片到这里'}
+                                                            className="h-full min-h-[500px] font-mono resize-none"
+                                                            {...field}
+                                                            onChange={(e) => {
+                                                                field.onChange(e)
+                                                                setContent(e.target.value)
+                                                            }}
+                                                        />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                    </ImageUploadZone>
                                 </div>
                             </Panel>
                             
@@ -628,10 +671,17 @@ export function NoteEditor({ note }: NoteEditorProps) {
                 </div>
                 
                 <div className="flex justify-end gap-4" role="group" aria-label="表单操作">
-                    <Button type="button" variant="outline" onClick={() => router.back()} aria-label={t('common.cancel')}>
+                    <Button type="button" variant="outline" onClick={() => router.back()} aria-label={t('common.cancel')} disabled={isSubmitting}>
                         {t('common.cancel')}
                     </Button>
-                    <Button type="submit" aria-label={t('common.save')}>{t('common.save')}</Button>
+                    <LoadingButton 
+                        type="submit" 
+                        loading={isSubmitting}
+                        loaderVariant="orbit"
+                        aria-label={t('common.save')}
+                    >
+                        {t('common.save')}
+                    </LoadingButton>
                 </div>
             </form>
         </Form>

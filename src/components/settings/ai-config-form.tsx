@@ -42,7 +42,7 @@ export function AIConfigForm() {
   // 避免水合不匹配
   if (!mounted) {
     return (
-      <Card className="w-full max-w-2xl">
+      <Card>
         <CardHeader>
           <CardTitle>AI API 配置</CardTitle>
           <CardDescription>加载中...</CardDescription>
@@ -126,7 +126,7 @@ export function AIConfigForm() {
   };
 
   return (
-    <Card className="w-full max-w-2xl">
+    <Card>
       <CardHeader>
         <CardTitle>AI API 配置</CardTitle>
         <CardDescription>
