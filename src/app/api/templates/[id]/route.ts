@@ -16,9 +16,10 @@ const updateTemplateSchema = z.object({
 // GET /api/templates/[id] - Get single template
 export async function GET(
   _request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const session = await auth();
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -26,7 +27,7 @@ export async function GET(
 
     const template = await prisma.noteTemplate.findFirst({
       where: {
-        id: params.id,
+        id,
         userId: session.user.id,
       },
     });
@@ -48,9 +49,10 @@ export async function GET(
 // PATCH /api/templates/[id] - Update template
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const session = await auth();
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -62,7 +64,7 @@ export async function PATCH(
     // Verify ownership
     const existing = await prisma.noteTemplate.findFirst({
       where: {
-        id: params.id,
+        id,
         userId: session.user.id,
       },
     });
@@ -72,7 +74,7 @@ export async function PATCH(
     }
 
     const template = await prisma.noteTemplate.update({
-      where: { id: params.id },
+      where: { id },
       data: validatedData,
     });
 
@@ -95,9 +97,10 @@ export async function PATCH(
 // DELETE /api/templates/[id] - Delete template
 export async function DELETE(
   _request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const session = await auth();
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -106,7 +109,7 @@ export async function DELETE(
     // Verify ownership
     const existing = await prisma.noteTemplate.findFirst({
       where: {
-        id: params.id,
+        id,
         userId: session.user.id,
       },
     });
@@ -116,7 +119,7 @@ export async function DELETE(
     }
 
     await prisma.noteTemplate.delete({
-      where: { id: params.id },
+      where: { id },
     });
 
     return NextResponse.json({ success: true });

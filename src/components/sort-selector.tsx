@@ -120,7 +120,7 @@ export function SortSelector({ onSortChange, baseUrl, className }: SortSelectorP
 
   if (isLoading) {
     return (
-      <div className={`flex items-center gap-2 ${className}`}>
+      <div className={`flex items-center gap-2 ${className ?? ''}`}>
         <div className="h-10 w-32 animate-pulse rounded-md bg-muted" />
         <div className="h-10 w-10 animate-pulse rounded-md bg-muted" />
       </div>
@@ -128,7 +128,7 @@ export function SortSelector({ onSortChange, baseUrl, className }: SortSelectorP
   }
 
   return (
-    <div className={`flex items-center gap-2 ${className}`}>
+    <div className={`flex items-center gap-2 ${className ?? ''}`}>
       <Select value={sortBy} onValueChange={handleSortByChange}>
         <SelectTrigger className="w-[140px]">
           <SelectValue placeholder="排序方式" />
@@ -231,7 +231,7 @@ export function SortSelectorCompact({ onSortChange, className }: SortSelectorPro
   const currentLabel = SORT_OPTIONS.find((opt) => opt.value === sortBy)?.label || '排序';
 
   return (
-    <div className={`flex items-center gap-1 ${className}`}>
+    <div className={`flex items-center gap-1 ${className ?? ''}`}>
       <Button
         variant="ghost"
         size="sm"

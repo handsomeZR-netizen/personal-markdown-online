@@ -1,6 +1,6 @@
 import NextAuth from "next-auth"
 import Credentials from "next-auth/providers/credentials"
-import { signIn as supabaseSignIn } from "@/lib/supabase-auth"
+import { getAuthAdapter } from "@/lib/auth/auth-adapter"
 import { z } from "zod"
 import { authConfig } from "./auth.config"
 
@@ -20,7 +20,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
                 if (parsedCredentials.success) {
                     const { email, password } = parsedCredentials.data
-                    const { data: user, error } = await supabaseSignIn({ email, password })
+                    const authAdapter = getAuthAdapter()
+                    const { data: user, error } = await authAdapter.signIn({ email, password })
                     if (error || !user) return null
                     return user
                 }

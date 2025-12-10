@@ -8,17 +8,36 @@ const nextConfig: NextConfig = {
   },
   // 指定项目根目录，避免 Next.js 检测到多个 lockfile 时的警告
   outputFileTracingRoot: process.cwd(),
+  // 优化大型包的导入以提升构建性能
+  experimental: {
+    optimizePackageImports: [
+      'lucide-react',
+      '@radix-ui/react-accordion',
+      '@radix-ui/react-alert-dialog',
+      '@radix-ui/react-checkbox',
+      '@radix-ui/react-dialog',
+      '@radix-ui/react-label',
+      '@radix-ui/react-progress',
+      '@radix-ui/react-scroll-area',
+      '@radix-ui/react-select',
+      '@radix-ui/react-slot',
+      '@radix-ui/react-switch',
+      '@radix-ui/react-tabs',
+      '@radix-ui/react-tooltip',
+      'date-fns',
+      'framer-motion',
+      'react-hook-form',
+    ],
+  },
 };
 
 export default withPWA({
   dest: "public",
   disable: process.env.NODE_ENV === "development",
   register: true,
-  skipWaiting: true,
   cacheOnFrontEndNav: true,
   aggressiveFrontEndNavCaching: true,
   reloadOnOnline: true,
-  swcMinify: true,
   fallbacks: {
     document: "/offline",
   },

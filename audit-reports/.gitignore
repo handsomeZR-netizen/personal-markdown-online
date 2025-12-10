@@ -1,0 +1,7 @@
+# Ignore all generated audit reports
+*.html
+*.json
+
+# Keep the directory structure
+!.gitkeep
+!.gitignore

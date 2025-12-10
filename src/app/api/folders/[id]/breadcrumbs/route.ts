@@ -12,9 +12,10 @@ import { prisma } from '@/lib/prisma';
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const session = await auth();
     if (!session?.user?.id) {
       return NextResponse.json({ error: '未授权' }, { status: 401 });
@@ -23,7 +24,7 @@ export async function GET(
     // Verify folder exists and belongs to user
     const folder = await prisma.folder.findFirst({
       where: {
-        id: params.id,
+        id,
         userId: session.user.id,
       },
     });

@@ -13,9 +13,10 @@ import { updateFolderSchema } from '@/lib/validations/folders';
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const session = await auth();
     if (!session?.user?.id) {
       return NextResponse.json({ error: '未授权' }, { status: 401 });
@@ -23,7 +24,7 @@ export async function GET(
 
     const folder = await prisma.folder.findFirst({
       where: {
-        id: params.id,
+        id,
         userId: session.user.id,
       },
       include: {
@@ -66,9 +67,10 @@ export async function GET(
  */
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const session = await auth();
     if (!session?.user?.id) {
       return NextResponse.json({ error: '未授权' }, { status: 401 });
@@ -80,7 +82,7 @@ export async function PATCH(
     // Verify folder exists and belongs to user
     const existingFolder = await prisma.folder.findFirst({
       where: {
-        id: params.id,
+        id,
         userId: session.user.id,
       },
     });
@@ -109,7 +111,7 @@ export async function PATCH(
       }
 
       // Prevent moving folder into itself
-      if (validated.parentId === params.id) {
+      if (validated.parentId === id) {
         return NextResponse.json(
           { error: '不能将文件夹移动到自身' },
           { status: 400 }
@@ -118,7 +120,7 @@ export async function PATCH(
 
       // Check for circular reference
       const wouldCreateCircle = await checkCircularReference(
-        params.id,
+        id,
         validated.parentId
       );
       if (wouldCreateCircle) {
@@ -130,7 +132,7 @@ export async function PATCH(
     }
 
     const folder = await prisma.folder.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         ...(validated.name && { name: validated.name }),
         ...(validated.parentId !== undefined && {
@@ -160,9 +162,10 @@ export async function PATCH(
  */
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const session = await auth();
     if (!session?.user?.id) {
       return NextResponse.json({ error: '未授权' }, { status: 401 });
@@ -171,7 +174,7 @@ export async function DELETE(
     // Verify folder exists and belongs to user
     const folder = await prisma.folder.findFirst({
       where: {
-        id: params.id,
+        id,
         userId: session.user.id,
       },
       include: {
@@ -200,7 +203,7 @@ export async function DELETE(
     }
 
     await prisma.folder.delete({
-      where: { id: params.id },
+      where: { id },
     });
 
     return NextResponse.json({ success: true });
@@ -224,12 +227,12 @@ async function checkCircularReference(
       return true; // Circular reference detected
     }
 
-    const folder = await prisma.folder.findUnique({
+    const foundFolder: { parentId: string | null } | null = await prisma.folder.findUnique({
       where: { id: currentId },
       select: { parentId: true },
     });
 
-    currentId = folder?.parentId || null;
+    currentId = foundFolder?.parentId || null;
   }
 
   return false;

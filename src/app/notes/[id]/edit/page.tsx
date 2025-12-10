@@ -1,8 +1,9 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { useSession } from "next-auth/react"
 import { NoteEditorLazy } from "@/components/notes/note-editor-lazy"
-import { notFound, useParams } from "next/navigation"
+import { notFound, useParams, useRouter } from "next/navigation"
 import { t } from "@/lib/i18n"
 import { offlineStorageService } from "@/lib/offline/offline-storage-service"
 import { getNote } from "@/lib/actions/notes"
@@ -19,14 +20,25 @@ type Note = {
 
 export default function EditNotePage() {
     const params = useParams()
+    const router = useRouter()
     const id = params.id as string
     const { isOnline } = useNetworkStatus()
+    const { data: session, status } = useSession()
     const [note, setNote] = useState<Note | null>(null)
     const [loading, setLoading] = useState(true)
     const [notFoundError, setNotFoundError] = useState(false)
 
+    // 如果未登录，重定向到登录页
+    useEffect(() => {
+        if (status === 'unauthenticated') {
+            router.push('/login')
+        }
+    }, [status, router])
+
     useEffect(() => {
         async function loadNote() {
+            if (status !== 'authenticated') return
+            
             try {
                 setLoading(true)
                 
@@ -70,9 +82,9 @@ export default function EditNotePage() {
         }
 
         loadNote()
-    }, [id, isOnline])
+    }, [id, isOnline, status])
 
-    if (loading) {
+    if (status === 'loading' || loading) {
         return (
             <div className="container mx-auto p-4 max-w-6xl">
                 <div className="flex items-center justify-center min-h-[400px]">
@@ -89,7 +101,7 @@ export default function EditNotePage() {
     return (
         <div className="container mx-auto p-4 max-w-6xl">
             <h1 className="text-2xl font-bold mb-6">{t('notes.editNote')}</h1>
-            <NoteEditorLazy note={note} />
+            <NoteEditorLazy note={note} userId={session?.user?.id} />
         </div>
     )
 }

@@ -1,21 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/auth';
+import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
 import { nanoid } from 'nanoid';
 
 // Enable public sharing for a note
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await getServerSession(authOptions);
+    const { id: noteId } = await params;
+    const session = await auth();
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
-
-    const noteId = params.id;
 
     // Check if user is the owner of the note
     const note = await prisma.note.findUnique({
@@ -100,15 +98,14 @@ export async function POST(
 // Disable public sharing for a note
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await getServerSession(authOptions);
+    const { id: noteId } = await params;
+    const session = await auth();
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
-
-    const noteId = params.id;
 
     // Check if user is the owner of the note
     const note = await prisma.note.findUnique({
@@ -152,15 +149,14 @@ export async function DELETE(
 // Get public sharing status
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await getServerSession(authOptions);
+    const { id: noteId } = await params;
+    const session = await auth();
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
-
-    const noteId = params.id;
 
     const note = await prisma.note.findUnique({
       where: { id: noteId },

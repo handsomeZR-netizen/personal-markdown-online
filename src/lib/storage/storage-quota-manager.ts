@@ -3,11 +3,9 @@
  * Calculates and manages storage usage for notes and images
  */
 
-import { supabaseBrowser } from '@/lib/supabase-browser';
+import { getStorageAdapter, type StorageAdapter } from './storage-adapter';
 import { prisma } from '@/lib/prisma';
-import type { SupabaseClient } from '@supabase/supabase-js';
 
-const BUCKET_NAME = 'note-images';
 const DEFAULT_QUOTA = 1024 * 1024 * 1024; // 1GB default quota
 
 export interface StorageUsage {
@@ -37,17 +35,14 @@ export interface LargeItem {
  * Storage Quota Manager class
  */
 export class StorageQuotaManager {
-  private supabase: SupabaseClient;
-  private bucketName: string;
+  private storageAdapter: StorageAdapter;
   private quotaBytes: number;
 
   constructor(
-    supabase?: SupabaseClient,
-    bucketName: string = BUCKET_NAME,
+    storageAdapter?: StorageAdapter,
     quotaBytes: number = DEFAULT_QUOTA
   ) {
-    this.supabase = supabase || supabaseBrowser;
-    this.bucketName = bucketName;
+    this.storageAdapter = storageAdapter || getStorageAdapter();
     this.quotaBytes = quotaBytes;
   }
 
@@ -100,19 +95,18 @@ export class StorageQuotaManager {
       // For each note, list images in its folder
       for (const note of notes) {
         try {
-          const { data, error } = await this.supabase.storage
-            .from(this.bucketName)
-            .list(note.id);
+          const paths = await this.storageAdapter.list(note.id);
 
-          if (error) {
-            console.warn(`Error listing images for note ${note.id}:`, error);
-            continue;
-          }
-
-          if (data) {
-            // Sum up file sizes
-            for (const file of data) {
-              totalBytes += file.metadata?.size || 0;
+          // For each file, we need to get its size
+          // Since the adapter doesn't return metadata, we'll need to download or estimate
+          // For now, we'll use a simplified approach
+          for (const path of paths) {
+            try {
+              const blob = await this.storageAdapter.download(path);
+              totalBytes += blob.size;
+            } catch (error) {
+              console.warn(`Error getting size for ${path}:`, error);
+              continue;
             }
           }
         } catch (error) {
@@ -177,13 +171,8 @@ export class StorageQuotaManager {
       let imagesCount = 0;
       for (const note of notes) {
         try {
-          const { data } = await this.supabase.storage
-            .from(this.bucketName)
-            .list(note.id);
-          
-          if (data) {
-            imagesCount += data.length;
-          }
+          const paths = await this.storageAdapter.list(note.id);
+          imagesCount += paths.length;
         } catch {
           continue;
         }
@@ -252,21 +241,23 @@ export class StorageQuotaManager {
 
       for (const note of userNotes) {
         try {
-          const { data } = await this.supabase.storage
-            .from(this.bucketName)
-            .list(note.id);
+          const paths = await this.storageAdapter.list(note.id);
 
-          if (data) {
-            for (const file of data) {
-              const size = file.metadata?.size || 0;
+          for (const path of paths) {
+            try {
+              const blob = await this.storageAdapter.download(path);
+              const fileName = path.split('/').pop() || path;
+              
               items.push({
-                id: file.id || file.name,
+                id: fileName,
                 type: 'image',
-                name: file.name,
-                size,
-                createdAt: new Date(file.created_at || Date.now()),
-                path: `${note.id}/${file.name}`,
+                name: fileName,
+                size: blob.size,
+                createdAt: new Date(), // We don't have creation date from adapter
+                path,
               });
+            } catch {
+              continue;
             }
           }
         } catch {

@@ -47,13 +47,13 @@ export async function getNote(id: string) {
         return null
     }
 
-    // 转换日期字符串为 Date 对象
+    // 转换日期字符串为 Date 对象，保留关联数据
     return {
         ...note,
         createdAt: new Date(note.createdAt),
         updatedAt: new Date(note.updatedAt),
-        tags: [],
-        category: null,
+        tags: note.tags || [],
+        category: note.category || null,
     }
 }
 

@@ -1,6 +1,6 @@
 /**
- * Image Upload Manager for Supabase Storage
- * Handles image uploads to the note-images bucket
+ * Image Upload Manager
+ * Handles image uploads using the storage abstraction layer
  * 
  * Performance optimizations:
  * - Automatic image compression for large files
@@ -9,11 +9,9 @@
  * - Progress tracking
  */
 
-import { supabaseBrowser } from '@/lib/supabase-browser';
-import type { SupabaseClient } from '@supabase/supabase-js';
+import { getStorageAdapter, type StorageAdapter } from './storage-adapter';
 import { compressImage, shouldCompressImage } from './image-optimizer';
 
-const BUCKET_NAME = 'note-images';
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const COMPRESSION_THRESHOLD = 2 * 1024 * 1024; // 2MB - compress files larger than this
 const ALLOWED_MIME_TYPES = [
@@ -40,12 +38,10 @@ export interface ImageUploadError {
  * Image Upload Manager class
  */
 export class ImageUploadManager {
-  private supabase: SupabaseClient;
-  private bucketName: string;
+  private storageAdapter: StorageAdapter;
 
-  constructor(supabase?: SupabaseClient, bucketName: string = BUCKET_NAME) {
-    this.supabase = supabase || supabaseBrowser;
-    this.bucketName = bucketName;
+  constructor(storageAdapter?: StorageAdapter) {
+    this.storageAdapter = storageAdapter || getStorageAdapter();
   }
 
   /**
@@ -129,31 +125,13 @@ export class ImageUploadManager {
       // Report initial progress
       options?.onProgress?.(0);
 
-      // Upload to Supabase Storage
-      const { data, error } = await this.supabase.storage
-        .from(this.bucketName)
-        .upload(fileName, fileToUpload, {
-          cacheControl: '3600',
-          upsert: false,
-        });
-
-      if (error) {
-        throw new Error(`上传失败: ${error.message}`);
-      }
+      // Upload using storage adapter
+      const result = await this.storageAdapter.upload(fileToUpload, fileName);
 
       // Report completion
       options?.onProgress?.(100);
 
-      // Get public URL
-      const { data: { publicUrl } } = this.supabase.storage
-        .from(this.bucketName)
-        .getPublicUrl(fileName);
-
-      return {
-        url: publicUrl,
-        path: fileName,
-        size: fileToUpload instanceof Blob ? fileToUpload.size : file.size,
-      };
+      return result;
     } catch (error) {
       if (error instanceof Error) {
         throw error;
@@ -182,15 +160,20 @@ export class ImageUploadManager {
     try {
       // Extract file path from URL
       const urlParts = url.split('/');
-      const pathIndex = urlParts.indexOf('public') + 2; // Skip 'public' and bucket name
-      const path = urlParts.slice(pathIndex).join('/');
-
-      const { error } = await this.supabase.storage
-        .from(this.bucketName)
-        .remove([path]);
-
-      if (error) {
-        throw new Error(`删除失败: ${error.message}`);
+      
+      // Try to find the path after 'storage' or 'api/storage'
+      let pathIndex = urlParts.indexOf('storage');
+      if (pathIndex === -1) {
+        pathIndex = urlParts.indexOf('public');
+      }
+      
+      if (pathIndex !== -1) {
+        // Skip to the actual file path (after bucket name or storage endpoint)
+        const path = urlParts.slice(pathIndex + 2).join('/');
+        await this.storageAdapter.delete(path);
+      } else {
+        // If we can't parse the URL, try using it as-is
+        await this.storageAdapter.delete(url);
       }
     } catch (error) {
       if (error instanceof Error) {
@@ -212,11 +195,7 @@ export class ImageUploadManager {
    * Get public URL for a file path
    */
   getPublicUrl(path: string): string {
-    const { data: { publicUrl } } = this.supabase.storage
-      .from(this.bucketName)
-      .getPublicUrl(path);
-    
-    return publicUrl;
+    return this.storageAdapter.getPublicUrl(path);
   }
 
   /**
@@ -224,15 +203,8 @@ export class ImageUploadManager {
    */
   async listNoteImages(noteId: string): Promise<string[]> {
     try {
-      const { data, error } = await this.supabase.storage
-        .from(this.bucketName)
-        .list(noteId);
-
-      if (error) {
-        throw new Error(`获取图片列表失败: ${error.message}`);
-      }
-
-      return data.map((file) => this.getPublicUrl(`${noteId}/${file.name}`));
+      const paths = await this.storageAdapter.list(noteId);
+      return paths.map((path) => this.getPublicUrl(path));
     } catch (error) {
       if (error instanceof Error) {
         throw error;
@@ -242,47 +214,85 @@ export class ImageUploadManager {
   }
 
   /**
-   * Check if bucket exists and is accessible
+   * Check if storage is accessible
    */
   async checkBucketAccess(): Promise<boolean> {
     try {
-      const { data, error } = await this.supabase.storage
-        .from(this.bucketName)
-        .list('', { limit: 1 });
-
-      return !error;
+      return await this.storageAdapter.checkAccess();
     } catch {
       return false;
     }
   }
 }
 
-// Export singleton instance
-export const imageUploadManager = new ImageUploadManager();
+// Lazy singleton instance (for server-side use only)
+let _imageUploadManager: ImageUploadManager | null = null;
+
+function getImageUploadManager(): ImageUploadManager {
+  if (!_imageUploadManager) {
+    _imageUploadManager = new ImageUploadManager();
+  }
+  return _imageUploadManager;
+}
+
+// Export getter for backward compatibility
+export const imageUploadManager = typeof window === 'undefined' 
+  ? { 
+      get uploadImage() { return getImageUploadManager().uploadImage.bind(getImageUploadManager()); },
+      get uploadImages() { return getImageUploadManager().uploadImages.bind(getImageUploadManager()); },
+      get deleteImage() { return getImageUploadManager().deleteImage.bind(getImageUploadManager()); },
+      get deleteImages() { return getImageUploadManager().deleteImages.bind(getImageUploadManager()); },
+      get getPublicUrl() { return getImageUploadManager().getPublicUrl.bind(getImageUploadManager()); },
+      get listNoteImages() { return getImageUploadManager().listNoteImages.bind(getImageUploadManager()); },
+      get checkBucketAccess() { return getImageUploadManager().checkBucketAccess.bind(getImageUploadManager()); },
+    } as ImageUploadManager
+  : (null as unknown as ImageUploadManager);
 
 // Export helper functions
 export async function uploadImage(
   file: File,
   noteId: string
 ): Promise<ImageUploadResult> {
-  return imageUploadManager.uploadImage(file, noteId);
+  // Check if we're in a browser environment
+  if (typeof window !== 'undefined') {
+    // Use API route for client-side uploads
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('noteId', noteId);
+
+    const response = await fetch('/api/images/upload', {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || '上传图片失败');
+    }
+
+    const result = await response.json();
+    return result.data;
+  }
+
+  // Server-side: use the manager directly
+  return getImageUploadManager().uploadImage(file, noteId);
 }
 
 export async function uploadImages(
   files: File[],
   noteId: string
 ): Promise<ImageUploadResult[]> {
-  return imageUploadManager.uploadImages(files, noteId);
+  return getImageUploadManager().uploadImages(files, noteId);
 }
 
 export async function deleteImage(url: string): Promise<void> {
-  return imageUploadManager.deleteImage(url);
+  return getImageUploadManager().deleteImage(url);
 }
 
 export async function deleteImages(urls: string[]): Promise<void> {
-  return imageUploadManager.deleteImages(urls);
+  return getImageUploadManager().deleteImages(urls);
 }
 
-export async function getPublicUrl(path: string): string {
-  return imageUploadManager.getPublicUrl(path);
+export function getPublicUrl(path: string): string {
+  return getImageUploadManager().getPublicUrl(path);
 }

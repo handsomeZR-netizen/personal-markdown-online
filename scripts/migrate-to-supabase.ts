@@ -102,6 +102,7 @@ async function migrate() {
             summary: noteData.summary,
             embedding: noteData.embedding,
             userId: noteData.userId,
+            ownerId: noteData.userId, // ownerId is required
             categoryId: noteData.categoryId,
             createdAt: noteData.createdAt,
             updatedAt: noteData.updatedAt,

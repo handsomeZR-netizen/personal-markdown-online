@@ -26,10 +26,10 @@ export interface NoteVersionWithUser extends NoteVersion {
  * Automatically limits to the most recent 50 versions
  */
 export async function saveNoteVersion(
+  userId: string,
   noteId: string,
   title: string,
-  content: string,
-  userId: string
+  content: string
 ): Promise<{ success: boolean; error?: string }> {
   try {
     // Create new version
@@ -244,8 +244,10 @@ export async function restoreNoteVersion(
       return { success: false, error: 'Note not found or insufficient permissions' }
     }
 
-    // Save current state as a version before restoring
-    await saveNoteVersion(noteId, note.title, note.content, userId)
+    // Save current state as a version before restoring (only if content differs)
+    if (note.title !== version.title || note.content !== version.content) {
+      await saveNoteVersion(userId, noteId, note.title, note.content)
+    }
 
     // Update the note with the restored content
     await prisma.note.update({
@@ -257,8 +259,8 @@ export async function restoreNoteVersion(
       },
     })
 
-    // Create a new version for the restore action
-    await saveNoteVersion(noteId, version.title, version.content, userId)
+    // Note: We don't create another version after restore to avoid duplicates
+    // The restored content will be saved as a new version on the next edit
 
     return { success: true }
   } catch (error) {

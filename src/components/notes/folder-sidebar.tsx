@@ -30,10 +30,10 @@ export function FolderSidebar() {
   }, [])
 
   const loadFolders = async () => {
+    setLoading(true)
     try {
-      setLoading(true)
       const result = await getFolders()
-      if (result.success && result.data) {
+      if (result?.success && result.data) {
         // 构建树形结构
         const folderMap = new Map<string, FolderNode>()
         const rootFolders: FolderNode[] = []
@@ -63,10 +63,16 @@ export function FolderSidebar() {
         })
 
         setFolders(rootFolders)
+      } else {
+        // Handle error case or unauthorized - set empty folders
+        if (result?.error && result.error !== '未授权') {
+          console.error('加载文件夹失败:', result.error)
+        }
+        setFolders([])
       }
     } catch (error) {
       console.error('加载文件夹失败:', error)
-      toast.error('加载文件夹失败')
+      setFolders([])
     } finally {
       setLoading(false)
     }

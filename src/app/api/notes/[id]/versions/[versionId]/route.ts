@@ -8,9 +8,10 @@ import { getNoteVersion } from "@/lib/versions/version-manager"
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string; versionId: string } }
+  { params }: { params: Promise<{ id: string; versionId: string }> }
 ) {
   try {
+    const { versionId } = await params;
     const session = await auth()
     if (!session?.user?.id) {
       return NextResponse.json(
@@ -19,7 +20,7 @@ export async function GET(
       )
     }
 
-    const result = await getNoteVersion(params.versionId, session.user.id)
+    const result = await getNoteVersion(versionId, session.user.id)
 
     if (!result.success) {
       return NextResponse.json(

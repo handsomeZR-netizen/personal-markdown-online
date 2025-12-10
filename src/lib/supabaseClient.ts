@@ -1,13 +1,19 @@
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+const databaseMode = process.env.DATABASE_MODE || 'local'
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing Supabase environment variables')
+// Only throw error if in Supabase mode and credentials are missing
+if (databaseMode === 'supabase' && (!supabaseUrl || !supabaseAnonKey)) {
+  throw new Error('Missing Supabase environment variables in Supabase mode')
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+// Create a dummy client for local mode to prevent import errors
+// In local mode, this client should not be used
+export const supabase = (supabaseUrl && supabaseAnonKey)
+  ? createClient(supabaseUrl, supabaseAnonKey)
+  : createClient('https://placeholder.supabase.co', 'placeholder-key')
 
 // 数据库类型定义
 export type Database = {

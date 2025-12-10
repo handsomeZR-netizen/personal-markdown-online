@@ -36,7 +36,7 @@ async function createStorageBucket() {
 
   // Use service role key if available, otherwise use anon key
   const apiKey = supabaseServiceKey || supabaseAnonKey;
-  const supabase = createClient(supabaseUrl, apiKey);
+  const supabase = createClient(supabaseUrl!, apiKey!);
 
   // Check if bucket already exists
   console.log('1️⃣ Checking if bucket already exists...');

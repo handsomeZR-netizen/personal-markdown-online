@@ -5,8 +5,7 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/auth'
+import { auth } from '@/auth'
 import { prisma } from '@/lib/prisma'
 import {
   addCollaboratorSchema,
@@ -22,7 +21,7 @@ import {
  */
 export async function addCollaborator(input: AddCollaboratorInput) {
   try {
-    const session = await getServerSession(authOptions)
+    const session = await auth()
     if (!session?.user?.id) {
       return { error: 'Unauthorized' }
     }
@@ -108,7 +107,7 @@ export async function addCollaborator(input: AddCollaboratorInput) {
  */
 export async function removeCollaborator(input: RemoveCollaboratorInput) {
   try {
-    const session = await getServerSession(authOptions)
+    const session = await auth()
     if (!session?.user?.id) {
       return { error: 'Unauthorized' }
     }
@@ -169,7 +168,7 @@ export async function removeCollaborator(input: RemoveCollaboratorInput) {
  */
 export async function updateCollaboratorRole(input: UpdateCollaboratorRoleInput) {
   try {
-    const session = await getServerSession(authOptions)
+    const session = await auth()
     if (!session?.user?.id) {
       return { error: 'Unauthorized' }
     }
@@ -230,7 +229,7 @@ export async function updateCollaboratorRole(input: UpdateCollaboratorRoleInput)
  */
 export async function getCollaborators(noteId: string) {
   try {
-    const session = await getServerSession(authOptions)
+    const session = await auth()
     if (!session?.user?.id) {
       return { error: 'Unauthorized' }
     }

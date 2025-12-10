@@ -27,11 +27,20 @@ export function TagSelector({ selectedTagIds, onChange }: TagSelectorProps) {
     useEffect(() => {
         async function loadTags() {
             setIsLoading(true)
-            const result = await getTags()
-            if (result.success && result.data) {
-                setTags(result.data)
+            try {
+                const result = await getTags()
+                if (result.success && result.data) {
+                    setTags(result.data)
+                } else {
+                    console.error('Failed to load tags:', result.error)
+                    setTags([])
+                }
+            } catch (error) {
+                console.error('Error loading tags:', error)
+                setTags([])
+            } finally {
+                setIsLoading(false)
             }
-            setIsLoading(false)
         }
         
         loadTags()

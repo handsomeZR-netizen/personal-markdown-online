@@ -16,9 +16,10 @@ const useTemplateSchema = z.object({
 // POST /api/templates/[id]/use - Create note from template
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const session = await auth();
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -30,7 +31,7 @@ export async function POST(
     // Get template
     const template = await prisma.noteTemplate.findFirst({
       where: {
-        id: params.id,
+        id,
         userId: session.user.id,
       },
     });
@@ -51,7 +52,7 @@ export async function POST(
         },
       }),
       prisma.noteTemplate.update({
-        where: { id: params.id },
+        where: { id },
         data: { usageCount: { increment: 1 } },
       }),
     ]);

@@ -1,19 +1,18 @@
 /**
  * API endpoint for image upload
- * Handles image uploads to Supabase Storage
+ * Handles image uploads using the storage abstraction layer
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/auth';
+import { auth } from '@/auth';
 import { ImageUploadManager } from '@/lib/storage/image-upload';
-import { supabaseBrowser } from '@/lib/supabase-browser';
+import { getStorageAdapter } from '@/lib/storage/storage-adapter';
 import { storageQuotaManager } from '@/lib/storage/storage-quota-manager';
 
 export async function POST(request: NextRequest) {
   try {
     // Check authentication
-    const session = await getServerSession(authOptions);
+    const session = await auth();
     if (!session?.user?.id) {
       return NextResponse.json(
         { error: '未授权' },
@@ -49,8 +48,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Upload image
-    const uploadManager = new ImageUploadManager(supabaseBrowser);
+    // Upload image using storage adapter
+    const storageAdapter = getStorageAdapter();
+    const uploadManager = new ImageUploadManager(storageAdapter);
     const result = await uploadManager.uploadImage(file, noteId);
 
     return NextResponse.json({
@@ -78,7 +78,7 @@ export async function POST(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   try {
     // Check authentication
-    const session = await getServerSession(authOptions);
+    const session = await auth();
     if (!session?.user?.id) {
       return NextResponse.json(
         { error: '未授权' },
@@ -114,8 +114,9 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    // Upload images
-    const uploadManager = new ImageUploadManager(supabaseBrowser);
+    // Upload images using storage adapter
+    const storageAdapter = getStorageAdapter();
+    const uploadManager = new ImageUploadManager(storageAdapter);
     const results = await uploadManager.uploadImages(files, noteId);
 
     return NextResponse.json({

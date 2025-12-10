@@ -187,14 +187,20 @@ export function ShareDialog({ noteId, noteTitle, isOwner, open: controlledOpen, 
     }
   }
 
+  // 判断是否由外部控制
+  const isControlled = controlledOpen !== undefined
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant="outline" size="sm">
-          <Share2Icon className="mr-2 h-4 w-4" />
-          Share
-        </Button>
-      </DialogTrigger>
+      {/* 只有在非外部控制时才显示默认触发器 */}
+      {!isControlled && (
+        <DialogTrigger asChild>
+          <Button variant="outline" size="sm">
+            <Share2Icon className="mr-2 h-4 w-4" />
+            Share
+          </Button>
+        </DialogTrigger>
+      )}
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>Share "{noteTitle}"</DialogTitle>

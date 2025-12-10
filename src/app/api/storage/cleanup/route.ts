@@ -6,9 +6,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
-import { supabaseBrowser } from '@/lib/supabase-browser';
-
-const BUCKET_NAME = 'note-images';
+import { getStorageAdapter } from '@/lib/storage/storage-adapter';
 
 export async function DELETE(request: NextRequest) {
   try {
@@ -53,17 +51,19 @@ export async function DELETE(request: NextRequest) {
         deletedNotes = result.count;
 
         // Also delete associated images from storage
+        const storageAdapter = getStorageAdapter();
         for (const noteId of ownedNoteIds) {
           try {
-            const { data: files } = await supabaseBrowser.storage
-              .from(BUCKET_NAME)
-              .list(noteId);
+            const paths = await storageAdapter.list(noteId);
 
-            if (files && files.length > 0) {
-              const filePaths = files.map((file) => `${noteId}/${file.name}`);
-              await supabaseBrowser.storage
-                .from(BUCKET_NAME)
-                .remove(filePaths);
+            if (paths && paths.length > 0) {
+              for (const path of paths) {
+                try {
+                  await storageAdapter.delete(path);
+                } catch (error) {
+                  console.warn(`Error deleting image ${path}:`, error);
+                }
+              }
             }
           } catch (error) {
             console.warn(`Error deleting images for note ${noteId}:`, error);
@@ -92,14 +92,15 @@ export async function DELETE(request: NextRequest) {
       }
 
       if (validPaths.length > 0) {
-        const { data, error } = await supabaseBrowser.storage
-          .from(BUCKET_NAME)
-          .remove(validPaths);
-
-        if (!error) {
-          deletedImages = validPaths.length;
-        } else {
-          console.error('Error deleting images:', error);
+        const storageAdapter = getStorageAdapter();
+        
+        for (const path of validPaths) {
+          try {
+            await storageAdapter.delete(path);
+            deletedImages++;
+          } catch (error) {
+            console.error(`Error deleting image ${path}:`, error);
+          }
         }
       }
     }

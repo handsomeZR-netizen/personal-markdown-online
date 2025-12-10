@@ -134,28 +134,53 @@ export async function callDeepSeek(
 }
 
 /**
- * 通过服务器端 API 路由调用 DeepSeek（使用服务器端默认配置）
+ * 通过服务器端直接调用 DeepSeek API（使用环境变量中的配置）
+ * 注意：此函数在服务器端执行，直接使用环境变量中的 API Key
  */
 async function callDeepSeekViaAPI(
   messages: DeepSeekMessage[],
   options: DeepSeekOptions = {}
 ): Promise<DeepSeekResponse> {
+  // 服务器端直接使用环境变量
+  const apiKey = process.env.DEEPSEEK_API_KEY;
+  const apiUrl = process.env.DEEPSEEK_API_URL || DEEPSEEK_API_URL;
+  const model = process.env.DEEPSEEK_MODEL || 'deepseek-chat';
+
+  if (!apiKey) {
+    throw new DeepSeekError('DeepSeek API key 未配置，请在环境变量中设置 DEEPSEEK_API_KEY');
+  }
+
+  const {
+    model: optModel = model,
+    temperature = 0.7,
+    max_tokens = 2000,
+    top_p = 1,
+    stream = false,
+  } = options;
+
+  const requestBody = {
+    model: optModel,
+    messages,
+    temperature,
+    max_tokens,
+    top_p,
+    stream,
+  };
+
   try {
-    const response = await fetch('/api/ai/chat', {
+    const response = await fetch(`${apiUrl}/chat/completions`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`,
       },
-      body: JSON.stringify({
-        messages,
-        options,
-      }),
+      body: JSON.stringify(requestBody),
     });
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
       throw new DeepSeekError(
-        errorData.error || `API 请求失败: ${response.status}`,
+        errorData.error?.message || `API 请求失败: ${response.status}`,
         response.status,
         errorData
       );
@@ -336,12 +361,21 @@ export async function streamDeepSeekResponse(
 }
 
 /**
- * 通过服务器端 API 路由进行流式调用（使用服务器端默认配置）
+ * 通过服务器端直接进行流式调用（使用环境变量中的配置）
  */
 async function streamDeepSeekViaAPI(
   prompt: string,
   systemPrompt?: string
 ): Promise<ReadableStream> {
+  // 服务器端直接使用环境变量
+  const apiKey = process.env.DEEPSEEK_API_KEY;
+  const apiUrl = process.env.DEEPSEEK_API_URL || DEEPSEEK_API_URL;
+  const model = process.env.DEEPSEEK_MODEL || 'deepseek-chat';
+
+  if (!apiKey) {
+    throw new DeepSeekError('DeepSeek API key 未配置，请在环境变量中设置 DEEPSEEK_API_KEY');
+  }
+
   const messages: DeepSeekMessage[] = [];
 
   if (systemPrompt) {
@@ -350,13 +384,18 @@ async function streamDeepSeekViaAPI(
 
   messages.push({ role: 'user', content: prompt });
 
-  const response = await fetch('/api/ai/stream', {
+  const response = await fetch(`${apiUrl}/chat/completions`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      'Authorization': `Bearer ${apiKey}`,
     },
     body: JSON.stringify({
+      model,
       messages,
+      temperature: 0.7,
+      max_tokens: 4000,
+      stream: true,
     }),
   });
 
@@ -364,5 +403,54 @@ async function streamDeepSeekViaAPI(
     throw new DeepSeekError(`API 请求失败: ${response.status}`);
   }
 
-  return response.body || new ReadableStream();
+  const reader = response.body?.getReader();
+  if (!reader) {
+    throw new DeepSeekError('无法读取响应流');
+  }
+
+  return new ReadableStream({
+    async start(controller) {
+      const decoder = new TextDecoder();
+      
+      try {
+        while (true) {
+          const { done, value } = await reader.read();
+          
+          if (done) {
+            controller.enqueue(new TextEncoder().encode('data: [DONE]\n\n'));
+            controller.close();
+            break;
+          }
+
+          const chunk = decoder.decode(value);
+          const lines = chunk.split('\n');
+
+          for (const line of lines) {
+            if (line.startsWith('data: ')) {
+              const data = line.slice(6);
+              
+              if (data === '[DONE]') {
+                continue;
+              }
+
+              try {
+                const parsed = JSON.parse(data);
+                const content = parsed.choices?.[0]?.delta?.content;
+                
+                if (content) {
+                  controller.enqueue(
+                    new TextEncoder().encode(`data: ${JSON.stringify({ content })}\n\n`)
+                  );
+                }
+              } catch (e) {
+                // 忽略解析错误
+              }
+            }
+          }
+        }
+      } catch (error) {
+        controller.error(error);
+      }
+    },
+  });
 }

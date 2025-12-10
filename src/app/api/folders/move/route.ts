@@ -118,12 +118,12 @@ async function checkCircularReference(
       return true; // Circular reference detected
     }
 
-    const folder = await prisma.folder.findUnique({
+    const foundFolder: { parentId: string | null } | null = await prisma.folder.findUnique({
       where: { id: currentId },
       select: { parentId: true },
     });
 
-    currentId = folder?.parentId || null;
+    currentId = foundFolder?.parentId || null;
   }
 
   return false;

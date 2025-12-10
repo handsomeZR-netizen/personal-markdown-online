@@ -9,9 +9,9 @@ import { formatDistanceToNow } from 'date-fns';
 import { zhCN } from 'date-fns/locale';
 
 interface PublicNotePageProps {
-  params: {
+  params: Promise<{
     slug: string;
-  };
+  }>;
 }
 
 async function getPublicNote(slug: string) {
@@ -48,7 +48,8 @@ async function getPublicNote(slug: string) {
 export async function generateMetadata({
   params,
 }: PublicNotePageProps): Promise<Metadata> {
-  const note = await getPublicNote(params.slug);
+  const { slug } = await params;
+  const note = await getPublicNote(slug);
 
   if (!note) {
     return {
@@ -63,7 +64,8 @@ export async function generateMetadata({
 }
 
 export default async function PublicNotePage({ params }: PublicNotePageProps) {
-  const note = await getPublicNote(params.slug);
+  const { slug } = await params;
+  const note = await getPublicNote(slug);
 
   if (!note) {
     notFound();
@@ -132,10 +134,10 @@ export default async function PublicNotePage({ params }: PublicNotePageProps) {
               {note.contentType === 'tiptap-json' ? (
                 <TiptapReadOnlyViewer content={note.content} />
               ) : (
-                <div
-                  className="whitespace-pre-wrap"
-                  dangerouslySetInnerHTML={{ __html: note.content }}
-                />
+                // Security: Render plain text content safely without HTML injection
+                <div className="whitespace-pre-wrap">
+                  {note.content}
+                </div>
               )}
             </div>
 
@@ -214,7 +216,7 @@ function renderTiptapContent(content: any): React.ReactNode {
         );
       
       case 'heading':
-        const HeadingTag = `h${node.attrs?.level || 1}` as keyof JSX.IntrinsicElements;
+        const HeadingTag = `h${node.attrs?.level || 1}` as 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
         return (
           <HeadingTag key={index}>
             {node.content?.map((child: any, childIndex: number) =>

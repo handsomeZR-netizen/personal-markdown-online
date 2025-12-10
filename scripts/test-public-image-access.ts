@@ -19,7 +19,7 @@ async function testPublicImageAccess() {
   console.log('='.repeat(60));
 
   // Create anonymous Supabase client (no auth)
-  const supabase = createClient(supabaseUrl, supabaseAnonKey);
+  const supabase = createClient(supabaseUrl!, supabaseAnonKey!);
 
   console.log('\n1️⃣ Testing anonymous access to storage bucket...');
   

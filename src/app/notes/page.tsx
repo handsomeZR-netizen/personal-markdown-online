@@ -1,3 +1,4 @@
+import { Suspense } from "react"
 import { getNotes } from "@/lib/actions/notes"
 import { getTags } from "@/lib/actions/tags"
 import { getCategories } from "@/lib/actions/categories"
@@ -13,6 +14,38 @@ import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { Plus } from "lucide-react"
 import { t } from "@/lib/i18n"
+
+function SortSelectorFallback() {
+    return (
+        <div className="flex items-center gap-2">
+            <div className="h-10 w-32 animate-pulse rounded-md bg-muted" />
+            <div className="h-10 w-10 animate-pulse rounded-md bg-muted" />
+        </div>
+    )
+}
+
+function SearchBarFallback() {
+    return <div className="h-10 w-full animate-pulse rounded-md bg-muted" />
+}
+
+function FilterPanelFallback() {
+    return (
+        <div className="space-y-4">
+            <div className="h-6 w-20 animate-pulse rounded bg-muted" />
+            <div className="h-32 w-full animate-pulse rounded-md bg-muted" />
+        </div>
+    )
+}
+
+function PaginationFallback() {
+    return (
+        <div className="flex justify-center gap-2">
+            <div className="h-10 w-10 animate-pulse rounded-md bg-muted" />
+            <div className="h-10 w-10 animate-pulse rounded-md bg-muted" />
+            <div className="h-10 w-10 animate-pulse rounded-md bg-muted" />
+        </div>
+    )
+}
 
 type SearchParams = {
     page?: string
@@ -84,12 +117,16 @@ export default async function NotesPage({
 
             {/* 搜索栏 */}
             <div className="mb-6">
-                <SearchBar />
+                <Suspense fallback={<SearchBarFallback />}>
+                    <SearchBar />
+                </Suspense>
             </div>
 
             {/* 移动端筛选按钮 */}
             <div className="mb-4 md:hidden">
-                <MobileFilterDrawer tags={tags} categories={categories} />
+                <Suspense fallback={<div className="h-11 w-full animate-pulse rounded-md bg-muted" />}>
+                    <MobileFilterDrawer tags={tags} categories={categories} />
+                </Suspense>
             </div>
 
             {/* 主内容区域 - 文件夹、筛选面板和笔记列表 */}
@@ -100,14 +137,18 @@ export default async function NotesPage({
                         <div className="border rounded-lg p-4 bg-card">
                             <FolderSidebar />
                         </div>
-                        <FilterPanel tags={tags} categories={categories} />
+                        <Suspense fallback={<FilterPanelFallback />}>
+                            <FilterPanel tags={tags} categories={categories} />
+                        </Suspense>
                     </div>
                 </aside>
 
                 {/* 右侧笔记列表 */}
                 <section className="lg:col-span-9 xl:col-span-10 space-y-6">
                     {/* 排序选择器 */}
-                    <SortSelector baseUrl="/notes" />
+                    <Suspense fallback={<SortSelectorFallback />}>
+                        <SortSelector baseUrl="/notes" />
+                    </Suspense>
 
                     {/* 笔记列表 */}
                     {notes.length > 0 ? (
@@ -119,11 +160,13 @@ export default async function NotesPage({
                             </div>
                             
                             {/* 分页 */}
-                            <Pagination 
-                                currentPage={currentPage} 
-                                totalPages={totalPages}
-                                baseUrl="/notes"
-                            />
+                            <Suspense fallback={<PaginationFallback />}>
+                                <Pagination 
+                                    currentPage={currentPage} 
+                                    totalPages={totalPages}
+                                    baseUrl="/notes"
+                                />
+                            </Suspense>
                         </>
                     ) : (
                         <div className="text-center mt-10 space-y-2" role="status" aria-live="polite">

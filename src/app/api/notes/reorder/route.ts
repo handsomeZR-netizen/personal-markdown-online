@@ -1,6 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import { batchUpdateNoteSortOrders } from '@/lib/actions/preferences';
+import { z } from 'zod';
+
+// Schema for validating reorder updates
+const reorderUpdateSchema = z.object({
+  id: z.string().uuid('Invalid note ID format'),
+  sortOrder: z.number().int().min(0).max(1000000),
+});
+
+const reorderRequestSchema = z.object({
+  updates: z.array(reorderUpdateSchema).min(1).max(100, 'Too many updates in single request'),
+});
 
 /**
  * POST /api/notes/reorder
@@ -15,24 +26,17 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { updates } = body;
-
-    if (!Array.isArray(updates)) {
+    
+    // Validate request body with Zod schema
+    const parseResult = reorderRequestSchema.safeParse(body);
+    if (!parseResult.success) {
       return NextResponse.json(
-        { error: 'Invalid request: updates must be an array' },
+        { error: parseResult.error.errors[0]?.message || 'Invalid request format' },
         { status: 400 }
       );
     }
 
-    // Validate each update
-    for (const update of updates) {
-      if (!update.id || typeof update.sortOrder !== 'number') {
-        return NextResponse.json(
-          { error: 'Invalid update format: each update must have id and sortOrder' },
-          { status: 400 }
-        );
-      }
-    }
+    const { updates } = parseResult.data;
 
     const result = await batchUpdateNoteSortOrders(updates);
 

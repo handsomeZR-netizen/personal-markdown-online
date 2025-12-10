@@ -1,13 +1,11 @@
-// prisma/schema.prisma
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
   provider  = "postgresql"
-  url       = env("DATABASE_URL") // ✅ 改为标准 Supabase 变量名
-  directUrl = env("DIRECT_URL") // ✅ 改为标准 Supabase 变量名
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model User {
@@ -15,53 +13,43 @@ model User {
   email          String          @unique
   password       String
   name           String?
-  avatar         String? // New: Avatar URL for collaboration
-  color          String? // New: Cursor color for collaboration
-  webhookUrl     String? // New: Personal webhook URL
+  avatar         String?
+  color          String?
+  webhookUrl     String?
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
-  notes          Note[]
-  ownedNotes     Note[]          @relation("NoteOwner")
   collaborations Collaborator[]
   folders        Folder[]
+  ownedNotes     Note[]          @relation("NoteOwner")
+  notes          Note[]
   preferences    UserPreference?
 
   @@index([email])
 }
 
 model Note {
-  id          String  @id @default(cuid())
-  title       String
-  content     String  @db.Text
-  contentType String  @default("tiptap-json") // New: Content type (tiptap-json, markdown, etc.)
-  summary     String? @db.Text
-  embedding   String? @db.Text
-
-  // Hierarchy (New)
-  folderId String?
-  folder   Folder? @relation(fields: [folderId], references: [id])
-
-  // Ownership (Updated)
-  userId  String // Creator
-  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  ownerId String // Owner
-  owner   User   @relation("NoteOwner", fields: [ownerId], references: [id])
-
-  // Collaboration (New)
+  id            String         @id @default(cuid())
+  title         String
+  content       String
+  contentType   String         @default("tiptap-json")
+  summary       String?
+  embedding     String?
+  folderId      String?
+  userId        String
+  ownerId       String
   isPublic      Boolean        @default(false)
   publicSlug    String?        @unique
+  categoryId    String?
+  sortOrder     Int            @default(0)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
   collaborators Collaborator[]
-
-  // Version Control (New)
-  versions NoteVersion[]
-
-  // Existing fields
-  tags       Tag[]
-  category   Category? @relation(fields: [categoryId], references: [id])
-  categoryId String?
-  sortOrder  Int       @default(0) // For manual sorting
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
+  category      Category?      @relation(fields: [categoryId], references: [id])
+  folder        Folder?        @relation(fields: [folderId], references: [id])
+  owner         User           @relation("NoteOwner", fields: [ownerId], references: [id])
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  versions      NoteVersion[]
+  tags          Tag[]          @relation("NoteToTag")
 
   @@index([userId])
   @@index([ownerId])
@@ -74,60 +62,56 @@ model Note {
   @@index([folderId, sortOrder])
 }
 
-// Folder model for hierarchical organization
 model Folder {
   id        String   @id @default(cuid())
   name      String
   parentId  String?
-  parent    Folder?  @relation("FolderHierarchy", fields: [parentId], references: [id], onDelete: Cascade)
-  children  Folder[] @relation("FolderHierarchy")
-  notes     Note[]
   userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  sortOrder Int      @default(0) // For manual sorting
+  sortOrder Int      @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  parent    Folder?  @relation("FolderHierarchy", fields: [parentId], references: [id], onDelete: Cascade)
+  children  Folder[] @relation("FolderHierarchy")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  notes     Note[]
 
   @@index([userId])
   @@index([parentId])
   @@index([parentId, sortOrder])
 }
 
-// Collaborator model for note sharing
 model Collaborator {
   id        String   @id @default(cuid())
   noteId    String
-  note      Note     @relation(fields: [noteId], references: [id], onDelete: Cascade)
   userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  role      String // "editor" | "viewer"
+  role      String
   createdAt DateTime @default(now())
+  note      Note     @relation(fields: [noteId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([noteId, userId])
   @@index([noteId])
   @@index([userId])
 }
 
-// NoteVersion model for version history
 model NoteVersion {
   id        String   @id @default(cuid())
   noteId    String
-  note      Note     @relation(fields: [noteId], references: [id], onDelete: Cascade)
-  content   String   @db.Text
+  content   String
   title     String
-  userId    String // User who made the modification
+  userId    String
   createdAt DateTime @default(now())
+  note      Note     @relation(fields: [noteId], references: [id], onDelete: Cascade)
 
   @@index([noteId])
   @@index([createdAt])
 }
 
-// NoteTemplate model for reusable templates
 model NoteTemplate {
   id          String   @id @default(cuid())
   name        String
   description String?
-  content     String   @db.Text
+  content     String
   userId      String
   usageCount  Int      @default(0)
   createdAt   DateTime @default(now())
@@ -139,7 +123,7 @@ model NoteTemplate {
 model Tag {
   id    String @id @default(cuid())
   name  String @unique
-  notes Note[]
+  notes Note[] @relation("NoteToTag")
 }
 
 model Category {
@@ -148,15 +132,14 @@ model Category {
   notes Note[]
 }
 
-// UserPreference model for storing user preferences
 model UserPreference {
-  id         String   @id @default(cuid())
-  userId     String   @unique
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  sortBy     String   @default("updatedAt") // "name" | "createdAt" | "updatedAt" | "manual"
-  sortOrder  String   @default("desc") // "asc" | "desc"
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  sortBy    String   @default("updatedAt")
+  sortOrder String   @default("desc")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
 }

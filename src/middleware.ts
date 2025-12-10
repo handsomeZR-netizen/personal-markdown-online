@@ -7,9 +7,12 @@ const auth = NextAuth({
   secret: process.env.AUTH_SECRET,
 }).auth
 
-export default auth((req) => {
+export default auth(async (req) => {
   const { nextUrl } = req
   const isLoggedIn = !!req.auth
+
+  // Note: Database health checks are performed in instrumentation.ts
+  // Middleware runs in Edge Runtime and cannot use Prisma directly
 
   // 跳过 API 路由、静态文件等
   if (

@@ -49,9 +49,30 @@ export default async function DashboardPage({
     // 只显示最近 6 篇
     notes = notes.slice(0, 6)
 
-    // 统计数据（简化版，因为我们没有迁移 Tag 和 Category 的查询）
-    const tagCount = 0
-    const categoryCount = 0
+    // 统计数据 - 从笔记中提取实际数据
+    const allNotesData = allNotes || []
+    const totalNoteCount = allNotesData.length
+    
+    // 计算唯一标签数（如果笔记有 tags 字段）
+    const uniqueTags = new Set<string>()
+    const uniqueCategories = new Set<string>()
+    
+    allNotesData.forEach(note => {
+      // 处理标签
+      if ((note as any).tags && Array.isArray((note as any).tags)) {
+        (note as any).tags.forEach((tag: any) => {
+          if (tag?.name) uniqueTags.add(tag.name)
+          else if (typeof tag === 'string') uniqueTags.add(tag)
+        })
+      }
+      // 处理分类
+      if ((note as any).categoryId) {
+        uniqueCategories.add((note as any).categoryId)
+      }
+    })
+    
+    const tagCount = uniqueTags.size
+    const categoryCount = uniqueCategories.size
     const recentNoteDate = notes[0]?.updatedAt
 
     return (
@@ -64,9 +85,9 @@ export default async function DashboardPage({
                 />
 
                 {/* 统计卡片 */}
-                {notes.length > 0 && (
+                {totalNoteCount > 0 && (
                     <StatsCards
-                        noteCount={notes.length}
+                        noteCount={totalNoteCount}
                         tagCount={tagCount}
                         categoryCount={categoryCount}
                         recentNoteDate={recentNoteDate}

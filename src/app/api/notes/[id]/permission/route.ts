@@ -4,16 +4,16 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/auth'
+import { auth } from '@/auth'
 import { checkNotePermission } from '@/lib/actions/collaborators'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await getServerSession(authOptions)
+    const { id: noteId } = await params;
+    const session = await auth()
     if (!session?.user?.id) {
       return NextResponse.json(
         { hasAccess: false, canEdit: false, role: null },
@@ -21,7 +21,6 @@ export async function GET(
       )
     }
 
-    const noteId = params.id
     const permission = await checkNotePermission(noteId, session.user.id)
 
     return NextResponse.json(permission)

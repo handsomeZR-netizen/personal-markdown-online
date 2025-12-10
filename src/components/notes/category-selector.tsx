@@ -27,11 +27,20 @@ export function CategorySelector({ selectedCategoryId, onChange }: CategorySelec
     useEffect(() => {
         async function loadCategories() {
             setIsLoading(true)
-            const result = await getCategories()
-            if (result.success && result.data) {
-                setCategories(result.data)
+            try {
+                const result = await getCategories()
+                if (result.success && result.data) {
+                    setCategories(result.data)
+                } else {
+                    console.error('Failed to load categories:', result.error)
+                    setCategories([])
+                }
+            } catch (error) {
+                console.error('Error loading categories:', error)
+                setCategories([])
+            } finally {
+                setIsLoading(false)
             }
-            setIsLoading(false)
         }
         
         loadCategories()

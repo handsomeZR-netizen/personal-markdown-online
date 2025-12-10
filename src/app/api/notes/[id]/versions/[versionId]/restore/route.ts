@@ -9,9 +9,10 @@ import { revalidatePath } from "next/cache"
  */
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string; versionId: string } }
+  { params }: { params: Promise<{ id: string; versionId: string }> }
 ) {
   try {
+    const { id: noteId, versionId } = await params;
     const session = await auth()
     if (!session?.user?.id) {
       return NextResponse.json(
@@ -19,9 +20,6 @@ export async function POST(
         { status: 401 }
       )
     }
-
-    const noteId = params.id
-    const versionId = params.versionId
 
     const result = await restoreNoteVersion(noteId, versionId, session.user.id)
 
