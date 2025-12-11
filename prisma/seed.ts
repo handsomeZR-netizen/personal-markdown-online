@@ -162,16 +162,19 @@ async function createUsers(count: number): Promise<any[]> {
   const hashedPassword = await bcrypt.hash('password123', 10);
   
   for (let i = 0; i < count; i++) {
+    const userId = `user-${i + 1}-${Date.now()}`;
     const user = await prisma.user.create({
       data: {
+        id: userId,
         email: `user${i + 1}@example.com`,
         password: hashedPassword,
         name: `User ${i + 1}`,
         avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=user${i + 1}`,
         color: colors[i % colors.length],
+        updatedAt: new Date(),
         UserPreference: {
           create: {
-            id: `pref-user${i + 1}`,
+            id: `pref-user${i + 1}-${Date.now()}`,
             sortBy: 'updatedAt',
             sortOrder: 'desc',
             updatedAt: new Date()
