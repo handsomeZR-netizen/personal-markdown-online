@@ -169,10 +169,12 @@ async function createUsers(count: number): Promise<any[]> {
         name: `User ${i + 1}`,
         avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=user${i + 1}`,
         color: colors[i % colors.length],
-        preferences: {
+        UserPreference: {
           create: {
+            id: `pref-user${i + 1}`,
             sortBy: 'updatedAt',
-            sortOrder: 'desc'
+            sortOrder: 'desc',
+            updatedAt: new Date()
           }
         }
       }
