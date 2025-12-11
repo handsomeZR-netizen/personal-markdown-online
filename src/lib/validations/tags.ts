@@ -1,4 +1,5 @@
 import { z } from "zod"
+import { cuid } from "./shared"
 
 /**
  * 标签相关的验证 schema
@@ -13,7 +14,7 @@ export const createTagSchema = z.object({
 })
 
 export const updateTagSchema = z.object({
-  id: z.string().cuid("无效的标签ID"),
+  id: cuid("无效的标签ID"),
   name: z
     .string()
     .min(1, "标签名称不能为空")
@@ -22,7 +23,7 @@ export const updateTagSchema = z.object({
 })
 
 export const deleteTagSchema = z.object({
-  id: z.string().cuid("无效的标签ID"),
+  id: cuid("无效的标签ID"),
 })
 
 export type CreateTagInput = z.infer<typeof createTagSchema>

@@ -3,6 +3,7 @@
 import { useRouter, useSearchParams, usePathname } from "next/navigation"
 import { TagFilter } from "./tag-filter"
 import { CategoryFilter } from "./category-filter"
+import { OwnershipFilter } from "./ownership-filter"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { X, Filter } from "lucide-react"
@@ -150,6 +151,9 @@ export function FilterPanel({ tags, categories }: FilterPanelProps) {
             </div>
           </div>
         )}
+
+        {/* 所有权筛选 */}
+        <OwnershipFilter />
 
         {/* 标签筛选 */}
         <TagFilter tags={tags} />

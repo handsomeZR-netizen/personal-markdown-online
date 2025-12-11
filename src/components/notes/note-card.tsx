@@ -6,7 +6,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { Edit, Trash2 } from "lucide-react"
+import { Edit, Trash2, Users, Eye, Pencil } from "lucide-react"
 import { deleteNote } from "@/lib/actions/notes"
 import { t } from "@/lib/i18n"
 import { formatDate } from "@/lib/i18n/date-format"
@@ -31,6 +31,9 @@ type NoteCardProps = {
         updatedAt: Date
         tags: Array<{ id: string; name: string }>
         category: { id: string; name: string } | null
+        isShared?: boolean
+        isOwner?: boolean
+        collaboratorRole?: string | null
     }
 }
 
@@ -156,7 +159,31 @@ export function NoteCard({ note }: NoteCardProps) {
             <div className={cn("flex-1", isLoading && "opacity-70")} aria-label={`查看笔记: ${note.title}`}>
                 <CardHeader>
                     <div className="flex items-start justify-between gap-2">
-                        <CardTitle id={`note-title-${note.id}`} className="truncate flex-1">{note.title}</CardTitle>
+                        <div className="flex items-center gap-2 flex-1 min-w-0">
+                            <CardTitle id={`note-title-${note.id}`} className="truncate">{note.title}</CardTitle>
+                            {/* 协作标识 */}
+                            {note.isShared && !note.isOwner && (
+                                <TooltipProvider>
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <Badge 
+                                                variant="secondary" 
+                                                className="shrink-0 gap-1 text-xs bg-primary/10 text-primary border-primary/20"
+                                            >
+                                                {note.collaboratorRole === 'editor' ? (
+                                                    <><Pencil className="h-3 w-3" />协作</>
+                                                ) : (
+                                                    <><Eye className="h-3 w-3" />只读</>
+                                                )}
+                                            </Badge>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                            <p>这是共享给你的笔记，你拥有{note.collaboratorRole === 'editor' ? '编辑' : '只读'}权限</p>
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </TooltipProvider>
+                            )}
+                        </div>
                         <div onClick={(e) => {
                             e.preventDefault()
                             handleSyncStatusClick()
@@ -166,8 +193,8 @@ export function NoteCard({ note }: NoteCardProps) {
                     </div>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                    {/* 摘要显示 - 限制2-3行，悬停显示完整摘要 */}
-                    <div className="space-y-1">
+                    {/* 摘要显示 - 固定高度确保卡片一致 */}
+                    <div className="h-[72px]">
                         <TooltipProvider>
                             <Tooltip>
                                 <TooltipTrigger asChild>
@@ -184,11 +211,13 @@ export function NoteCard({ note }: NoteCardProps) {
                                 </TooltipContent>
                             </Tooltip>
                         </TooltipProvider>
-                        {isAISummary && (
-                            <span className="text-xs text-muted-foreground/70 italic">
-                                AI 生成
-                            </span>
-                        )}
+                        {/* AI 标签始终占位，保持卡片高度一致 */}
+                        <span className={cn(
+                            "text-xs italic h-4 block mt-1",
+                            isAISummary ? "text-muted-foreground/70" : "invisible"
+                        )}>
+                            {isAISummary ? "AI 生成" : "\u00A0"}
+                        </span>
                     </div>
                     
                     {/* 标签 */}

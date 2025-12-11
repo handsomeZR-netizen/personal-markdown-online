@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input"
 import { FolderPlus, ChevronRight, ChevronDown, Folder, FileText } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { toast } from "sonner"
-import { createFolder, getFolders } from "@/lib/actions/folders"
+import { createFolder } from "@/lib/actions/folders"
 import { useRouter } from "next/navigation"
 
 interface FolderNode {
@@ -17,66 +17,21 @@ interface FolderNode {
   children?: FolderNode[]
 }
 
-export function FolderSidebar() {
+interface FolderSidebarProps {
+  initialFolders?: FolderNode[]
+}
+
+export function FolderSidebar({ initialFolders = [] }: FolderSidebarProps) {
   const router = useRouter()
-  const [folders, setFolders] = useState<FolderNode[]>([])
+  const [folders, setFolders] = useState<FolderNode[]>(initialFolders)
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set())
   const [isCreating, setIsCreating] = useState(false)
   const [newFolderName, setNewFolderName] = useState("")
-  const [loading, setLoading] = useState(true)
 
+  // 当 initialFolders 变化时同步更新
   useEffect(() => {
-    loadFolders()
-  }, [])
-
-  const loadFolders = async () => {
-    setLoading(true)
-    try {
-      const result = await getFolders()
-      if (result?.success && result.data) {
-        // 构建树形结构
-        const folderMap = new Map<string, FolderNode>()
-        const rootFolders: FolderNode[] = []
-
-        // 第一遍：创建所有节点
-        result.data.forEach((folder: any) => {
-          folderMap.set(folder.id, {
-            id: folder.id,
-            name: folder.name,
-            parentId: folder.parentId,
-            noteCount: folder._count?.notes || 0,
-            children: []
-          })
-        })
-
-        // 第二遍：建立父子关系
-        folderMap.forEach((folder) => {
-          if (folder.parentId) {
-            const parent = folderMap.get(folder.parentId)
-            if (parent) {
-              parent.children = parent.children || []
-              parent.children.push(folder)
-            }
-          } else {
-            rootFolders.push(folder)
-          }
-        })
-
-        setFolders(rootFolders)
-      } else {
-        // Handle error case or unauthorized - set empty folders
-        if (result?.error && result.error !== '未授权') {
-          console.error('加载文件夹失败:', result.error)
-        }
-        setFolders([])
-      }
-    } catch (error) {
-      console.error('加载文件夹失败:', error)
-      setFolders([])
-    } finally {
-      setLoading(false)
-    }
-  }
+    setFolders(initialFolders)
+  }, [initialFolders])
 
   const handleCreateFolder = async () => {
     if (!newFolderName.trim()) {
@@ -90,7 +45,8 @@ export function FolderSidebar() {
         toast.success('文件夹创建成功')
         setNewFolderName("")
         setIsCreating(false)
-        loadFolders()
+        // 刷新页面以获取最新数据
+        router.refresh()
       } else {
         toast.error(result.error || '创建失败')
       }
@@ -224,11 +180,7 @@ export function FolderSidebar() {
       )}
 
       <div className="space-y-0.5">
-        {loading ? (
-          <div className="text-sm text-muted-foreground py-4 text-center">
-            加载中...
-          </div>
-        ) : folders.length === 0 ? (
+        {folders.length === 0 ? (
           <div className="text-sm text-muted-foreground py-4 text-center">
             暂无文件夹
           </div>

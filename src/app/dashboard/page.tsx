@@ -6,6 +6,7 @@ import { WelcomeSection } from "@/components/dashboard/welcome-section"
 import { StatsCards } from "@/components/dashboard/stats-cards"
 import { AnimatedNoteCard } from "@/components/dashboard/animated-note-card"
 import { FloatingActionButton } from "@/components/dashboard/floating-action-button"
+import { SharedNotesSection } from "@/components/dashboard/shared-notes-section"
 import Link from "next/link"
 import { t } from "@/lib/i18n"
 import { Grid, Sparkles, FileText } from "lucide-react"
@@ -148,7 +149,8 @@ export default async function DashboardPage({
                     </Link>
                 </div>
 
-
+                {/* 共享给我的笔记 */}
+                <SharedNotesSection />
 
                 {/* 最近笔记 */}
                 {notes.length > 0 && (

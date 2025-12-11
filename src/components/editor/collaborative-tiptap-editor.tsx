@@ -11,9 +11,10 @@ import Image from '@tiptap/extension-image';
 import Placeholder from '@tiptap/extension-placeholder';
 import Collaboration from '@tiptap/extension-collaboration';
 import CollaborationCursor from '@tiptap/extension-collaboration-cursor';
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { toast } from 'sonner';
 import { Loader2, Wifi, WifiOff, Users } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { useCollaboration } from '@/hooks/use-collaboration';
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -43,6 +44,23 @@ export function CollaborativeTiptapEditor({
 }: CollaborativeTiptapEditorProps) {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState<string>('');
+
+  // Magic border effect state
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [isHovered, setIsHovered] = useState(false);
+
+  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    if (!containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    setMousePosition({
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
+    });
+  }, []);
+
+  const handleMouseEnter = useCallback(() => setIsHovered(true), []);
+  const handleMouseLeave = useCallback(() => setIsHovered(false), []);
 
   // Initialize collaboration
   const {
@@ -328,7 +346,48 @@ export function CollaborativeTiptapEditor({
   };
 
   return (
-    <div className="relative border rounded-lg overflow-hidden bg-background">
+    <div
+      ref={containerRef}
+      className="relative group rounded-lg"
+      onMouseMove={handleMouseMove}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
+      {/* Animated gradient border - subtle in light mode, prominent in dark mode */}
+      <div
+        className={cn(
+          "absolute -inset-[1px] rounded-lg pointer-events-none transition-opacity duration-500",
+          "opacity-0 group-hover:opacity-20 dark:group-hover:opacity-50",
+          "bg-gradient-to-r from-violet-500 via-blue-500 to-purple-600"
+        )}
+      />
+
+      {/* Mouse-following glow effect */}
+      <div
+        className="absolute -inset-[1px] rounded-lg pointer-events-none transition-opacity duration-300"
+        style={{
+          opacity: isHovered ? 0.15 : 0,
+          background: `radial-gradient(400px circle at ${mousePosition.x}px ${mousePosition.y}px, rgba(139, 92, 246, 0.4), transparent 40%)`,
+        }}
+      />
+
+      {/* Animated border beam - flowing gradient effect */}
+      <div className="absolute -inset-[1px] rounded-lg pointer-events-none overflow-hidden">
+        <div
+          className={cn(
+            "absolute inset-0 transition-opacity duration-500",
+            "opacity-0 dark:opacity-30",
+            isHovered && "opacity-10 dark:opacity-60"
+          )}
+          style={{
+            background: `conic-gradient(from var(--border-angle, 0deg) at 50% 50%, transparent 0%, rgb(139, 92, 246) 10%, rgb(59, 130, 246) 20%, rgb(147, 51, 234) 30%, transparent 40%)`,
+            animation: "border-beam 4s linear infinite",
+          }}
+        />
+      </div>
+
+      {/* Main editor container */}
+      <div className="relative border rounded-lg overflow-hidden bg-background">
       {/* Collaboration status bar */}
       {enableCollaboration && (
         <div className="flex items-center justify-between px-4 py-2 bg-muted/50 border-b">
@@ -408,6 +467,7 @@ export function CollaborativeTiptapEditor({
       />
 
       <EditorContent editor={editor} />
+      </div>
     </div>
   );
 }

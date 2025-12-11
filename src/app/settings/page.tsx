@@ -11,7 +11,8 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion"
-import { Sparkles, Webhook, Wifi, HardDrive, Smartphone, Database } from "lucide-react"
+import { Sparkles, Webhook, Wifi, HardDrive, Smartphone, Database, Image } from "lucide-react"
+import { WallpaperSettingsComponent } from "@/components/settings/wallpaper-settings"
 import Link from "next/link"
 
 export default async function SettingsPage() {
@@ -97,6 +98,23 @@ export default async function SettingsPage() {
           </AccordionTrigger>
           <AccordionContent>
             <CacheSettingsComponent />
+          </AccordionContent>
+        </AccordionItem>
+
+        <AccordionItem value="wallpaper" className="border rounded-lg px-6">
+          <AccordionTrigger className="hover:no-underline">
+            <div className="flex items-center gap-3">
+              <Image className="h-5 w-5 text-pink-600" />
+              <div className="text-left">
+                <div className="font-semibold">壁纸设置</div>
+                <div className="text-sm text-muted-foreground font-normal">
+                  自定义应用背景壁纸、透明度和位置
+                </div>
+              </div>
+            </div>
+          </AccordionTrigger>
+          <AccordionContent>
+            <WallpaperSettingsComponent />
           </AccordionContent>
         </AccordionItem>
 

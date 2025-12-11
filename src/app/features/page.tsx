@@ -4,35 +4,26 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { CoreFeatureCards, ContentFeatureCards, ExportFeatureCards, SpecialFeatureCards, SpecialFeatureCards2, MobileFeatureCards, CollaborationFeatureCards, ProductivityFeatureCards } from "@/components/features"
 import { 
   FolderTree, 
   Users, 
   Image, 
   Download, 
   Smartphone, 
-  Search, 
-  History, 
-  FileText, 
-  Webhook,
   ArrowLeft,
   Sparkles,
-  Share2,
   Calculator,
   Zap,
   CheckCircle2,
   Palette,
-  Globe,
-  Lock,
-  Tag,
-  Clock,
   Eye,
-  Edit3,
+  Clock,
+  History,
   Layers,
-  Wifi,
   WifiOff,
   Keyboard,
   Moon,
-  Sun,
   Database,
   Shield,
   Bookmark,
@@ -47,80 +38,6 @@ export default async function FeaturesPage() {
   if (!session?.user) {
     redirect('/login')
   }
-
-  // 核心功能
-  const coreFeatures = [
-    {
-      icon: Edit3,
-      title: "Markdown 编辑器",
-      description: "强大的 Markdown 编辑器，支持实时预览和语法高亮",
-      href: "/notes/new",
-      color: "text-blue-500",
-      bgColor: "bg-blue-500/10",
-      status: "stable"
-    },
-    {
-      icon: FolderTree,
-      title: "文件夹管理",
-      description: "创建、嵌套、拖放文件夹，树形结构组织笔记",
-      href: "/notes",
-      color: "text-green-500",
-      bgColor: "bg-green-500/10",
-      status: "stable",
-      info: "在笔记列表左侧查看文件夹树"
-    },
-    {
-      icon: Search,
-      title: "全文搜索",
-      description: "统一搜索文件夹和笔记内容，支持全文检索",
-      href: "/search",
-      color: "text-cyan-500",
-      bgColor: "bg-cyan-500/10",
-      status: "stable"
-    },
-    {
-      icon: Tag,
-      title: "标签系统",
-      description: "为笔记添加标签，快速分类和查找",
-      href: "/notes",
-      color: "text-purple-500",
-      bgColor: "bg-purple-500/10",
-      status: "stable"
-    }
-  ]
-
-  // 协作功能
-  const collaborationFeatures = [
-    {
-      icon: Users,
-      title: "实时协作",
-      description: "多人同时编辑笔记，实时同步光标和内容",
-      href: "/notes",
-      color: "text-green-600",
-      bgColor: "bg-green-600/10",
-      status: "beta",
-      info: "需要启动 WebSocket 服务器"
-    },
-    {
-      icon: Share2,
-      title: "公开分享",
-      description: "生成公开链接，与任何人分享你的笔记",
-      href: "/notes",
-      color: "text-emerald-500",
-      bgColor: "bg-emerald-500/10",
-      status: "stable",
-      info: "在笔记页面点击分享按钮"
-    },
-    {
-      icon: Lock,
-      title: "权限管理",
-      description: "设置笔记访问权限，控制谁可以查看和编辑",
-      href: "/notes",
-      color: "text-red-500",
-      bgColor: "bg-red-500/10",
-      status: "stable"
-    }
-  ]
 
   // 内容增强
   const contentFeatures = [
@@ -197,68 +114,9 @@ export default async function FeaturesPage() {
     }
   ]
 
-  // 效率工具
-  const productivityFeatures = [
-    {
-      icon: FileText,
-      title: "模板系统",
-      description: "使用和创建笔记模板，提高工作效率",
-      href: "/templates",
-      color: "text-indigo-600",
-      bgColor: "bg-indigo-600/10",
-      status: "stable"
-    },
-    {
-      icon: Sparkles,
-      title: "AI 助手",
-      description: "AI 摘要、标签生成、内容格式化、语义搜索",
-      href: "/ai",
-      color: "text-violet-600",
-      bgColor: "bg-violet-600/10",
-      status: "beta"
-    },
-    {
-      icon: Webhook,
-      title: "Webhook 集成",
-      description: "笔记事件通知和自动化集成",
-      href: "/settings/webhooks",
-      color: "text-red-600",
-      bgColor: "bg-red-600/10",
-      status: "stable"
-    }
-  ]
 
-  // 移动端与体验
-  const mobileFeatures = [
-    {
-      icon: Smartphone,
-      title: "PWA 应用",
-      description: "安装为原生应用，支持离线使用",
-      href: "/settings/pwa",
-      color: "text-pink-600",
-      bgColor: "bg-pink-600/10",
-      status: "stable"
-    },
-    {
-      icon: Zap,
-      title: "加载动画",
-      description: "优雅的加载动画系统，提升用户体验",
-      href: "/test-loading",
-      color: "text-amber-600",
-      bgColor: "bg-amber-600/10",
-      status: "new",
-      info: "Orbit、Pulse、Dots 等多种样式"
-    },
-    {
-      icon: Globe,
-      title: "响应式设计",
-      description: "完美适配桌面、平板、手机各种设备",
-      href: "/notes",
-      color: "text-teal-500",
-      bgColor: "bg-teal-500/10",
-      status: "stable"
-    }
-  ]
+
+
 
   // 特色功能
   const specialFeatures = [
@@ -421,69 +279,54 @@ export default async function FeaturesPage() {
         <p className="text-muted-foreground text-lg">探索所有可用的功能和工具，提升你的笔记体验</p>
       </div>
 
-      {/* 核心功能 */}
+      {/* 核心功能 - 使用可点击弹窗的客户端组件 */}
       <section className="mb-12">
         <div className="flex items-center gap-2 mb-6">
           <Layers className="h-6 w-6 text-primary" />
           <h2 className="text-2xl font-bold">核心功能</h2>
+          <Badge variant="secondary" className="text-xs">点击查看实现详情</Badge>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {coreFeatures.map((feature) => (
-            <FeatureCard key={feature.title} feature={feature} />
-          ))}
-        </div>
+        <CoreFeatureCards />
       </section>
 
-      {/* 协作功能 */}
+      {/* 协作功能 - 使用可点击弹窗的客户端组件 */}
       <section className="mb-12">
         <div className="flex items-center gap-2 mb-6">
           <Users className="h-6 w-6 text-primary" />
           <h2 className="text-2xl font-bold">协作功能</h2>
+          <Badge variant="secondary" className="text-xs">点击查看实现详情</Badge>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {collaborationFeatures.map((feature) => (
-            <FeatureCard key={feature.title} feature={feature} />
-          ))}
-        </div>
+        <CollaborationFeatureCards />
       </section>
 
-      {/* 内容增强 */}
+      {/* 内容增强 - 使用可点击弹窗的客户端组件 */}
       <section className="mb-12">
         <div className="flex items-center gap-2 mb-6">
           <Sparkles className="h-6 w-6 text-primary" />
           <h2 className="text-2xl font-bold">内容增强</h2>
+          <Badge variant="secondary" className="text-xs">点击查看实现详情</Badge>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {contentFeatures.map((feature) => (
-            <FeatureCard key={feature.title} feature={feature} />
-          ))}
-        </div>
+        <ContentFeatureCards />
       </section>
 
-      {/* 导出与历史 */}
+      {/* 导出与历史 - 使用可点击弹窗的客户端组件 */}
       <section className="mb-12">
         <div className="flex items-center gap-2 mb-6">
           <Download className="h-6 w-6 text-primary" />
           <h2 className="text-2xl font-bold">导出与历史</h2>
+          <Badge variant="secondary" className="text-xs">点击查看实现详情</Badge>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {exportFeatures.map((feature) => (
-            <FeatureCard key={feature.title} feature={feature} />
-          ))}
-        </div>
+        <ExportFeatureCards />
       </section>
 
-      {/* 效率工具 */}
+      {/* 效率工具 - 使用可点击弹窗的客户端组件 */}
       <section className="mb-12">
         <div className="flex items-center gap-2 mb-6">
           <Zap className="h-6 w-6 text-primary" />
           <h2 className="text-2xl font-bold">效率工具</h2>
+          <Badge variant="secondary" className="text-xs">点击查看实现详情</Badge>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {productivityFeatures.map((feature) => (
-            <FeatureCard key={feature.title} feature={feature} />
-          ))}
-        </div>
+        <ProductivityFeatureCards />
       </section>
 
       {/* 移动端与体验 */}
@@ -491,15 +334,12 @@ export default async function FeaturesPage() {
         <div className="flex items-center gap-2 mb-6">
           <Smartphone className="h-6 w-6 text-primary" />
           <h2 className="text-2xl font-bold">移动端与体验</h2>
+          <Badge variant="secondary" className="text-xs">点击查看实现详情</Badge>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {mobileFeatures.map((feature) => (
-            <FeatureCard key={feature.title} feature={feature} />
-          ))}
-        </div>
+        <MobileFeatureCards />
       </section>
 
-      {/* 特色功能 */}
+      {/* 特色功能 - 使用可点击弹窗的客户端组件 */}
       <section className="mb-12">
         <div className="flex items-center gap-2 mb-6">
           <Star className="h-6 w-6 text-primary" />
@@ -507,11 +347,12 @@ export default async function FeaturesPage() {
           <Badge className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white">
             亮点
           </Badge>
+          <Badge variant="secondary" className="text-xs">点击查看实现详情</Badge>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-          {specialFeatures.map((feature) => (
-            <FeatureCard key={feature.title} feature={feature} />
-          ))}
+        <SpecialFeatureCards />
+        {/* 其他特色功能 - 使用可点击弹窗的客户端组件 */}
+        <div className="mt-6">
+          <SpecialFeatureCards2 />
         </div>
       </section>
 

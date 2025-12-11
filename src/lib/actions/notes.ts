@@ -66,6 +66,7 @@ export async function getNotes(params?: {
     sortBy?: 'createdAt' | 'updatedAt' | 'title'
     sortOrder?: 'asc' | 'desc'
     query?: string
+    ownership?: 'all' | 'mine' | 'shared'
 }) {
     const session = await auth()
     if (!session?.user?.id) {
@@ -77,7 +78,18 @@ export async function getNotes(params?: {
         }
     }
 
-    const { data: allNotes, error } = await getUserNotes(session.user.id)
+    const userId = session.user.id
+    const { prisma } = await import('@/lib/prisma')
+
+    // 获取用户协作的笔记ID列表
+    const collaborations = await prisma.collaborator.findMany({
+        where: { userId },
+        select: { noteId: true, role: true },
+    })
+    const collaborationMap = new Map(collaborations.map(c => [c.noteId, c.role]))
+    const collaboratedNoteIds = collaborations.map(c => c.noteId)
+
+    const { data: allNotes, error } = await getUserNotes(userId)
     
     if (error || !allNotes) {
         return {
@@ -88,8 +100,21 @@ export async function getNotes(params?: {
         }
     }
 
-    // 客户端过滤和排序
-    let notes = allNotes
+    // 为每个笔记添加协作信息
+    let notes = allNotes.map(note => ({
+        ...note,
+        isShared: collaboratedNoteIds.includes(note.id),
+        isOwner: note.ownerId === userId || note.userId === userId,
+        collaboratorRole: collaborationMap.get(note.id) || null,
+    }))
+
+    // 所有权筛选
+    const ownership = params?.ownership || 'all'
+    if (ownership === 'mine') {
+        notes = notes.filter(note => note.isOwner)
+    } else if (ownership === 'shared') {
+        notes = notes.filter(note => note.isShared && !note.isOwner)
+    }
 
     // 搜索过滤
     if (params?.query) {
@@ -104,8 +129,8 @@ export async function getNotes(params?: {
     const sortBy = params?.sortBy || 'updatedAt'
     const sortOrder = params?.sortOrder || 'desc'
     notes.sort((a, b) => {
-        const aValue = a[sortBy]
-        const bValue = b[sortBy]
+        const aValue = a[sortBy as keyof typeof a]
+        const bValue = b[sortBy as keyof typeof b]
         if (sortOrder === 'asc') {
             return aValue > bValue ? 1 : -1
         } else {
@@ -268,66 +293,73 @@ export async function updateNote(id: string, formData: FormData): Promise<never>
         throw new Error(validation.error)
     }
 
-    try {
-        // Get the current note before updating to save as version
-        const { data: currentNote } = await getNoteById(id, session.user.id)
-        
-        let summary: string | null = null
-        if (content && content.length >= 50) {
-            const summaryResult = await generateSummary(content)
-            if (summaryResult.success) {
-                summary = summaryResult.data
-            }
-        }
-
-        let embedding: string | null = null
-        if (title && content) {
-            try {
-                const text = `${title}\n\n${content}`
-                const embeddingVector = await generateEmbedding(text)
-                embedding = JSON.stringify(embeddingVector)
-            } catch (error) {
-                console.error('生成嵌入失败:', error)
-            }
-        }
-
-        const updateData: any = {}
-        if (title !== undefined) updateData.title = title
-        if (content !== undefined) updateData.content = content
-        if (summary !== null) updateData.summary = summary
-        if (embedding !== null) updateData.embedding = embedding
-
-        const { error } = await updateNoteSupabase(id, session.user.id, updateData)
-
-        if (error) {
-            throw new Error(error)
-        }
-
-        // Save version after successful update (save the previous state)
-        if (currentNote) {
-            await saveNoteVersion(
-                id,
-                currentNote.title,
-                currentNote.content,
-                session.user.id
-            ).catch(err => {
-                console.error('Failed to save version:', err)
-            })
-        }
-
-        // Trigger webhook for note update
-        triggerNoteUpdated(id, title, session.user.id).catch(err => {
-            console.error('Webhook trigger failed:', err)
-        })
-
-        revalidatePath("/dashboard")
-        revalidatePath("/notes")
-        revalidatePath(`/notes/${id}`)
-    } catch (error) {
-        throw new Error(t('notes.updateError'))
+    // Get the current note before updating to save as version
+    const { data: currentNote, error: fetchError } = await getNoteById(id, session.user.id)
+    
+    if (fetchError) {
+        console.error('Failed to fetch note for update:', fetchError)
+        throw new Error(t('notes.updateError') + ': ' + fetchError)
     }
     
-    redirect("/dashboard")
+    let summary: string | null = null
+    if (content && content.length >= 50) {
+        const summaryResult = await generateSummary(content)
+        if (summaryResult.success) {
+            summary = summaryResult.data
+        }
+    }
+
+    let embedding: string | null = null
+    if (title && content) {
+        try {
+            const text = `${title}\n\n${content}`
+            const embeddingVector = await generateEmbedding(text)
+            embedding = JSON.stringify(embeddingVector)
+        } catch (error) {
+            console.error('生成嵌入失败:', error)
+        }
+    }
+
+    const updateData: any = {}
+    if (title !== undefined) updateData.title = title
+    if (content !== undefined) updateData.content = content
+    if (summary !== null) updateData.summary = summary
+    if (embedding !== null) updateData.embedding = embedding
+
+    const { error } = await updateNoteSupabase(id, session.user.id, updateData)
+
+    if (error) {
+        console.error('Failed to update note:', error)
+        throw new Error(t('notes.updateError') + ': ' + error)
+    }
+
+    // Save version after successful update (save the previous state)
+    if (currentNote) {
+        console.log('Saving version for note:', id, 'user:', session.user.id)
+        const versionResult = await saveNoteVersion(
+            session.user.id,
+            id,
+            currentNote.title,
+            currentNote.content
+        )
+        if (!versionResult.success) {
+            console.error('Failed to save version:', versionResult.error)
+        } else {
+            console.log('Version saved successfully')
+        }
+    }
+
+    // Trigger webhook for note update
+    triggerNoteUpdated(id, title, session.user.id).catch(err => {
+        console.error('Webhook trigger failed:', err)
+    })
+
+    revalidatePath("/dashboard")
+    revalidatePath("/notes")
+    revalidatePath(`/notes/${id}`)
+    revalidatePath(`/notes/${id}/edit`)
+    
+    redirect(`/notes/${id}/edit`)
 }
 
 /**
@@ -363,10 +395,10 @@ export async function autoSaveNote(
     // Only save version if there's a significant change (not on every keystroke)
     if (currentNote && shouldSaveVersion(currentNote, data)) {
         await saveNoteVersion(
+            session.user.id,
             id,
             currentNote.title,
-            currentNote.content,
-            session.user.id
+            currentNote.content
         ).catch(err => {
             console.error('Failed to save version:', err)
         })

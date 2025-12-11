@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Sparkles, Loader2 } from "lucide-react"
 import { toast } from "sonner"
@@ -8,10 +8,17 @@ import { toast } from "sonner"
 interface AIFormatButtonProps {
   content: string
   onFormatted: (formattedContent: string) => void
+  /** 格式化状态变化回调，用于触发外部效果 */
+  onFormattingChange?: (isFormatting: boolean) => void
 }
 
-export function AIFormatButton({ content, onFormatted }: AIFormatButtonProps) {
+export function AIFormatButton({ content, onFormatted, onFormattingChange }: AIFormatButtonProps) {
   const [isFormatting, setIsFormatting] = useState(false)
+
+  // 通知父组件格式化状态变化
+  useEffect(() => {
+    onFormattingChange?.(isFormatting)
+  }, [isFormatting, onFormattingChange])
 
   const handleFormat = async () => {
     if (!content.trim()) {
@@ -78,32 +85,24 @@ export function AIFormatButton({ content, onFormatted }: AIFormatButtonProps) {
   }
 
   return (
-    <div className="relative">
-      <Button
-        type="button"
-        variant="outline"
-        size="sm"
-        onClick={handleFormat}
-        disabled={isFormatting}
-        className={`relative overflow-visible ${isFormatting ? 'z-10' : ''}`}
-      >
-        {isFormatting ? (
-          <>
-            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-            AI 处理中...
-          </>
-        ) : (
-          <>
-            <Sparkles className="h-4 w-4 mr-2" />
-            AI 检查排版
-          </>
-        )}
-      </Button>
-      
-      {/* 彩虹霓虹灯边框效果 */}
-      {isFormatting && (
-        <div className="absolute inset-0 rounded-md animate-rainbow-border pointer-events-none -z-10" />
+    <Button
+      type="button"
+      variant="outline"
+      size="sm"
+      onClick={handleFormat}
+      disabled={isFormatting}
+    >
+      {isFormatting ? (
+        <>
+          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+          AI 处理中...
+        </>
+      ) : (
+        <>
+          <Sparkles className="h-4 w-4 mr-2" />
+          AI 检查排版
+        </>
       )}
-    </div>
+    </Button>
   )
 }

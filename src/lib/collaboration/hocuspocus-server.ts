@@ -18,7 +18,7 @@ interface HocuspocusConfig {
  * Create and configure the Hocuspocus server
  */
 export function createHocuspocusServer(config: HocuspocusConfig) {
-  const server = Server.configure({
+  const server = new Server({
     port: config.port,
     
     // JWT Authentication

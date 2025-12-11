@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { getTags, createTag } from "@/lib/actions/tags"
 import { t } from "@/lib/i18n"
 import { X, Plus } from "lucide-react"
 import { toast } from "sonner"
@@ -16,9 +15,10 @@ interface Tag {
 interface TagSelectorProps {
     selectedTagIds: string[]
     onChange: (tagIds: string[]) => void
+    refreshKey?: number
 }
 
-export function TagSelector({ selectedTagIds, onChange }: TagSelectorProps) {
+export function TagSelector({ selectedTagIds, onChange, refreshKey }: TagSelectorProps) {
     const [tags, setTags] = useState<Tag[]>([])
     const [isCreating, setIsCreating] = useState(false)
     const [newTagName, setNewTagName] = useState("")
@@ -28,7 +28,8 @@ export function TagSelector({ selectedTagIds, onChange }: TagSelectorProps) {
         async function loadTags() {
             setIsLoading(true)
             try {
-                const result = await getTags()
+                const response = await fetch('/api/tags')
+                const result = await response.json()
                 if (result.success && result.data) {
                     setTags(result.data)
                 } else {
@@ -44,19 +45,29 @@ export function TagSelector({ selectedTagIds, onChange }: TagSelectorProps) {
         }
         
         loadTags()
-    }, [])
+    }, [refreshKey])
 
     const handleCreateTag = async () => {
         if (!newTagName.trim()) return
 
-        const result = await createTag(newTagName.trim())
-        if (result.success && result.data) {
-            setTags([...tags, result.data])
-            onChange([...selectedTagIds, result.data.id])
-            setNewTagName("")
-            setIsCreating(false)
-            toast.success(t('tags.createSuccess'))
-        } else {
+        try {
+            const response = await fetch('/api/tags', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name: newTagName.trim() }),
+            })
+            const result = await response.json()
+            if (result.success && result.data) {
+                setTags([...tags, result.data])
+                onChange([...selectedTagIds, result.data.id])
+                setNewTagName("")
+                setIsCreating(false)
+                toast.success(t('tags.createSuccess'))
+            } else {
+                toast.error(t('tags.createError'))
+            }
+        } catch (error) {
+            console.error('Error creating tag:', error)
             toast.error(t('tags.createError'))
         }
     }

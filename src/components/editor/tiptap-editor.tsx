@@ -3,16 +3,18 @@
 /**
  * Tiptap Rich Text Editor with Image Upload
  * Supports paste and drag-drop image uploads
+ * Features magic border glow effect that follows mouse movement
  */
 
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Image from '@tiptap/extension-image';
 import Placeholder from '@tiptap/extension-placeholder';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
 import { MobileKeyboardAdapter } from './mobile-keyboard-adapter';
+import { cn } from '@/lib/utils';
 
 interface TiptapEditorProps {
   noteId: string;
@@ -31,6 +33,23 @@ export function TiptapEditor({
 }: TiptapEditorProps) {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState<string>('');
+  
+  // Magic border effect state
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [isHovered, setIsHovered] = useState(false);
+
+  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    if (!containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    setMousePosition({
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
+    });
+  }, []);
+
+  const handleMouseEnter = useCallback(() => setIsHovered(true), []);
+  const handleMouseLeave = useCallback(() => setIsHovered(false), []);
 
   // Custom image upload handler
   const handleImageUpload = useCallback(
@@ -78,9 +97,9 @@ export function TiptapEditor({
 
   // Handle multiple image uploads
   const handleMultipleImageUploads = useCallback(
-    async (files: File[]): Promise<string[]> {
+    async (files: File[]): Promise<string[]> => {
       setIsUploading(true);
-      setUploadProgress(`上传 ${files.length} 张图片...`);
+      setUploadProgress('上传 ' + files.length + ' 张图片...');
 
       try {
         const formData = new FormData();
@@ -232,34 +251,76 @@ export function TiptapEditor({
   });
 
   return (
-    <div className="relative border rounded-lg overflow-hidden bg-background">
-      {/* Upload progress indicator */}
-      {isUploading && (
-        <div className="absolute top-2 right-2 z-10 flex items-center gap-2 bg-background/90 backdrop-blur-sm px-3 py-2 rounded-md shadow-md">
-          <Loader2 className="h-4 w-4 animate-spin" />
-          <span className="text-sm">{uploadProgress}</span>
-        </div>
-      )}
-
-      {/* Drop zone overlay */}
+    <div
+      ref={containerRef}
+      className="relative group rounded-lg"
+      onMouseMove={handleMouseMove}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
+      {/* Animated gradient border - subtle in light mode, prominent in dark mode */}
       <div
-        className="absolute inset-0 pointer-events-none"
-        onDragOver={(e) => {
-          e.preventDefault();
-          e.currentTarget.classList.add('bg-primary/5', 'border-primary');
-        }}
-        onDragLeave={(e) => {
-          e.currentTarget.classList.remove('bg-primary/5', 'border-primary');
-        }}
-        onDrop={(e) => {
-          e.currentTarget.classList.remove('bg-primary/5', 'border-primary');
+        className={cn(
+          "absolute -inset-[1px] rounded-lg pointer-events-none transition-opacity duration-500",
+          "opacity-0 group-hover:opacity-20 dark:group-hover:opacity-50",
+          "bg-gradient-to-r from-violet-500 via-blue-500 to-purple-600"
+        )}
+      />
+
+      {/* Mouse-following glow effect */}
+      <div
+        className="absolute -inset-[1px] rounded-lg pointer-events-none transition-opacity duration-300"
+        style={{
+          opacity: isHovered ? 0.15 : 0,
+          background: `radial-gradient(400px circle at ${mousePosition.x}px ${mousePosition.y}px, rgba(139, 92, 246, 0.4), transparent 40%)`,
         }}
       />
 
-      {/* Wrap editor content with mobile keyboard adapter */}
-      <MobileKeyboardAdapter>
-        <EditorContent editor={editor} />
-      </MobileKeyboardAdapter>
+      {/* Animated border beam - flowing gradient effect */}
+      <div className="absolute -inset-[1px] rounded-lg pointer-events-none overflow-hidden">
+        <div
+          className={cn(
+            "absolute inset-0 transition-opacity duration-500",
+            "opacity-0 dark:opacity-30",
+            isHovered && "opacity-10 dark:opacity-60"
+          )}
+          style={{
+            background: `conic-gradient(from var(--border-angle, 0deg) at 50% 50%, transparent 0%, rgb(139, 92, 246) 10%, rgb(59, 130, 246) 20%, rgb(147, 51, 234) 30%, transparent 40%)`,
+            animation: "border-beam 4s linear infinite",
+          }}
+        />
+      </div>
+
+      {/* Main editor container */}
+      <div className="relative border rounded-lg overflow-hidden bg-background">
+        {/* Upload progress indicator */}
+        {isUploading && (
+          <div className="absolute top-2 right-2 z-10 flex items-center gap-2 bg-background/90 backdrop-blur-sm px-3 py-2 rounded-md shadow-md">
+            <Loader2 className="h-4 w-4 animate-spin" />
+            <span className="text-sm">{uploadProgress}</span>
+          </div>
+        )}
+
+        {/* Drop zone overlay */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          onDragOver={(e) => {
+            e.preventDefault();
+            e.currentTarget.classList.add('bg-primary/5', 'border-primary');
+          }}
+          onDragLeave={(e) => {
+            e.currentTarget.classList.remove('bg-primary/5', 'border-primary');
+          }}
+          onDrop={(e) => {
+            e.currentTarget.classList.remove('bg-primary/5', 'border-primary');
+          }}
+        />
+
+        {/* Wrap editor content with mobile keyboard adapter */}
+        <MobileKeyboardAdapter>
+          <EditorContent editor={editor} />
+        </MobileKeyboardAdapter>
+      </div>
     </div>
   );
 }

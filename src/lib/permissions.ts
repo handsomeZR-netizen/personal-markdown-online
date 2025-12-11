@@ -28,7 +28,7 @@ export async function checkNotePermissions(
         ownerId: true,
         userId: true,
         isPublic: true,
-        collaborators: {
+        Collaborator: {
           where: { userId },
           select: { role: true },
         },
@@ -68,7 +68,7 @@ export async function checkNotePermissions(
     }
 
     // Check collaborator role
-    const collaborator = note.collaborators[0]
+    const collaborator = note.Collaborator[0]
     if (collaborator) {
       const isEditor = collaborator.role === 'editor'
       return {

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import {
   Select,
@@ -12,53 +12,31 @@ import {
 import { Button } from '@/components/ui/button';
 import { ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 import { SortBy, SortOrder, SORT_OPTIONS } from '@/lib/sorting';
-import { getUserPreferences, updateUserPreferences } from '@/lib/actions/preferences';
-import { toast } from 'sonner';
+import { updateUserPreferences } from '@/lib/actions/preferences';
 
 interface SortSelectorProps {
   onSortChange?: (sortBy: SortBy, sortOrder: SortOrder) => void;
   baseUrl?: string; // For URL-based sorting (backward compatibility)
   className?: string;
+  initialSortBy?: SortBy;
+  initialSortOrder?: SortOrder;
 }
 
 /**
  * SortSelector component for selecting sorting options
  * Validates: Requirements 22.1, 22.5
  */
-export function SortSelector({ onSortChange, baseUrl, className }: SortSelectorProps) {
+export function SortSelector({ 
+  onSortChange, 
+  baseUrl, 
+  className,
+  initialSortBy = 'updatedAt',
+  initialSortOrder = 'desc'
+}: SortSelectorProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [sortBy, setSortBy] = useState<SortBy>('updatedAt');
-  const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
-  const [isLoading, setIsLoading] = useState(true);
-
-  // Load user preferences on mount
-  useEffect(() => {
-    loadPreferences();
-  }, []);
-
-  const loadPreferences = async () => {
-    try {
-      const prefs = await getUserPreferences();
-      setSortBy(prefs.sortBy as SortBy);
-      setSortOrder(prefs.sortOrder as SortOrder);
-      
-      // Notify parent component
-      if (onSortChange) {
-        onSortChange(prefs.sortBy as SortBy, prefs.sortOrder as SortOrder);
-      }
-      
-      // Update URL if baseUrl is provided
-      if (baseUrl) {
-        updateURL(prefs.sortBy as SortBy, prefs.sortOrder as SortOrder);
-      }
-    } catch (error) {
-      console.error('Failed to load preferences:', error);
-      toast.error('加载排序偏好失败');
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const [sortBy, setSortBy] = useState<SortBy>(initialSortBy);
+  const [sortOrder, setSortOrder] = useState<SortOrder>(initialSortOrder);
 
   const updateURL = (newSortBy: SortBy, newSortOrder: SortOrder) => {
     if (!baseUrl) return;
@@ -74,58 +52,41 @@ export function SortSelector({ onSortChange, baseUrl, className }: SortSelectorP
   const handleSortByChange = async (value: SortBy) => {
     setSortBy(value);
     
-    try {
-      await updateUserPreferences(value, sortOrder);
-      
-      // Notify parent component
-      if (onSortChange) {
-        onSortChange(value, sortOrder);
-      }
-      
-      // Update URL if baseUrl is provided
-      if (baseUrl) {
-        updateURL(value, sortOrder);
-      }
-      
-      toast.success('排序方式已更新');
-    } catch (error) {
-      console.error('Failed to update sort preference:', error);
-      toast.error('更新排序方式失败');
+    // Update URL immediately for better UX
+    if (baseUrl) {
+      updateURL(value, sortOrder);
     }
+    
+    // Notify parent component
+    if (onSortChange) {
+      onSortChange(value, sortOrder);
+    }
+    
+    // Save preference in background (don't block UI)
+    updateUserPreferences(value, sortOrder).catch((error) => {
+      console.error('Failed to update sort preference:', error);
+    });
   };
 
   const handleSortOrderToggle = async () => {
     const newOrder: SortOrder = sortOrder === 'asc' ? 'desc' : 'asc';
     setSortOrder(newOrder);
     
-    try {
-      await updateUserPreferences(sortBy, newOrder);
-      
-      // Notify parent component
-      if (onSortChange) {
-        onSortChange(sortBy, newOrder);
-      }
-      
-      // Update URL if baseUrl is provided
-      if (baseUrl) {
-        updateURL(sortBy, newOrder);
-      }
-      
-      toast.success('排序顺序已更新');
-    } catch (error) {
-      console.error('Failed to update sort order:', error);
-      toast.error('更新排序顺序失败');
+    // Update URL immediately for better UX
+    if (baseUrl) {
+      updateURL(sortBy, newOrder);
     }
+    
+    // Notify parent component
+    if (onSortChange) {
+      onSortChange(sortBy, newOrder);
+    }
+    
+    // Save preference in background (don't block UI)
+    updateUserPreferences(sortBy, newOrder).catch((error) => {
+      console.error('Failed to update sort order:', error);
+    });
   };
-
-  if (isLoading) {
-    return (
-      <div className={`flex items-center gap-2 ${className ?? ''}`}>
-        <div className="h-10 w-32 animate-pulse rounded-md bg-muted" />
-        <div className="h-10 w-10 animate-pulse rounded-md bg-muted" />
-      </div>
-    );
-  }
 
   return (
     <div className={`flex items-center gap-2 ${className ?? ''}`}>
@@ -162,71 +123,45 @@ export function SortSelector({ onSortChange, baseUrl, className }: SortSelectorP
 /**
  * Compact version for mobile
  */
-export function SortSelectorCompact({ onSortChange, className }: SortSelectorProps) {
-  const [sortBy, setSortBy] = useState<SortBy>('updatedAt');
-  const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
-  const [isLoading, setIsLoading] = useState(true);
+export function SortSelectorCompact({ 
+  onSortChange, 
+  className,
+  initialSortBy = 'updatedAt',
+  initialSortOrder = 'desc'
+}: SortSelectorProps) {
+  const [sortBy, setSortBy] = useState<SortBy>(initialSortBy);
+  const [sortOrder, setSortOrder] = useState<SortOrder>(initialSortOrder);
 
-  useEffect(() => {
-    loadPreferences();
-  }, []);
-
-  const loadPreferences = async () => {
-    try {
-      const prefs = await getUserPreferences();
-      setSortBy(prefs.sortBy as SortBy);
-      setSortOrder(prefs.sortOrder as SortOrder);
-      
-      if (onSortChange) {
-        onSortChange(prefs.sortBy as SortBy, prefs.sortOrder as SortOrder);
-      }
-    } catch (error) {
-      console.error('Failed to load preferences:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const cycleSortOption = async () => {
+  const cycleSortOption = () => {
     const currentIndex = SORT_OPTIONS.findIndex((opt) => opt.value === sortBy);
     const nextIndex = (currentIndex + 1) % SORT_OPTIONS.length;
     const nextSortBy = SORT_OPTIONS[nextIndex].value;
     
     setSortBy(nextSortBy);
     
-    try {
-      await updateUserPreferences(nextSortBy, sortOrder);
-      
-      if (onSortChange) {
-        onSortChange(nextSortBy, sortOrder);
-      }
-    } catch (error) {
-      console.error('Failed to update sort preference:', error);
+    if (onSortChange) {
+      onSortChange(nextSortBy, sortOrder);
     }
+    
+    // Save preference in background
+    updateUserPreferences(nextSortBy, sortOrder).catch((error) => {
+      console.error('Failed to update sort preference:', error);
+    });
   };
 
-  const toggleSortOrder = async () => {
+  const toggleSortOrder = () => {
     const newOrder: SortOrder = sortOrder === 'asc' ? 'desc' : 'asc';
     setSortOrder(newOrder);
     
-    try {
-      await updateUserPreferences(sortBy, newOrder);
-      
-      if (onSortChange) {
-        onSortChange(sortBy, newOrder);
-      }
-    } catch (error) {
-      console.error('Failed to update sort order:', error);
+    if (onSortChange) {
+      onSortChange(sortBy, newOrder);
     }
+    
+    // Save preference in background
+    updateUserPreferences(sortBy, newOrder).catch((error) => {
+      console.error('Failed to update sort order:', error);
+    });
   };
-
-  if (isLoading) {
-    return (
-      <Button variant="ghost" size="sm" disabled className={className}>
-        <ArrowUpDown className="h-4 w-4" />
-      </Button>
-    );
-  }
 
   const currentLabel = SORT_OPTIONS.find((opt) => opt.value === sortBy)?.label || '排序';
 

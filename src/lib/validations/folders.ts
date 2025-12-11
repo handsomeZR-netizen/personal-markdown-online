@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { cuid } from './shared';
 
 /**
  * Validation schemas for folder operations
@@ -15,11 +16,11 @@ export const updateFolderSchema = z.object({
 });
 
 export const deleteFolderSchema = z.object({
-  id: z.string().cuid('无效的文件夹 ID'),
+  id: cuid('无效的文件夹 ID'),
 });
 
 export const getFolderSchema = z.object({
-  id: z.string().cuid('无效的文件夹 ID'),
+  id: cuid('无效的文件夹 ID'),
 });
 
 export type CreateFolderInput = z.infer<typeof createFolderSchema>;

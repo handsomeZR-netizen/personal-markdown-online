@@ -2,19 +2,14 @@ import NextAuth from "next-auth"
 import { authConfig } from "./auth.config"
 import { NextResponse } from "next/server"
 
-const auth = NextAuth({
-  ...authConfig,
-  secret: process.env.AUTH_SECRET,
-}).auth
+// Create a minimal auth instance for middleware (Edge Runtime compatible)
+const { auth } = NextAuth(authConfig)
 
-export default auth(async (req) => {
+export default auth((req) => {
   const { nextUrl } = req
   const isLoggedIn = !!req.auth
 
-  // Note: Database health checks are performed in instrumentation.ts
-  // Middleware runs in Edge Runtime and cannot use Prisma directly
-
-  // 跳过 API 路由、静态文件等
+  // Skip API routes, static files, etc.
   if (
     nextUrl.pathname.startsWith('/api') ||
     nextUrl.pathname.startsWith('/_next') ||
@@ -23,7 +18,7 @@ export default auth(async (req) => {
     return NextResponse.next()
   }
 
-  // 定义受保护的路由
+  // Define protected routes
   const protectedRoutes = [
     '/dashboard', 
     '/notes', 
@@ -40,25 +35,25 @@ export default auth(async (req) => {
     nextUrl.pathname.startsWith(route)
   )
 
-  // 定义公开路由（已登录用户不应访问）
+  // Define public routes (logged-in users shouldn't access)
   const publicRoutes = ['/login', '/register']
   const isPublicRoute = publicRoutes.some(route => 
     nextUrl.pathname.startsWith(route)
   )
 
-  // 如果访问受保护路由但未登录，重定向到登录页
+  // Redirect to login if accessing protected route while not logged in
   if (isProtectedRoute && !isLoggedIn) {
     const loginUrl = new URL('/login', nextUrl.origin)
     loginUrl.searchParams.set('callbackUrl', nextUrl.pathname)
     return NextResponse.redirect(loginUrl)
   }
 
-  // 如果已登录但访问公开路由，重定向到仪表板
+  // Redirect to dashboard if logged in but accessing public route
   if (isPublicRoute && isLoggedIn) {
     return NextResponse.redirect(new URL('/dashboard', nextUrl.origin))
   }
 
-  // 创建响应并添加安全头部
+  // Create response and add security headers
   const response = NextResponse.next()
 
   // Content Security Policy
@@ -77,14 +72,14 @@ export default auth(async (req) => {
     ].join('; ')
   )
 
-  // 安全响应头
+  // Security headers
   response.headers.set('X-Frame-Options', 'DENY')
   response.headers.set('X-Content-Type-Options', 'nosniff')
   response.headers.set('X-XSS-Protection', '1; mode=block')
   response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin')
   response.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()')
 
-  // HSTS（仅在生产环境）
+  // HSTS (production only)
   if (process.env.NODE_ENV === 'production') {
     response.headers.set(
       'Strict-Transport-Security',

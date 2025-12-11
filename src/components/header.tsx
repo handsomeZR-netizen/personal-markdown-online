@@ -81,10 +81,10 @@ export async function Header() {
                                 </Link>
                             </nav>
 
-                            {/* 搜索栏 - 在桌面端显示 */}
-                            <div className="hidden md:block flex-1 max-w-md">
-                                <Suspense fallback={<div className="h-10 w-full bg-muted/20 animate-pulse rounded-md" />}>
-                                    <SearchBar />
+                            {/* 搜索栏 - 在桌面端显示，点击展开 */}
+                            <div className="hidden md:flex items-center">
+                                <Suspense fallback={<div className="h-10 w-24 bg-muted/20 animate-pulse rounded-md" />}>
+                                    <SearchBar expandable />
                                 </Suspense>
                             </div>
 

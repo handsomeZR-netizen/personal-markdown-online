@@ -2,6 +2,8 @@ import type { NextConfig } from "next";
 import withPWA from "@ducanh2912/next-pwa";
 
 const nextConfig: NextConfig = {
+  // 启用 standalone 输出模式，用于 Docker 部署
+  output: 'standalone',
   eslint: {
     // 只忽略警告，保留错误检查
     ignoreDuringBuilds: true,

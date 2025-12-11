@@ -67,50 +67,48 @@ export function NoteActionsToolbar({ noteId, noteTitle, noteContent }: NoteActio
 
   return (
     <>
-      <div className="flex items-center gap-2 flex-wrap">
-        {/* 同步状态图标 */}
-        {noteId !== 'new' && (
-          <SyncStatusIcon
-            status={syncStatus}
-            onClick={() => setShowSyncStatus(true)}
-          />
-        )}
+      {/* 同步状态图标 */}
+      {noteId !== 'new' && (
+        <SyncStatusIcon
+          status={syncStatus}
+          onClick={() => setShowSyncStatus(true)}
+        />
+      )}
 
-        {/* 导出对话框 - 使用 trigger 模式 */}
-        <ExportDialog
-          note={noteData}
-          trigger={
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              title="导出笔记"
-            >
-              <Download className="h-4 w-4 mr-2" />
-              <span className="hidden sm:inline">导出</span>
-            </Button>
-          }
-        />
-        
-        {/* 版本历史对话框 - 使用 trigger 模式 */}
-        <VersionHistory
-          noteId={noteId}
-          trigger={
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              title="查看版本历史"
-            >
-              <History className="h-4 w-4 mr-2" />
-              <span className="hidden sm:inline">历史</span>
-            </Button>
-          }
-        />
-        
-        {/* 分享按钮 */}
-        <ShareButton noteId={noteId} noteTitle={noteTitle} />
-      </div>
+      {/* 导出对话框 - 使用 trigger 模式 */}
+      <ExportDialog
+        note={noteData}
+        trigger={
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            title="导出笔记"
+          >
+            <Download className="h-4 w-4 mr-2" />
+            <span className="hidden sm:inline">导出</span>
+          </Button>
+        }
+      />
+      
+      {/* 版本历史对话框 - 使用 trigger 模式 */}
+      <VersionHistory
+        noteId={noteId}
+        trigger={
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            title="查看版本历史"
+          >
+            <History className="h-4 w-4 mr-2" />
+            <span className="hidden sm:inline">历史</span>
+          </Button>
+        }
+      />
+      
+      {/* 分享按钮 */}
+      <ShareButton noteId={noteId} noteTitle={noteTitle} />
 
       {/* 同步状态对话框 */}
       {showSyncStatus && noteId !== 'new' && (

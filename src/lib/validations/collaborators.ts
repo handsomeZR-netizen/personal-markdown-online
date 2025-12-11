@@ -3,6 +3,7 @@
  */
 
 import { z } from 'zod'
+import { cuid, emailSchema } from './shared'
 
 /**
  * Collaborator role enum
@@ -14,8 +15,8 @@ export type CollaboratorRoleType = z.infer<typeof CollaboratorRole>
  * Schema for adding a collaborator
  */
 export const addCollaboratorSchema = z.object({
-  noteId: z.string().cuid('Invalid note ID'),
-  email: z.string().email('Invalid email address'),
+  noteId: cuid('Invalid note ID'),
+  email: emailSchema,
   role: CollaboratorRole,
 })
 
@@ -25,8 +26,8 @@ export type AddCollaboratorInput = z.infer<typeof addCollaboratorSchema>
  * Schema for removing a collaborator
  */
 export const removeCollaboratorSchema = z.object({
-  noteId: z.string().cuid('Invalid note ID'),
-  userId: z.string().cuid('Invalid user ID'),
+  noteId: cuid('Invalid note ID'),
+  userId: cuid('Invalid user ID'),
 })
 
 export type RemoveCollaboratorInput = z.infer<typeof removeCollaboratorSchema>
@@ -35,8 +36,8 @@ export type RemoveCollaboratorInput = z.infer<typeof removeCollaboratorSchema>
  * Schema for updating collaborator role
  */
 export const updateCollaboratorRoleSchema = z.object({
-  noteId: z.string().cuid('Invalid note ID'),
-  userId: z.string().cuid('Invalid user ID'),
+  noteId: cuid('Invalid note ID'),
+  userId: cuid('Invalid user ID'),
   role: CollaboratorRole,
 })
 
@@ -46,7 +47,7 @@ export type UpdateCollaboratorRoleInput = z.infer<typeof updateCollaboratorRoleS
  * Schema for listing collaborators
  */
 export const listCollaboratorsSchema = z.object({
-  noteId: z.string().cuid('Invalid note ID'),
+  noteId: cuid('Invalid note ID'),
 })
 
 export type ListCollaboratorsInput = z.infer<typeof listCollaboratorsSchema>

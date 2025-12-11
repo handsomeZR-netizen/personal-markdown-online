@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
   Dialog,
   DialogContent,
@@ -68,6 +68,22 @@ function KeyBadge({ keyName }: { keyName: string }) {
 
 export function KeyboardShortcutsHelp() {
   const [open, setOpen] = useState(false)
+  const [mounted, setMounted] = useState(false)
+
+  // Prevent hydration mismatch by only rendering Dialog after mount
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  // Render placeholder button during SSR
+  if (!mounted) {
+    return (
+      <Button variant="ghost" size="sm" className="gap-2">
+        <Keyboard className="h-4 w-4" />
+        <span className="hidden sm:inline">快捷键</span>
+      </Button>
+    )
+  }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>

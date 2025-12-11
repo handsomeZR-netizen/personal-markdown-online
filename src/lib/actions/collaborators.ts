@@ -15,6 +15,7 @@ import {
   type RemoveCollaboratorInput,
   type UpdateCollaboratorRoleInput,
 } from '@/lib/validations/collaborators'
+import crypto from 'crypto'
 
 /**
  * Add a collaborator to a note
@@ -74,12 +75,13 @@ export async function addCollaborator(input: AddCollaboratorInput) {
     // Create collaborator
     const collaborator = await prisma.collaborator.create({
       data: {
+        id: crypto.randomUUID(),
         noteId: validated.noteId,
         userId: targetUser.id,
         role: validated.role,
       },
       include: {
-        user: {
+        User: {
           select: {
             id: true,
             name: true,
@@ -91,11 +93,17 @@ export async function addCollaborator(input: AddCollaboratorInput) {
       },
     })
 
+    // Transform to match expected format
+    const transformedCollaborator = {
+      ...collaborator,
+      user: collaborator.User,
+    }
+
     // Revalidate paths
     revalidatePath(`/notes/${validated.noteId}`)
     revalidatePath(`/notes/${validated.noteId}/edit`)
 
-    return { success: true, collaborator }
+    return { success: true, collaborator: transformedCollaborator }
   } catch (error) {
     console.error('Error adding collaborator:', error)
     return { error: 'Failed to add collaborator' }
@@ -241,7 +249,7 @@ export async function getCollaborators(noteId: string) {
         id: true,
         ownerId: true,
         userId: true,
-        collaborators: {
+        Collaborator: {
           where: { userId: session.user.id },
         },
       },
@@ -255,7 +263,7 @@ export async function getCollaborators(noteId: string) {
     const hasAccess =
       note.ownerId === session.user.id ||
       note.userId === session.user.id ||
-      note.collaborators.length > 0
+      note.Collaborator.length > 0
 
     if (!hasAccess) {
       return { error: 'Access denied' }
@@ -265,7 +273,7 @@ export async function getCollaborators(noteId: string) {
     const collaborators = await prisma.collaborator.findMany({
       where: { noteId },
       include: {
-        user: {
+        User: {
           select: {
             id: true,
             name: true,
@@ -278,7 +286,13 @@ export async function getCollaborators(noteId: string) {
       orderBy: { createdAt: 'asc' },
     })
 
-    return { success: true, collaborators }
+    // Transform to match expected format
+    const transformedCollaborators = collaborators.map((c) => ({
+      ...c,
+      user: c.User,
+    }))
+
+    return { success: true, collaborators: transformedCollaborators }
   } catch (error) {
     console.error('Error getting collaborators:', error)
     return { error: 'Failed to get collaborators' }
@@ -295,7 +309,7 @@ export async function checkNotePermission(noteId: string, userId: string) {
       select: {
         ownerId: true,
         userId: true,
-        collaborators: {
+        Collaborator: {
           where: { userId },
           select: { role: true },
         },
@@ -312,7 +326,7 @@ export async function checkNotePermission(noteId: string, userId: string) {
     }
 
     // Check collaborator role
-    const collaborator = note.collaborators[0]
+    const collaborator = note.Collaborator[0]
     if (collaborator) {
       return {
         hasAccess: true,

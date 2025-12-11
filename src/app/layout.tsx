@@ -19,6 +19,7 @@ import { PWAInstallPrompt } from "@/components/pwa-install-prompt";
 import { BottomNavWrapper } from "@/components/mobile/bottom-nav-wrapper";
 import { LoadingProvider } from "@/hooks/use-loading";
 import { TopLoadingBar } from "@/components/top-loading-bar";
+import { WallpaperBackground } from "@/components/wallpaper-background";
 
 export const metadata: Metadata = {
   title: t('common.appName'),
@@ -60,7 +61,7 @@ export default async function RootLayout({
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
         <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
       </head>
-      <body className="font-sans antialiased bg-background">
+      <body className="font-sans antialiased bg-background relative">
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
@@ -69,6 +70,7 @@ export default async function RootLayout({
         >
           <LoadingProvider>
             <NetworkStatusProvider>
+            <WallpaperBackground />
             <TopLoadingBar />
             <DataRecovery userId={session?.user?.id} />
             <UnloadWarning userId={session?.user?.id} />

@@ -32,8 +32,10 @@ export async function saveNoteVersion(
   content: string
 ): Promise<{ success: boolean; error?: string }> {
   try {
+    console.log('saveNoteVersion called with:', { userId, noteId, titleLength: title?.length, contentLength: content?.length })
+    
     // Create new version
-    await prisma.noteVersion.create({
+    const version = await prisma.noteVersion.create({
       data: {
         noteId,
         title,
@@ -41,6 +43,8 @@ export async function saveNoteVersion(
         userId,
       },
     })
+    
+    console.log('Version created:', version.id)
 
     // Get count of versions for this note
     const versionCount = await prisma.noteVersion.count({
@@ -154,7 +158,7 @@ export async function getNoteVersion(
           select: {
             userId: true,
             ownerId: true,
-            collaborators: {
+            Collaborator: {
               select: { userId: true },
             },
           },
@@ -170,7 +174,7 @@ export async function getNoteVersion(
     const hasAccess = 
       version.note.userId === userId ||
       version.note.ownerId === userId ||
-      version.note.collaborators.some(c => c.userId === userId)
+      version.note.Collaborator.some(c => c.userId === userId)
 
     if (!hasAccess) {
       return { success: false, error: 'Access denied' }

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useId } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
@@ -25,7 +25,13 @@ import { useGestureHandler } from "@/hooks/use-gesture-handler"
  */
 export function MobileNav() {
   const [open, setOpen] = useState(false)
+  const [mounted, setMounted] = useState(false)
   const pathname = usePathname()
+
+  // Prevent hydration mismatch by only rendering after mount
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   // 手势处理器：边缘滑动打开/关闭侧边栏
   const { handlers, getEdgeSwipeDirection } = useGestureHandler({
@@ -91,6 +97,22 @@ export function MobileNav() {
       document.body.style.overflow = 'unset'
     }
   }, [open])
+
+  // Render placeholder button during SSR to prevent hydration mismatch
+  if (!mounted) {
+    return (
+      <div>
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          className="lg:hidden min-h-[44px] min-w-[44px]"
+          aria-label={t('accessibility.openMenu')}
+        >
+          <Menu className="h-5 w-5" aria-hidden="true" />
+        </Button>
+      </div>
+    )
+  }
 
   return (
     <div {...handlers}>

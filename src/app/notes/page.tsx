@@ -2,6 +2,8 @@ import { Suspense } from "react"
 import { getNotes } from "@/lib/actions/notes"
 import { getTags } from "@/lib/actions/tags"
 import { getCategories } from "@/lib/actions/categories"
+import { getFolders } from "@/lib/actions/folders"
+import { getUserPreferences } from "@/lib/actions/preferences"
 import { NoteCard } from "@/components/notes/note-card"
 import { Pagination } from "@/components/pagination"
 import { SortSelector } from "@/components/sort-selector"
@@ -14,6 +16,47 @@ import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { Plus } from "lucide-react"
 import { t } from "@/lib/i18n"
+import type { SortBy, SortOrder } from "@/lib/sorting"
+
+// 文件夹树形结构构建函数
+interface FolderNode {
+  id: string
+  name: string
+  parentId: string | null
+  noteCount?: number
+  children?: FolderNode[]
+}
+
+function buildFolderTree(folders: any[]): FolderNode[] {
+  const folderMap = new Map<string, FolderNode>()
+  const rootFolders: FolderNode[] = []
+
+  // 第一遍：创建所有节点
+  folders.forEach((folder) => {
+    folderMap.set(folder.id, {
+      id: folder.id,
+      name: folder.name,
+      parentId: folder.parentId,
+      noteCount: folder._count?.notes || 0,
+      children: []
+    })
+  })
+
+  // 第二遍：建立父子关系
+  folderMap.forEach((folder) => {
+    if (folder.parentId) {
+      const parent = folderMap.get(folder.parentId)
+      if (parent) {
+        parent.children = parent.children || []
+        parent.children.push(folder)
+      }
+    } else {
+      rootFolders.push(folder)
+    }
+  })
+
+  return rootFolders
+}
 
 function SortSelectorFallback() {
     return (
@@ -37,6 +80,22 @@ function FilterPanelFallback() {
     )
 }
 
+function FolderSidebarFallback() {
+    return (
+        <div className="space-y-4">
+            <div className="flex items-center justify-between">
+                <div className="h-5 w-16 animate-pulse rounded bg-muted" />
+                <div className="h-8 w-8 animate-pulse rounded bg-muted" />
+            </div>
+            <div className="space-y-2">
+                <div className="h-8 w-full animate-pulse rounded bg-muted" />
+                <div className="h-8 w-full animate-pulse rounded bg-muted" />
+                <div className="h-8 w-3/4 animate-pulse rounded bg-muted" />
+            </div>
+        </div>
+    )
+}
+
 function PaginationFallback() {
     return (
         <div className="flex justify-center gap-2">
@@ -54,6 +113,7 @@ type SearchParams = {
     query?: string
     tagIds?: string
     categoryId?: string
+    ownership?: 'all' | 'mine' | 'shared'
 }
 
 export default async function NotesPage({
@@ -68,21 +128,27 @@ export default async function NotesPage({
     const query = params.query
     const tagIds = params.tagIds ? params.tagIds.split(',') : undefined
     const categoryId = params.categoryId || undefined
+    const ownership = params.ownership || 'all'
 
-    // 并行获取笔记、标签和分类
+    // 并行获取笔记、标签、分类、文件夹和用户偏好
     const [
         notesData,
         tagsResult,
-        categoriesResult
+        categoriesResult,
+        foldersResult,
+        userPrefs
     ] = await Promise.all([
         getNotes({
             page,
             sortBy,
             sortOrder,
             query,
+            ownership,
         }),
         getTags(),
-        getCategories()
+        getCategories(),
+        getFolders(),
+        getUserPreferences().catch(() => ({ sortBy: 'updatedAt' as SortBy, sortOrder: 'desc' as SortOrder }))
     ])
 
     // 安全解构，提供默认值
@@ -95,6 +161,7 @@ export default async function NotesPage({
     
     const tags = (tagsResult?.success ? tagsResult.data : []) as Array<{ id: string; name: string }>
     const categories = (categoriesResult?.success ? categoriesResult.data : []) as Array<{ id: string; name: string }>
+    const folderTree = foldersResult?.success ? buildFolderTree(foldersResult.data || []) : []
 
     return (
         <PullToRefresh>
@@ -135,20 +202,20 @@ export default async function NotesPage({
                 <aside className="hidden lg:block lg:col-span-3 xl:col-span-2" aria-label="侧边栏">
                     <div className="sticky top-20 space-y-6">
                         <div className="border rounded-lg p-4 bg-card">
-                            <FolderSidebar />
+                            <FolderSidebar initialFolders={folderTree} />
                         </div>
-                        <Suspense fallback={<FilterPanelFallback />}>
-                            <FilterPanel tags={tags} categories={categories} />
-                        </Suspense>
+                        <FilterPanel tags={tags} categories={categories} />
                     </div>
                 </aside>
 
                 {/* 右侧笔记列表 */}
                 <section className="lg:col-span-9 xl:col-span-10 space-y-6">
                     {/* 排序选择器 */}
-                    <Suspense fallback={<SortSelectorFallback />}>
-                        <SortSelector baseUrl="/notes" />
-                    </Suspense>
+                    <SortSelector 
+                        baseUrl="/notes" 
+                        initialSortBy={userPrefs.sortBy as SortBy}
+                        initialSortOrder={userPrefs.sortOrder as SortOrder}
+                    />
 
                     {/* 笔记列表 */}
                     {notes.length > 0 ? (

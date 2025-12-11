@@ -8,138 +8,138 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-model User {
-  id             String          @id @default(cuid())
-  email          String          @unique
-  password       String
-  name           String?
-  avatar         String?
-  color          String?
-  webhookUrl     String?
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
-  collaborations Collaborator[]
-  folders        Folder[]
-  ownedNotes     Note[]          @relation("NoteOwner")
-  notes          Note[]
-  preferences    UserPreference?
-
-  @@index([email])
-}
-
-model Note {
-  id            String         @id @default(cuid())
-  title         String
-  content       String
-  contentType   String         @default("tiptap-json")
-  summary       String?
-  embedding     String?
-  folderId      String?
-  userId        String
-  ownerId       String
-  isPublic      Boolean        @default(false)
-  publicSlug    String?        @unique
-  categoryId    String?
-  sortOrder     Int            @default(0)
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
-  collaborators Collaborator[]
-  category      Category?      @relation(fields: [categoryId], references: [id])
-  folder        Folder?        @relation(fields: [folderId], references: [id])
-  owner         User           @relation("NoteOwner", fields: [ownerId], references: [id])
-  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  versions      NoteVersion[]
-  tags          Tag[]          @relation("NoteToTag")
-
-  @@index([userId])
-  @@index([ownerId])
-  @@index([folderId])
-  @@index([createdAt])
-  @@index([updatedAt])
-  @@index([userId, createdAt])
-  @@index([categoryId])
-  @@index([publicSlug])
-  @@index([folderId, sortOrder])
-}
-
-model Folder {
-  id        String   @id @default(cuid())
-  name      String
-  parentId  String?
-  userId    String
-  sortOrder Int      @default(0)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  parent    Folder?  @relation("FolderHierarchy", fields: [parentId], references: [id], onDelete: Cascade)
-  children  Folder[] @relation("FolderHierarchy")
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  notes     Note[]
-
-  @@index([userId])
-  @@index([parentId])
-  @@index([parentId, sortOrder])
+model Category {
+  id   String @id
+  name String @unique
+  Note Note[]
 }
 
 model Collaborator {
-  id        String   @id @default(cuid())
+  id        String   @id
   noteId    String
   userId    String
   role      String
   createdAt DateTime @default(now())
-  note      Note     @relation(fields: [noteId], references: [id], onDelete: Cascade)
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  Note      Note     @relation(fields: [noteId], references: [id], onDelete: Cascade)
+  User      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([noteId, userId])
   @@index([noteId])
   @@index([userId])
 }
 
-model NoteVersion {
-  id        String   @id @default(cuid())
-  noteId    String
-  content   String
-  title     String
-  userId    String
-  createdAt DateTime @default(now())
-  note      Note     @relation(fields: [noteId], references: [id], onDelete: Cascade)
+model Folder {
+  id           String   @id
+  name         String
+  parentId     String?
+  userId       String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime
+  sortOrder    Int      @default(0)
+  Folder       Folder?  @relation("FolderToFolder", fields: [parentId], references: [id], onDelete: Cascade)
+  other_Folder Folder[] @relation("FolderToFolder")
+  User         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  Note         Note[]
 
-  @@index([noteId])
+  @@index([parentId])
+  @@index([parentId, sortOrder])
+  @@index([userId])
+}
+
+model Note {
+  id                      String         @id
+  title                   String
+  content                 String
+  summary                 String?
+  embedding               String?
+  userId                  String
+  categoryId              String?
+  createdAt               DateTime       @default(now())
+  updatedAt               DateTime
+  contentType             String         @default("tiptap-json")
+  folderId                String?
+  ownerId                 String
+  isPublic                Boolean        @default(false)
+  publicSlug              String?        @unique
+  sortOrder               Int            @default(0)
+  Collaborator            Collaborator[]
+  Category                Category?      @relation(fields: [categoryId], references: [id])
+  Folder                  Folder?        @relation(fields: [folderId], references: [id])
+  User_Note_ownerIdToUser User           @relation("Note_ownerIdToUser", fields: [ownerId], references: [id])
+  User_Note_userIdToUser  User           @relation("Note_userIdToUser", fields: [userId], references: [id], onDelete: Cascade)
+  NoteVersion             NoteVersion[]
+  Tag                     Tag[]
+
+  @@index([categoryId])
   @@index([createdAt])
+  @@index([folderId])
+  @@index([folderId, sortOrder])
+  @@index([ownerId])
+  @@index([publicSlug])
+  @@index([updatedAt])
+  @@index([userId, createdAt])
+  @@index([userId])
 }
 
 model NoteTemplate {
-  id          String   @id @default(cuid())
+  id          String   @id
   name        String
   description String?
   content     String
   userId      String
   usageCount  Int      @default(0)
   createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  updatedAt   DateTime
 
   @@index([userId])
 }
 
-model Tag {
-  id    String @id @default(cuid())
-  name  String @unique
-  notes Note[] @relation("NoteToTag")
+model NoteVersion {
+  id        String   @id
+  noteId    String
+  content   String
+  title     String
+  userId    String
+  createdAt DateTime @default(now())
+  Note      Note     @relation(fields: [noteId], references: [id], onDelete: Cascade)
+
+  @@index([createdAt])
+  @@index([noteId])
 }
 
-model Category {
-  id    String @id @default(cuid())
-  name  String @unique
-  notes Note[]
+model Tag {
+  id   String @id
+  name String @unique
+  Note Note[]
+}
+
+model User {
+  id                      String          @id
+  email                   String          @unique
+  password                String
+  name                    String?
+  createdAt               DateTime        @default(now())
+  updatedAt               DateTime
+  avatar                  String?
+  color                   String?
+  webhookUrl              String?
+  Collaborator            Collaborator[]
+  Folder                  Folder[]
+  Note_Note_ownerIdToUser Note[]          @relation("Note_ownerIdToUser")
+  Note_Note_userIdToUser  Note[]          @relation("Note_userIdToUser")
+  UserPreference          UserPreference?
+
+  @@index([email])
 }
 
 model UserPreference {
-  id        String   @id @default(cuid())
+  id        String   @id
   userId    String   @unique
   sortBy    String   @default("updatedAt")
   sortOrder String   @default("desc")
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  updatedAt DateTime
+  User      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
 }

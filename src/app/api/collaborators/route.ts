@@ -13,6 +13,7 @@ import {
   listCollaboratorsSchema,
 } from '@/lib/validations/collaborators'
 import { z } from 'zod'
+import crypto from 'crypto'
 
 /**
  * GET /api/collaborators?noteId=xxx
@@ -35,16 +36,13 @@ export async function GET(request: NextRequest) {
     // Validate input
     const validated = listCollaboratorsSchema.parse({ noteId })
 
-    // Check if user has access to this note
+    // Check if note exists and user has access
     const note = await prisma.note.findUnique({
       where: { id: validated.noteId },
       select: {
         id: true,
         ownerId: true,
         userId: true,
-        collaborators: {
-          where: { userId: session.user.id },
-        },
       },
     })
 
@@ -52,32 +50,55 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Note not found' }, { status: 404 })
     }
 
+    // Check if user is a collaborator
+    const userCollaboration = await prisma.collaborator.findUnique({
+      where: {
+        noteId_userId: {
+          noteId: validated.noteId,
+          userId: session.user.id,
+        },
+      },
+    })
+
     // User must be owner, creator, or existing collaborator
     const hasAccess =
       note.ownerId === session.user.id ||
       note.userId === session.user.id ||
-      note.collaborators.length > 0
+      userCollaboration !== null
 
     if (!hasAccess) {
       return NextResponse.json({ error: 'Access denied' }, { status: 403 })
     }
 
-    // Get all collaborators with user details
-    const collaborators = await prisma.collaborator.findMany({
+    // Get all collaborators
+    const collaboratorRecords = await prisma.collaborator.findMany({
       where: { noteId: validated.noteId },
-      include: {
-        user: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            avatar: true,
-            color: true,
-          },
-        },
-      },
       orderBy: { createdAt: 'asc' },
     })
+
+    // Get user details for each collaborator
+    const userIds = collaboratorRecords.map((c) => c.userId)
+    const users = await prisma.user.findMany({
+      where: { id: { in: userIds } },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        avatar: true,
+        color: true,
+      },
+    })
+    const userMap = new Map(users.map((u) => [u.id, u]))
+
+    // Combine collaborator records with user details
+    const collaborators = collaboratorRecords.map((c) => ({
+      id: c.id,
+      noteId: c.noteId,
+      userId: c.userId,
+      role: c.role,
+      createdAt: c.createdAt,
+      user: userMap.get(c.userId) || null,
+    }))
 
     return NextResponse.json({ collaborators })
   } catch (error) {
@@ -168,27 +189,24 @@ export async function POST(request: NextRequest) {
     // Create collaborator
     const collaborator = await prisma.collaborator.create({
       data: {
+        id: crypto.randomUUID(),
         noteId: validated.noteId,
         userId: targetUser.id,
         role: validated.role,
       },
-      include: {
-        user: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            avatar: true,
-            color: true,
-          },
-        },
-      },
     })
 
-    // TODO: Send email invitation (implement in future)
-    // await sendCollaboratorInvitation(targetUser.email, note, validated.role)
+    // Return with user details
+    const result = {
+      id: collaborator.id,
+      noteId: collaborator.noteId,
+      userId: collaborator.userId,
+      role: collaborator.role,
+      createdAt: collaborator.createdAt,
+      user: targetUser,
+    }
 
-    return NextResponse.json({ collaborator }, { status: 201 })
+    return NextResponse.json({ collaborator: result }, { status: 201 })
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
@@ -319,20 +337,31 @@ export async function PATCH(request: NextRequest) {
       data: {
         role: validated.role,
       },
-      include: {
-        user: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            avatar: true,
-            color: true,
-          },
-        },
+    })
+
+    // Get user details
+    const user = await prisma.user.findUnique({
+      where: { id: collaborator.userId },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        avatar: true,
+        color: true,
       },
     })
 
-    return NextResponse.json({ collaborator })
+    // Return with user details
+    const result = {
+      id: collaborator.id,
+      noteId: collaborator.noteId,
+      userId: collaborator.userId,
+      role: collaborator.role,
+      createdAt: collaborator.createdAt,
+      user,
+    }
+
+    return NextResponse.json({ collaborator: result })
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(

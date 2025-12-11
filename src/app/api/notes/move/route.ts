@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
+import { cuid } from '@/lib/validations/shared';
 
 /**
  * API route for moving notes to folders
@@ -9,8 +10,8 @@ import { z } from 'zod';
  */
 
 const moveNoteSchema = z.object({
-  noteId: z.string().cuid('无效的笔记 ID'),
-  folderId: z.string().cuid('无效的文件夹 ID').nullable(),
+  noteId: cuid('无效的笔记 ID'),
+  folderId: cuid('无效的文件夹 ID').nullable(),
 });
 
 /**

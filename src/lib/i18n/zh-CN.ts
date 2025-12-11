@@ -6,7 +6,7 @@
 export const translations = {
   // 通用
   common: {
-    appName: '笔记管理平台',
+    appName: '苹果笔记',
     loading: '加载中...',
     saving: '保存中...',
     saved: '已保存',
@@ -224,6 +224,16 @@ export const translations = {
     relatedNotes: '相关笔记',
     generating: '生成中...',
     generationError: '生成失败',
+    searchHistory: '搜索历史',
+    clearHistory: '清空历史',
+    conversationHistory: '对话历史',
+    newConversation: '新对话',
+    noHistory: '暂无历史记录',
+    deleteConversation: '删除对话',
+    clearAllConversations: '清空所有对话',
+    conversationDeleted: '对话已删除',
+    allConversationsCleared: '所有对话已清空',
+    historySaved: '已自动保存',
   },
 
   // 错误消息

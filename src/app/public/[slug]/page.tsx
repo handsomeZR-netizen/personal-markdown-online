@@ -178,6 +178,19 @@ export default async function PublicNotePage({ params }: PublicNotePageProps) {
 
 // Read-only Tiptap viewer component
 function TiptapReadOnlyViewer({ content }: { content: string }) {
+  // First check if content looks like JSON (starts with { or [)
+  const trimmedContent = content.trim();
+  const looksLikeJson = trimmedContent.startsWith('{') || trimmedContent.startsWith('[');
+  
+  if (!looksLikeJson) {
+    // Content is plain text or Markdown, render as-is with whitespace preserved
+    return (
+      <div className="whitespace-pre-wrap">
+        {content}
+      </div>
+    );
+  }
+  
   try {
     const parsedContent = JSON.parse(content);
     
@@ -190,9 +203,10 @@ function TiptapReadOnlyViewer({ content }: { content: string }) {
     );
   } catch (error) {
     console.error('Error parsing Tiptap content:', error);
+    // Fallback: render as plain text if JSON parsing fails
     return (
-      <div className="text-muted-foreground">
-        无法显示笔记内容
+      <div className="whitespace-pre-wrap">
+        {content}
       </div>
     );
   }

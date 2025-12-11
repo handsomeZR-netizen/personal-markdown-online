@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
+import { cuid } from '@/lib/validations/shared';
 
 /**
  * API route for moving folders
@@ -9,8 +10,8 @@ import { z } from 'zod';
  */
 
 const moveFolderSchema = z.object({
-  nodeId: z.string().cuid('无效的节点 ID'),
-  newParentId: z.string().cuid('无效的父节点 ID').nullable(),
+  nodeId: cuid('无效的节点 ID'),
+  newParentId: cuid('无效的父节点 ID').nullable(),
 });
 
 /**

@@ -5,14 +5,16 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Loader2, Trash2, AlertTriangle, CheckCircle2 } from 'lucide-react';
+import { Loader2, Trash2, AlertTriangle, CheckCircle2, Database, FileText, Folder, History, FileCode, Tag, Users, MessageSquare } from 'lucide-react';
 import { storageManager, StorageUsageDetails, CleanupResult } from '@/lib/offline/storage-manager';
 import { SmartCleanupDialog } from '@/components/offline/smart-cleanup-dialog';
+import type { DatabaseStats } from '@/app/api/storage/stats/route';
 
 export function CacheSettingsComponent() {
   const [loading, setLoading] = useState(true);
   const [showCleanupDialog, setShowCleanupDialog] = useState(false);
   const [storageUsage, setStorageUsage] = useState<StorageUsageDetails | null>(null);
+  const [databaseStats, setDatabaseStats] = useState<DatabaseStats | null>(null);
   const [cleanupResult, setCleanupResult] = useState<CleanupResult | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -20,8 +22,19 @@ export function CacheSettingsComponent() {
     try {
       setLoading(true);
       setError(null);
-      const usage = await storageManager.getStorageUsage();
+      
+      // 并行加载本地缓存和数据库统计
+      const [usage, dbStatsResponse] = await Promise.all([
+        storageManager.getStorageUsage(),
+        fetch('/api/storage/stats'),
+      ]);
+      
       setStorageUsage(usage);
+      
+      if (dbStatsResponse.ok) {
+        const dbStats = await dbStatsResponse.json();
+        setDatabaseStats(dbStats);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : '加载存储信息失败');
     } finally {
@@ -189,6 +202,135 @@ export function CacheSettingsComponent() {
               </div>
             </CardContent>
           </Card>
+
+          {/* 数据库存储统计 */}
+          {databaseStats && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Database className="h-5 w-5" />
+                  数据库存储
+                </CardTitle>
+                <CardDescription>
+                  云端数据库中的数据统计（实时数据）
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {/* 笔记 */}
+                  <div className="flex items-center justify-between p-3 border rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <FileText className="h-4 w-4 text-blue-500" />
+                      <div>
+                        <p className="font-medium text-neutral-800">笔记</p>
+                        <p className="text-sm text-neutral-600">
+                          {databaseStats.notes.count} 篇笔记
+                        </p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-semibold text-neutral-800">
+                        {formatBytes(databaseStats.notes.totalContentSize)}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* 文件夹 */}
+                  <div className="flex items-center justify-between p-3 border rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <Folder className="h-4 w-4 text-yellow-500" />
+                      <div>
+                        <p className="font-medium text-neutral-800">文件夹</p>
+                        <p className="text-sm text-neutral-600">
+                          {databaseStats.folders.count} 个文件夹
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 版本历史 */}
+                  <div className="flex items-center justify-between p-3 border rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <History className="h-4 w-4 text-purple-500" />
+                      <div>
+                        <p className="font-medium text-neutral-800">版本历史</p>
+                        <p className="text-sm text-neutral-600">
+                          {databaseStats.versions.count} 个版本
+                        </p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-semibold text-neutral-800">
+                        {formatBytes(databaseStats.versions.totalContentSize)}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* 模板 */}
+                  <div className="flex items-center justify-between p-3 border rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <FileCode className="h-4 w-4 text-green-500" />
+                      <div>
+                        <p className="font-medium text-neutral-800">模板</p>
+                        <p className="text-sm text-neutral-600">
+                          {databaseStats.templates.count} 个模板
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 标签 */}
+                  <div className="flex items-center justify-between p-3 border rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <Tag className="h-4 w-4 text-orange-500" />
+                      <div>
+                        <p className="font-medium text-neutral-800">标签</p>
+                        <p className="text-sm text-neutral-600">
+                          {databaseStats.tags.count} 个标签
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 协作 */}
+                  <div className="flex items-center justify-between p-3 border rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <Users className="h-4 w-4 text-cyan-500" />
+                      <div>
+                        <p className="font-medium text-neutral-800">协作</p>
+                        <p className="text-sm text-neutral-600">
+                          {databaseStats.collaborations.count} 个协作笔记
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* AI 对话 */}
+                  <div className="flex items-center justify-between p-3 border rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <MessageSquare className="h-4 w-4 text-pink-500" />
+                      <div>
+                        <p className="font-medium text-neutral-800">AI 对话</p>
+                        <p className="text-sm text-neutral-600">
+                          {databaseStats.aiConversations.count} 个对话，{databaseStats.aiConversations.messagesCount} 条消息
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 总计 */}
+                  <div className="mt-4 pt-4 border-t">
+                    <div className="flex items-center justify-between">
+                      <span className="font-medium text-neutral-800">数据库总占用（估算）</span>
+                      <span className="text-lg font-semibold text-neutral-800">
+                        {formatBytes(databaseStats.total.estimatedSize)}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           <Card>
             <CardHeader>

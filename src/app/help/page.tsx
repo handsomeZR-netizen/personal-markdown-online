@@ -25,19 +25,17 @@ export default async function HelpPage() {
       icon: BookOpen,
       title: "用户指南",
       description: "完整的功能使用指南和最佳实践",
-      href: "/USER_GUIDE.md",
+      href: "/help/user-guide",
       color: "text-blue-500",
-      bgColor: "bg-blue-500/10",
-      external: true
+      bgColor: "bg-blue-500/10"
     },
     {
       icon: FileText,
       title: "数学公式指南",
       description: "学习如何在笔记中使用 LaTeX 数学公式",
-      href: "/MATH_FORMULAS_GUIDE.md",
+      href: "/help/math-formulas",
       color: "text-indigo-500",
-      bgColor: "bg-indigo-500/10",
-      external: true
+      bgColor: "bg-indigo-500/10"
     },
     {
       icon: FileText,

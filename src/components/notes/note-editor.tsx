@@ -24,8 +24,11 @@ import { TagSelector } from "./tag-selector"
 import { CategorySelector } from "./category-selector"
 import { AITagSuggestions } from "./ai-tag-suggestions"
 import { AIFormatButton } from "./ai-format-button"
+import { AIWritingAssistantButton } from "./ai-writing-assistant-button"
 import { t } from "@/lib/i18n"
-import { Loader2, Check, Edit, Eye, WifiOff, Cloud } from "lucide-react"
+import { Loader2, Check, Edit, Eye, WifiOff, PanelLeftClose, PanelLeft, Maximize2, Minimize2 } from "lucide-react"
+import { cn } from "@/lib/utils"
+import { useRef, useCallback } from "react"
 import { NoteActionsToolbar } from "./note-actions-toolbar"
 import { LoadingButton } from "@/components/ui/loading-button"
 import { useLoading } from "@/hooks/use-loading"
@@ -42,6 +45,12 @@ const formSchema = z.object({
     categoryId: z.string().optional(),
 })
 
+interface RecentNote {
+    id: string
+    title: string
+    updatedAt: Date
+}
+
 interface NoteEditorProps {
     note?: {
         id: string
@@ -51,15 +60,17 @@ interface NoteEditorProps {
         categoryId?: string | null
     }
     userId?: string | null
+    recentNotes?: RecentNote[]
 }
 
 type SaveStatus = 'idle' | 'saving' | 'saved' | 'error'
 
-export function NoteEditor({ note, userId: propUserId }: NoteEditorProps) {
+export function NoteEditor({ note, userId: propUserId, recentNotes = [] }: NoteEditorProps) {
     const router = useRouter()
     const { isOnline } = useNetworkStatus()
     const { showLoading, hideLoading } = useLoading()
     const [isSubmitting, setIsSubmitting] = useState(false)
+    const [isFullscreen, setIsFullscreen] = useState(false)
     
     // 使用传入的 userId 或从 localStorage 获取
     const [userId, setUserId] = useState<string | null>(propUserId || null)
@@ -107,6 +118,7 @@ export function NoteEditor({ note, userId: propUserId }: NoteEditorProps) {
     const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle')
     const [selectedTagIds, setSelectedTagIds] = useState<string[]>(note?.tags?.map(t => t.id) || [])
     const [selectedCategoryId, setSelectedCategoryId] = useState<string | undefined>(note?.categoryId || undefined)
+    const [tagRefreshKey, setTagRefreshKey] = useState(0)
     
     // 草稿恢复相关状态
     const [draftToRecover, setDraftToRecover] = useState<DraftContent | null>(null)
@@ -125,8 +137,8 @@ export function NoteEditor({ note, userId: propUserId }: NoteEditorProps) {
     const title = form.watch("title")
     const watchedContent = form.watch("content")
     
-    // Get draft auto-save interval from settings
-    const [draftInterval, setDraftInterval] = useState(3000)
+    // Get draft auto-save interval from settings (default 10 seconds)
+    const [draftInterval, setDraftInterval] = useState(10000)
     
     useEffect(() => {
         const settings = OfflineSettingsManager.getSettings()
@@ -196,11 +208,19 @@ export function NoteEditor({ note, userId: propUserId }: NoteEditorProps) {
         }
     }, [title, watchedContent, selectedTagIds, selectedCategoryId, saveDraftDebounced])
 
+    // 记录上次保存的内容，避免重复保存
+    const [lastSavedContent, setLastSavedContent] = useState({ title: note?.title || '', content: note?.content || '' })
+
     // Auto-save effect
     useEffect(() => {
         if (!note?.id) return // Only auto-save for existing notes
         if (!debouncedTitle) return
         if (!userId) return
+        
+        // 检查内容是否真的变化了
+        if (debouncedTitle === lastSavedContent.title && debouncedContent === lastSavedContent.content) {
+            return // 内容没变，不需要保存
+        }
 
         const performAutoSave = async () => {
             setSaveStatus('saving')
@@ -235,6 +255,7 @@ export function NoteEditor({ note, userId: propUserId }: NoteEditorProps) {
             })
 
             if (result.success) {
+                setLastSavedContent({ title: debouncedTitle, content: debouncedContent })
                 setSaveStatus('saved')
                 setTimeout(() => setSaveStatus('idle'), 2000)
             } else {
@@ -244,7 +265,7 @@ export function NoteEditor({ note, userId: propUserId }: NoteEditorProps) {
         }
 
         performAutoSave()
-    }, [debouncedTitle, debouncedContent, debouncedTagIds, debouncedCategoryId, note, isOnline, userId])
+    }, [debouncedTitle, debouncedContent, note, isOnline, userId, lastSavedContent])
 
     async function onSubmit(values: z.infer<typeof formSchema>) {
         if (!userId) {
@@ -303,7 +324,25 @@ export function NoteEditor({ note, userId: propUserId }: NoteEditorProps) {
                 const noteId = note?.id || 'new';
                 draftManager.deleteDraft(noteId);
             }
-        } catch (error) {
+        } catch (error: unknown) {
+            // Next.js redirect() throws a special error - don't show error toast for redirects
+            // The error can have different formats depending on Next.js version
+            const isRedirectError = 
+                (error instanceof Error && error.message === 'NEXT_REDIRECT') ||
+                (error instanceof Error && error.message.includes('NEXT_REDIRECT')) ||
+                (typeof error === 'object' && error !== null && 'digest' in error && 
+                 typeof (error as { digest?: string }).digest === 'string' && 
+                 (error as { digest: string }).digest.includes('NEXT_REDIRECT'));
+            
+            if (isRedirectError) {
+                // This is a successful redirect, not an error
+                // Clear draft before redirect completes
+                const noteId = note?.id || 'new';
+                draftManager.deleteDraft(noteId);
+                toast.success(note ? t('notes.updateSuccess') : t('notes.createSuccess'));
+                return
+            }
+            console.error('Save note error:', error);
             toast.error(note ? t('notes.updateError') : t('notes.createError'))
         } finally {
             setIsSubmitting(false)
@@ -394,6 +433,28 @@ export function NoteEditor({ note, userId: propUserId }: NoteEditorProps) {
         insertMarkdown('[', '](url)')
     }, { ctrl: true })
 
+    // 左侧面板折叠状态
+    const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
+
+    // 魔法边框效果状态
+    const editorContainerRef = useRef<HTMLDivElement>(null)
+    const [editorMousePosition, setEditorMousePosition] = useState({ x: 0, y: 0 })
+    const [isEditorHovered, setIsEditorHovered] = useState(false)
+    // AI 格式化进行中状态 - 用于显示编辑器霓虹灯效果
+    const [isAIFormatting, setIsAIFormatting] = useState(false)
+
+    const handleEditorMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+        if (!editorContainerRef.current) return
+        const rect = editorContainerRef.current.getBoundingClientRect()
+        setEditorMousePosition({
+            x: e.clientX - rect.left,
+            y: e.clientY - rect.top,
+        })
+    }, [])
+
+    const handleEditorMouseEnter = useCallback(() => setIsEditorHovered(true), [])
+    const handleEditorMouseLeave = useCallback(() => setIsEditorHovered(false), [])
+
     return (
         <>
             <DraftRecoveryDialog
@@ -404,100 +465,200 @@ export function NoteEditor({ note, userId: propUserId }: NoteEditorProps) {
             />
             
             <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4" aria-label={note ? t('notes.editNote') : t('notes.createNote')}>
-                <FormField
-                    control={form.control}
-                    name="title"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>{t('notes.title')}</FormLabel>
-                            <FormControl>
-                                <Input placeholder={t('notes.title')} {...field} />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
+                <form 
+                    onSubmit={form.handleSubmit(onSubmit)} 
+                    aria-label={note ? t('notes.editNote') : t('notes.createNote')}
+                    className={cn(
+                        "transition-all duration-300 ease-in-out",
+                        isFullscreen && "fixed inset-0 z-50 bg-background flex flex-col"
                     )}
-                />
-
-                {/* Tags selector */}
-                <div className="space-y-3">
-                    <FormLabel>{t('tags.tags')}</FormLabel>
-                    <TagSelector
-                        selectedTagIds={selectedTagIds}
-                        onChange={(tagIds) => {
-                            setSelectedTagIds(tagIds)
-                            form.setValue('tagIds', tagIds)
-                        }}
-                    />
-                    
-                    {/* AI Tag Suggestions */}
-                    <AITagSuggestions
-                        content={watchedContent}
-                        title={title}
-                        onAddTags={async (tagNames) => {
-                            try {
-                                // Import getTags and createTag from actions
-                                const { getTags, createTag } = await import('@/lib/actions/tags')
-                                
-                                // Get all tags
-                                const tagsResult = await getTags()
-                                
-                                if (!tagsResult.success || !tagsResult.data) {
-                                    toast.error('获取标签失败')
-                                    return
-                                }
-                                
-                                const newTagIds = [...selectedTagIds]
-                                
-                                // Process each suggested tag
-                                for (const tagName of tagNames) {
-                                    // Check if tag exists
-                                    const existingTag = tagsResult.data.find(tag => tag.name === tagName)
-                                    let tagId = existingTag?.id
-                                    
-                                    // If tag doesn't exist, create it
-                                    if (!tagId) {
-                                        const result = await createTag(tagName)
-                                        if (result.success && result.data) {
-                                            tagId = result.data.id
-                                            // Add to local tags list for next iteration
-                                            tagsResult.data.push(result.data)
-                                        } else {
-                                            console.error(`创建标签失败: ${tagName}`)
-                                            continue
-                                        }
-                                    }
-                                    
-                                    // Add tag to selected tags if not already selected
-                                    if (tagId && !newTagIds.includes(tagId)) {
-                                        newTagIds.push(tagId)
-                                    }
-                                }
-                                
-                                // Update state
-                                setSelectedTagIds(newTagIds)
-                                form.setValue('tagIds', newTagIds)
-                            } catch (error) {
-                                console.error('添加AI标签失败:', error)
-                                toast.error('添加AI标签失败')
-                            }
-                        }}
-                    />
-                </div>
-
-                {/* Category selector */}
-                <div className="space-y-2">
-                    <FormLabel>{t('categories.category')}</FormLabel>
-                    <CategorySelector
-                        selectedCategoryId={selectedCategoryId}
-                        onChange={(categoryId) => {
-                            setSelectedCategoryId(categoryId)
-                            form.setValue('categoryId', categoryId)
-                        }}
-                    />
-                </div>
+                >
+                {/* 全屏模式下的固定工具栏 */}
+                {isFullscreen && (
+                    <div className="flex-shrink-0 bg-background border-b px-4 py-3 transition-all duration-300 ease-in-out">
+                        <div className="flex items-center gap-2 flex-wrap">
+                            <EditorToolbar onInsert={insertMarkdown} />
+                            <AIFormatButton 
+                                content={watchedContent}
+                                onFormatted={(formattedContent) => {
+                                    form.setValue("content", formattedContent)
+                                    setContent(formattedContent)
+                                }}
+                                onFormattingChange={setIsAIFormatting}
+                            />
+                            <AIWritingAssistantButton
+                                content={watchedContent}
+                                onFormatted={(formattedContent) => {
+                                    form.setValue("content", formattedContent)
+                                    setContent(formattedContent)
+                                }}
+                                onFormattingChange={setIsAIFormatting}
+                            />
+                            <NoteActionsToolbar 
+                                noteId={note?.id || 'new'}
+                                noteTitle={title}
+                                noteContent={watchedContent}
+                            />
+                            <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setIsFullscreen(false)}
+                                title="退出全屏"
+                                className="transition-transform duration-200 hover:scale-105"
+                            >
+                                <Minimize2 className="h-4 w-4" />
+                            </Button>
+                        </div>
+                    </div>
+                )}
                 
-                <div className="space-y-2">
+                {/* 左右分栏布局 */}
+                <div className={cn(
+                    "flex flex-col lg:flex-row gap-4 transition-all duration-300 ease-in-out",
+                    isFullscreen && "flex-1 overflow-auto p-4"
+                )}>
+                    {/* 左侧边栏：元数据 */}
+                    <div className={`flex-shrink-0 transition-all duration-300 ease-in-out ${isSidebarCollapsed ? 'lg:w-10' : 'lg:w-52'}`}>
+                        {/* 折叠/展开按钮 */}
+                        <div className="hidden lg:flex justify-end mb-2">
+                            <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+                                className="h-8 w-8 p-0"
+                                aria-label={isSidebarCollapsed ? '展开侧边栏' : '折叠侧边栏'}
+                            >
+                                {isSidebarCollapsed ? (
+                                    <PanelLeft className="h-4 w-4" />
+                                ) : (
+                                    <PanelLeftClose className="h-4 w-4" />
+                                )}
+                            </Button>
+                        </div>
+                        
+                        {/* 折叠时只显示展开按钮 */}
+                        <div className={`space-y-3 ${isSidebarCollapsed ? 'lg:hidden' : ''}`}>
+                        <FormField
+                            control={form.control}
+                            name="title"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>{t('notes.title')}</FormLabel>
+                                    <FormControl>
+                                        <Input placeholder={t('notes.title')} {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+
+                        {/* Tags selector */}
+                        <div className="space-y-2">
+                            <FormLabel>{t('tags.tags')}</FormLabel>
+                            <TagSelector
+                                selectedTagIds={selectedTagIds}
+                                onChange={(tagIds) => {
+                                    setSelectedTagIds(tagIds)
+                                    form.setValue('tagIds', tagIds)
+                                }}
+                                refreshKey={tagRefreshKey}
+                            />
+                            
+                            {/* AI Tag Suggestions */}
+                            <AITagSuggestions
+                                content={watchedContent}
+                                title={title}
+                                onAddTags={async (tagNames) => {
+                                    try {
+                                        const { getTags, createTag } = await import('@/lib/actions/tags')
+                                        const tagsResult = await getTags()
+                                        
+                                        if (!tagsResult.success || !tagsResult.data) {
+                                            toast.error('获取标签失败')
+                                            return
+                                        }
+                                        
+                                        const newTagIds = [...selectedTagIds]
+                                        
+                                        for (const tagName of tagNames) {
+                                            const existingTag = tagsResult.data.find(tag => tag.name === tagName)
+                                            let tagId = existingTag?.id
+                                            
+                                            if (!tagId) {
+                                                const result = await createTag(tagName)
+                                                if (result.success && result.data) {
+                                                    tagId = result.data.id
+                                                    tagsResult.data.push(result.data)
+                                                } else {
+                                                    continue
+                                                }
+                                            }
+                                            
+                                            if (tagId && !newTagIds.includes(tagId)) {
+                                                newTagIds.push(tagId)
+                                            }
+                                        }
+                                        
+                                        setSelectedTagIds(newTagIds)
+                                        form.setValue('tagIds', newTagIds)
+                                        // 触发 TagSelector 刷新以显示新创建的标签
+                                        setTagRefreshKey(prev => prev + 1)
+                                    } catch (error) {
+                                        console.error('添加AI标签失败:', error)
+                                        toast.error('添加AI标签失败')
+                                    }
+                                }}
+                            />
+                        </div>
+
+                        {/* Category selector */}
+                        <div className="space-y-2">
+                            <FormLabel>{t('categories.category')}</FormLabel>
+                            <CategorySelector
+                                selectedCategoryId={selectedCategoryId}
+                                onChange={(categoryId) => {
+                                    setSelectedCategoryId(categoryId)
+                                    form.setValue('categoryId', categoryId)
+                                }}
+                            />
+                        </div>
+
+                        {/* 保存按钮 */}
+                        <LoadingButton
+                            type="submit"
+                            className="w-full"
+                            loading={isSubmitting}
+                        >
+                            {note ? t('common.save') : t('common.create')}
+                        </LoadingButton>
+                        
+                        {/* 最近笔记 */}
+                        {recentNotes.length > 0 && (
+                            <div className="mt-6 pt-4 border-t">
+                                <div className="flex items-center gap-2 mb-3">
+                                    <span className="text-xs text-muted-foreground">最近笔记</span>
+                                </div>
+                                <div className="space-y-1">
+                                    {recentNotes.map((recentNote) => (
+                                        <a
+                                            key={recentNote.id}
+                                            href={`/notes/${recentNote.id}/edit`}
+                                            className="block p-2 rounded-md hover:bg-accent transition-colors text-sm truncate"
+                                            title={recentNote.title || "无标题"}
+                                        >
+                                            {recentNote.title || "无标题"}
+                                        </a>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                        </div>
+                    </div>
+
+                    {/* 右侧：编辑器 */}
+                    <div className="flex-1 min-w-0 space-y-2">
                     <div className="flex items-center justify-between">
                         <FormLabel>{t('notes.content')}</FormLabel>
                         <div className="flex items-center gap-3">
@@ -530,21 +691,45 @@ export function NoteEditor({ note, userId: propUserId }: NoteEditorProps) {
                             )}
                         </div>
                     </div>
-                    <div className="flex items-center gap-2 flex-wrap border-b pb-3">
-                        <EditorToolbar onInsert={insertMarkdown} />
-                        <AIFormatButton 
-                            content={watchedContent}
-                            onFormatted={(formattedContent) => {
-                                form.setValue("content", formattedContent)
-                                setContent(formattedContent)
-                            }}
-                        />
-                        <NoteActionsToolbar 
-                            noteId={note?.id || 'new'}
-                            noteTitle={title}
-                            noteContent={watchedContent}
-                        />
-                    </div>
+                    {/* 非全屏模式下的 sticky 工具栏 */}
+                    {!isFullscreen && (
+                        <div className="sticky top-[73px] z-40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b pb-3 pt-2 -mt-2 transition-all duration-300 ease-in-out">
+                            <div className="flex items-center gap-2 flex-wrap">
+                                <EditorToolbar onInsert={insertMarkdown} />
+                                <AIFormatButton 
+                                    content={watchedContent}
+                                    onFormatted={(formattedContent) => {
+                                        form.setValue("content", formattedContent)
+                                        setContent(formattedContent)
+                                    }}
+                                    onFormattingChange={setIsAIFormatting}
+                                />
+                                <AIWritingAssistantButton
+                                    content={watchedContent}
+                                    onFormatted={(formattedContent) => {
+                                        form.setValue("content", formattedContent)
+                                        setContent(formattedContent)
+                                    }}
+                                    onFormattingChange={setIsAIFormatting}
+                                />
+                                <NoteActionsToolbar 
+                                    noteId={note?.id || 'new'}
+                                    noteTitle={title}
+                                    noteContent={watchedContent}
+                                />
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => setIsFullscreen(true)}
+                                    title="全屏编辑"
+                                    className="transition-transform duration-200 hover:scale-105"
+                                >
+                                    <Maximize2 className="h-4 w-4" />
+                                </Button>
+                            </div>
+                        </div>
+                    )}
                     
                     {/* 移动端：标签页切换编辑器和预览 */}
                     <div className="lg:hidden">
@@ -605,7 +790,104 @@ export function NoteEditor({ note, userId: propUserId }: NoteEditorProps) {
                     </div>
 
                     {/* 桌面端：可调整大小的并排显示编辑器和预览 */}
-                    <div className="hidden lg:block border rounded-lg overflow-hidden">
+                    <div
+                        ref={editorContainerRef}
+                        className="hidden lg:block relative group rounded-lg"
+                        onMouseMove={handleEditorMouseMove}
+                        onMouseEnter={handleEditorMouseEnter}
+                        onMouseLeave={handleEditorMouseLeave}
+                    >
+                        {/* AI格式化霓虹灯效果 - 外发光层（模糊光晕） */}
+                        {isAIFormatting && (
+                            <div 
+                                className="absolute -inset-2 rounded-xl pointer-events-none"
+                                style={{
+                                    background: `conic-gradient(from var(--border-angle, 0deg) at 50% 50%, 
+                                        rgb(236, 72, 153) 0%, 
+                                        rgb(139, 92, 246) 14%, 
+                                        rgb(59, 130, 246) 28%, 
+                                        rgb(34, 211, 238) 42%, 
+                                        rgb(52, 211, 153) 56%, 
+                                        rgb(250, 204, 21) 70%, 
+                                        rgb(251, 146, 60) 84%, 
+                                        rgb(236, 72, 153) 100%)`,
+                                    animation: "border-beam 2s linear infinite",
+                                    filter: "blur(12px)",
+                                    opacity: 0.7,
+                                    // 使用 mask 镂空中间，只保留边框发光
+                                    mask: "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
+                                    maskComposite: "xor",
+                                    WebkitMaskComposite: "xor",
+                                    padding: "8px",
+                                }}
+                            />
+                        )}
+                        
+                        {/* AI格式化霓虹灯效果 - 清晰边框层 */}
+                        {isAIFormatting && (
+                            <div 
+                                className="absolute -inset-[3px] rounded-lg pointer-events-none"
+                                style={{
+                                    background: `conic-gradient(from var(--border-angle, 0deg) at 50% 50%, 
+                                        rgb(236, 72, 153) 0%, 
+                                        rgb(139, 92, 246) 14%, 
+                                        rgb(59, 130, 246) 28%, 
+                                        rgb(34, 211, 238) 42%, 
+                                        rgb(52, 211, 153) 56%, 
+                                        rgb(250, 204, 21) 70%, 
+                                        rgb(251, 146, 60) 84%, 
+                                        rgb(236, 72, 153) 100%)`,
+                                    animation: "border-beam 2s linear infinite",
+                                    // 使用 mask 镂空中间，只保留 3px 边框
+                                    mask: "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
+                                    maskComposite: "xor",
+                                    WebkitMaskComposite: "xor",
+                                    padding: "3px",
+                                }}
+                            />
+                        )}
+
+                        {/* 流光渐变边框 - 普通 hover 效果 */}
+                        {!isAIFormatting && (
+                            <div
+                                className={cn(
+                                    "absolute -inset-[1px] rounded-lg pointer-events-none transition-opacity duration-500",
+                                    "bg-gradient-to-r from-violet-500 via-blue-500 to-purple-600",
+                                    "opacity-0 group-hover:opacity-20 dark:group-hover:opacity-50"
+                                )}
+                            />
+                        )}
+
+                        {/* 鼠标跟随光晕效果 */}
+                        {!isAIFormatting && (
+                            <div
+                                className="absolute -inset-[1px] rounded-lg pointer-events-none transition-opacity duration-300"
+                                style={{
+                                    opacity: isEditorHovered ? 0.15 : 0,
+                                    background: `radial-gradient(400px circle at ${editorMousePosition.x}px ${editorMousePosition.y}px, rgba(139, 92, 246, 0.4), transparent 40%)`,
+                                }}
+                            />
+                        )}
+
+                        {/* 流动边框光束动画 - 普通 hover 效果 */}
+                        {!isAIFormatting && (
+                            <div className="absolute -inset-[1px] rounded-lg pointer-events-none overflow-hidden">
+                                <div
+                                    className={cn(
+                                        "absolute inset-0 transition-opacity duration-500",
+                                        "opacity-0 dark:opacity-30",
+                                        isEditorHovered && "opacity-10 dark:opacity-60"
+                                    )}
+                                    style={{
+                                        background: `conic-gradient(from var(--border-angle, 0deg) at 50% 50%, transparent 0%, rgb(139, 92, 246) 10%, rgb(59, 130, 246) 20%, rgb(147, 51, 234) 30%, transparent 40%)`,
+                                        animation: "border-beam 4s linear infinite",
+                                    }}
+                                />
+                            </div>
+                        )}
+
+                        {/* 编辑器主容器 */}
+                        <div className="relative border rounded-lg overflow-hidden bg-background z-10">
                         <PanelGroup direction="horizontal">
                             {/* Editor pane */}
                             <Panel defaultSize={50} minSize={30}>
@@ -667,22 +949,12 @@ export function NoteEditor({ note, userId: propUserId }: NoteEditorProps) {
                                 </div>
                             </Panel>
                         </PanelGroup>
+                        </div>
                     </div>
+                    </div>
+                    {/* 关闭右侧编辑器 div */}
                 </div>
-                
-                <div className="flex justify-end gap-4" role="group" aria-label="表单操作">
-                    <Button type="button" variant="outline" onClick={() => router.back()} aria-label={t('common.cancel')} disabled={isSubmitting}>
-                        {t('common.cancel')}
-                    </Button>
-                    <LoadingButton 
-                        type="submit" 
-                        loading={isSubmitting}
-                        loaderVariant="orbit"
-                        aria-label={t('common.save')}
-                    >
-                        {t('common.save')}
-                    </LoadingButton>
-                </div>
+                {/* 关闭左右分栏布局 div */}
             </form>
         </Form>
         </>

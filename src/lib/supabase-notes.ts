@@ -228,41 +228,105 @@ export async function updateNote(id: string, userId: string, updates: UpdateNote
   // Local mode: use Prisma
   if (!isSupabaseMode()) {
     try {
-      const note = await prisma.note.updateMany({
+      // First, check if the note exists and get its ownership info
+      const existingNote = await prisma.note.findUnique({
+        where: { id },
+        select: { id: true, userId: true, ownerId: true },
+      })
+      
+      if (!existingNote) {
+        console.error('Note not found:', id)
+        return { error: 'Note not found', data: null }
+      }
+      
+      console.log('Updating note:', { 
+        noteId: id, 
+        requestUserId: userId, 
+        noteUserId: existingNote.userId, 
+        noteOwnerId: existingNote.ownerId 
+      })
+      
+      // Check if user is owner (either userId or ownerId matches)
+      const isOwner = existingNote.userId === userId || existingNote.ownerId === userId
+      
+      if (isOwner) {
+        // User is owner, allow update
+        const updatedNote = await prisma.note.update({
+          where: { id },
+          data: {
+            ...updates,
+            updatedAt: new Date(),
+          },
+        })
+        return { data: updatedNote, error: null }
+      }
+      
+      // If not owner, check if user is a collaborator with editor role
+      const collaborator = await prisma.collaborator.findFirst({
         where: {
-          id,
-          OR: [
-            { userId: userId },
-            { ownerId: userId },
-          ],
-        },
-        data: {
-          ...updates,
-          updatedAt: new Date(),
+          noteId: id,
+          userId: userId,
+          role: 'editor',
         },
       })
-      if (note.count === 0) {
-        return { error: 'Note not found or not authorized', data: null }
+      
+      if (collaborator) {
+        // User is an editor collaborator, allow update
+        const updatedNote = await prisma.note.update({
+          where: { id },
+          data: {
+            ...updates,
+            updatedAt: new Date(),
+          },
+        })
+        return { data: updatedNote, error: null }
       }
-      const updatedNote = await prisma.note.findUnique({ where: { id } })
-      return { data: updatedNote, error: null }
+      
+      console.error('User not authorized to update note:', { userId, noteId: id })
+      return { error: 'Not authorized to update this note', data: null }
     } catch (error) {
       console.error('Update note error (Prisma):', error)
       return { error: (error as Error).message, data: null }
     }
   }
 
-  // Supabase mode
-  const { data, error } = await db
+  // Supabase mode - first try direct ownership
+  let { data, error } = await db
     .from('Note')
     .update({
       ...updates,
       updatedAt: new Date().toISOString(),
     })
     .eq('id', id)
-    .eq('userId', userId)
+    .or(`userId.eq.${userId},ownerId.eq.${userId}`)
     .select()
     .single()
+
+  // If not found by ownership, check collaborator access
+  if (error && error.code === 'PGRST116') {
+    const { data: collaborator } = await db
+      .from('Collaborator')
+      .select('role')
+      .eq('noteId', id)
+      .eq('userId', userId)
+      .eq('role', 'editor')
+      .maybeSingle()
+
+    if (collaborator) {
+      const result = await db
+        .from('Note')
+        .update({
+          ...updates,
+          updatedAt: new Date().toISOString(),
+        })
+        .eq('id', id)
+        .select()
+        .single()
+      
+      data = result.data
+      error = result.error
+    }
+  }
 
   if (error) {
     console.error('Update note error:', error)

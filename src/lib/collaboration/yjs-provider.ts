@@ -47,6 +47,8 @@ export class YjsProvider {
   private statusListeners: Set<(status: ConnectionStatus) => void> = new Set();
   private syncedListeners: Set<() => void> = new Set();
   private currentStatus: ConnectionStatus = 'disconnected';
+  private _isDestroyed: boolean = false;
+  private _initializationFailed: boolean = false;
   
   // Reconnection state
   private reconnectionAttempts: number = 0;
@@ -147,9 +149,17 @@ export class YjsProvider {
       
     } catch (error) {
       console.error('Failed to initialize provider:', error);
+      this._initializationFailed = true;
       this.updateStatus('error');
       this.scheduleReconnection();
     }
+  }
+  
+  /**
+   * Check if initialization failed (provider couldn't be created)
+   */
+  public hasInitializationFailed(): boolean {
+    return this._initializationFailed;
   }
   
   /**
@@ -469,7 +479,13 @@ export class YjsProvider {
    * Disconnect and cleanup
    */
   public destroy(): void {
+    if (this._isDestroyed) {
+      return; // Already destroyed, prevent double cleanup
+    }
+    
     console.log(`Destroying provider for note: ${this.config.noteId}`);
+    
+    this._isDestroyed = true;
     
     // Stop heartbeat
     this.stopHeartbeat();
@@ -508,9 +524,10 @@ export class YjsProvider {
 
   /**
    * Check if provider is destroyed
+   * Note: This returns true only after destroy() is called, not when initialization fails
    */
   public isDestroyed(): boolean {
-    return this.provider === null;
+    return this._isDestroyed;
   }
 }
 
