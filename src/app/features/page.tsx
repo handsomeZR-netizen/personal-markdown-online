@@ -4,7 +4,7 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { CoreFeatureCards, ContentFeatureCards, ExportFeatureCards, SpecialFeatureCards, SpecialFeatureCards2, MobileFeatureCards, CollaborationFeatureCards, ProductivityFeatureCards, PerformanceFeatureCards } from "@/components/features"
+import { CoreFeatureCards, ContentFeatureCards, ExportFeatureCards, SpecialFeatureCards, SpecialFeatureCards2, MobileFeatureCards, CollaborationFeatureCards, ProductivityFeatureCards, PerformanceFeatureCards, AIFeatureCards } from "@/components/features"
 import { 
   FolderTree, 
   Users, 
@@ -31,7 +31,8 @@ import {
   TrendingUp,
   Bell,
   Code2,
-  Gauge
+  Gauge,
+  Brain
 } from "lucide-react"
 
 export default async function FeaturesPage() {
@@ -328,6 +329,19 @@ export default async function FeaturesPage() {
           <Badge variant="secondary" className="text-xs">点击查看实现详情</Badge>
         </div>
         <ProductivityFeatureCards />
+      </section>
+
+      {/* AI 智能功能 - 使用可点击弹窗的客户端组件 */}
+      <section className="mb-12">
+        <div className="flex items-center gap-2 mb-6">
+          <Brain className="h-6 w-6 text-primary" />
+          <h2 className="text-2xl font-bold">AI 智能功能</h2>
+          <Badge className="bg-gradient-to-r from-cyan-500 to-purple-500 text-white">
+            智能
+          </Badge>
+          <Badge variant="secondary" className="text-xs">点击查看实现详情</Badge>
+        </div>
+        <AIFeatureCards />
       </section>
 
       {/* 性能优化 - 使用可点击弹窗的客户端组件 */}

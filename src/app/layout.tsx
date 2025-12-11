@@ -60,8 +60,6 @@ export default async function RootLayout({
         <meta name="theme-color" content="#6366f1" />
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
         <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" crossOrigin="anonymous" />
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/github-dark.min.css" crossOrigin="anonymous" />
       </head>
       <body className="font-sans antialiased bg-background relative">
         <ThemeProvider

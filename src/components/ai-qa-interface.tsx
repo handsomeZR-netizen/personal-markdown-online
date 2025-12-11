@@ -8,8 +8,9 @@ import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { 
   MessageCircle, Loader2, Send, FileText, History, 
-  Plus, Trash2, ChevronLeft, Square, Search, X
+  Plus, Trash2, ChevronLeft, Search, X
 } from 'lucide-react';
+import { answerQuery } from '@/lib/actions/ai';
 import { 
   createConversation, 
   addMessageToConversation, 
@@ -20,7 +21,6 @@ import {
   saveSearchHistory,
   searchConversations,
 } from '@/lib/actions/ai-history';
-import { useStreamChat } from '@/hooks/use-stream-chat';
 import { MarkdownRenderer } from '@/components/ui/markdown-renderer';
 import { toast } from 'sonner';
 import { t } from '@/lib/i18n';
@@ -31,7 +31,6 @@ interface Message {
   role: 'user' | 'assistant';
   content: string;
   relatedNotes?: Array<{ id: string; title: string; similarity: number }>;
-  isStreaming?: boolean;
 }
 
 interface Conversation {
@@ -43,6 +42,7 @@ interface Conversation {
 
 export function AIQAInterface() {
   const [query, setQuery] = useState('');
+  const [isAsking, setIsAsking] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [currentConversationId, setCurrentConversationId] = useState<string | null>(null);
   const [conversations, setConversations] = useState<Conversation[]>([]);
@@ -54,37 +54,19 @@ export function AIQAInterface() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const { 
-    isStreaming, 
-    content: streamingContent, 
-    relatedNotes: streamingNotes,
-    sendMessage: sendStreamMessage,
-    stopStreaming,
-  } = useStreamChat({
-    onToken: () => scrollToBottom(),
-  });
-
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, []);
 
+  // 加载对话列表
   useEffect(() => {
     loadConversations();
   }, []);
 
+  // 消息更新时滚动到底部
   useEffect(() => {
-    if (isStreaming && streamingContent) {
-      setMessages(prev => {
-        const newMessages = [...prev];
-        const lastMessage = newMessages[newMessages.length - 1];
-        if (lastMessage?.role === 'assistant' && lastMessage.isStreaming) {
-          lastMessage.content = streamingContent;
-          lastMessage.relatedNotes = streamingNotes;
-        }
-        return newMessages;
-      });
-    }
-  }, [isStreaming, streamingContent, streamingNotes]);
+    scrollToBottom();
+  }, [messages, scrollToBottom]);
 
   const loadConversations = async () => {
     const result = await getConversations(50);
@@ -125,7 +107,6 @@ export function AIQAInterface() {
         relatedNotes: msg.relatedNotes || undefined,
       })));
       setShowHistory(false);
-      setTimeout(scrollToBottom, 100);
     }
     setIsLoadingHistory(false);
   };
@@ -154,8 +135,10 @@ export function AIQAInterface() {
 
   const handleAsk = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!query.trim() || isStreaming) return;
+    
+    if (!query.trim() || isAsking) return;
 
+    // 创建或获取对话 ID
     let conversationId = currentConversationId;
     if (!conversationId) {
       const createResult = await createConversation();
@@ -167,51 +150,56 @@ export function AIQAInterface() {
       setCurrentConversationId(conversationId);
     }
 
+    // 添加用户消息到界面
     const userMessage: Message = { role: 'user', content: query };
-    const assistantMessage: Message = { role: 'assistant', content: '', isStreaming: true };
-    setMessages(prev => [...prev, userMessage, assistantMessage]);
+    setMessages(prev => [...prev, userMessage]);
     
     const currentQuery = query;
     setQuery('');
-    scrollToBottom();
+    setIsAsking(true);
 
     try {
+      // 保存用户消息到数据库
       await addMessageToConversation(conversationId, 'user', currentQuery);
+      
+      // 保存搜索历史
       await saveSearchHistory(currentQuery, 'natural_language', 0);
 
-      const result = await sendStreamMessage(currentQuery, conversationId, true);
+      // 调用原来的 answerQuery action（使用数据库查询笔记）
+      const result = await answerQuery(currentQuery, 5);
       
-      if (result) {
-        setMessages(prev => {
-          const newMessages = [...prev];
-          const lastMessage = newMessages[newMessages.length - 1];
-          if (lastMessage?.role === 'assistant') {
-            lastMessage.content = result.content;
-            lastMessage.relatedNotes = result.relatedNotes;
-            lastMessage.isStreaming = false;
-          }
-          return newMessages;
-        });
-
-        await addMessageToConversation(conversationId, 'assistant', result.content, result.relatedNotes);
+      if (result.success) {
+        // 添加 AI 回复到界面
+        const assistantMessage: Message = {
+          role: 'assistant',
+          content: result.data.answer,
+          relatedNotes: result.data.relatedNotes,
+        };
+        setMessages(prev => [...prev, assistantMessage]);
+        
+        // 保存 AI 回复到数据库
+        await addMessageToConversation(
+          conversationId, 
+          'assistant', 
+          result.data.answer,
+          result.data.relatedNotes
+        );
+        
+        // 刷新对话列表
         await loadConversations();
+      } else {
+        toast.error(result.error || '提问失败');
+        // 移除用户消息
+        setMessages(prev => prev.slice(0, -1));
       }
-    } catch {
+    } catch (error) {
+      console.error('AI 问答错误:', error);
       toast.error('提问失败，请重试');
-      setMessages(prev => prev.slice(0, -2));
+      // 移除用户消息
+      setMessages(prev => prev.slice(0, -1));
+    } finally {
+      setIsAsking(false);
     }
-  };
-
-  const handleStopStreaming = () => {
-    stopStreaming();
-    setMessages(prev => {
-      const newMessages = [...prev];
-      const lastMessage = newMessages[newMessages.length - 1];
-      if (lastMessage?.role === 'assistant') {
-        lastMessage.isStreaming = false;
-      }
-      return newMessages;
-    });
   };
 
   const formatDate = (date: Date) => {
@@ -228,6 +216,7 @@ export function AIQAInterface() {
 
   return (
     <div className="space-y-4">
+      {/* 头部 */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           {showHistory && (
@@ -243,7 +232,11 @@ export function AIQAInterface() {
         <div className="flex items-center gap-2">
           {!showHistory && (
             <>
-              <Button variant="outline" size="sm" onClick={() => { setShowHistory(true); loadConversations(); }}>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => { setShowHistory(true); loadConversations(); }}
+              >
                 <History className="h-4 w-4 mr-1" />
                 历史 ({conversations.length})
               </Button>
@@ -262,8 +255,10 @@ export function AIQAInterface() {
         </div>
       </div>
 
+      {/* 对话历史列表 */}
       {showHistory ? (
         <div className="space-y-3">
+          {/* 搜索框 */}
           <div className="flex gap-2">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -290,6 +285,7 @@ export function AIQAInterface() {
             </Button>
           </div>
 
+          {/* 对话列表 */}
           <ScrollArea className="h-[400px]">
             <div className="space-y-2 pr-4">
               {conversations.length === 0 ? (
@@ -314,7 +310,7 @@ export function AIQAInterface() {
                         <p className="text-sm font-medium truncate">{conv.title || '新对话'}</p>
                         <p className="text-xs text-muted-foreground">
                           {formatDate(conv.updatedAt)}
-                          {conv.messageCount && ` · ${conv.messageCount} 条消息`}
+                          {conv.messageCount !== undefined && ` · ${conv.messageCount} 条消息`}
                         </p>
                       </div>
                       <Button
@@ -334,6 +330,7 @@ export function AIQAInterface() {
         </div>
       ) : (
         <>
+          {/* 消息列表 */}
           {messages.length > 0 && (
             <ScrollArea className="h-[500px] p-4 border rounded-lg bg-muted/30">
               <div className="space-y-4 pr-4">
@@ -353,29 +350,22 @@ export function AIQAInterface() {
                         <p className="text-sm whitespace-pre-wrap">{message.content}</p>
                       ) : (
                         <div className="text-sm">
-                          {message.content ? (
-                            <MarkdownRenderer content={message.content} />
-                          ) : message.isStreaming ? (
-                            <div className="flex items-center gap-2">
-                              <Loader2 className="h-4 w-4 animate-spin" />
-                              <span className="text-muted-foreground">AI 正在思考...</span>
-                            </div>
-                          ) : null}
-                          {message.isStreaming && message.content && (
-                            <span className="inline-block w-2 h-4 bg-primary animate-pulse ml-0.5" />
-                          )}
+                          <MarkdownRenderer content={message.content} />
                         </div>
                       )}
                       
+                      {/* 相关笔记 */}
                       {message.relatedNotes && message.relatedNotes.length > 0 && (
                         <div className="mt-3 pt-3 border-t space-y-2">
-                          <p className="text-xs font-medium text-muted-foreground">{t('ai.relatedNotes')}:</p>
+                          <p className="text-xs font-medium text-muted-foreground">
+                            {t('ai.relatedNotes')}:
+                          </p>
                           <div className="space-y-1">
                             {message.relatedNotes.map((note) => (
                               <Link
                                 key={note.id}
                                 href={`/notes/${note.id}`}
-                                className="flex items-center justify-between gap-2 text-xs hover:underline"
+                                className="flex items-center justify-between gap-2 text-xs hover:underline text-primary"
                               >
                                 <div className="flex items-center gap-1">
                                   <FileText className="h-3 w-3" />
@@ -392,11 +382,25 @@ export function AIQAInterface() {
                     </div>
                   </div>
                 ))}
+                
+                {/* 加载中状态 */}
+                {isAsking && (
+                  <div className="flex justify-start">
+                    <div className="max-w-[85%] rounded-lg p-3 bg-background border">
+                      <div className="flex items-center gap-2">
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        <span className="text-sm text-muted-foreground">AI 正在思考...</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                
                 <div ref={messagesEndRef} />
               </div>
             </ScrollArea>
           )}
 
+          {/* 输入表单 */}
           <form onSubmit={handleAsk} className="flex gap-2">
             <Input
               ref={inputRef}
@@ -404,22 +408,22 @@ export function AIQAInterface() {
               placeholder={t('ai.askQuestion')}
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              disabled={isLoadingHistory}
+              disabled={isAsking || isLoadingHistory}
               className="flex-1"
             />
-            {isStreaming ? (
-              <Button type="button" variant="destructive" onClick={handleStopStreaming}>
-                <Square className="h-4 w-4 mr-2" />
-                停止
-              </Button>
-            ) : (
-              <Button type="submit" disabled={!query.trim() || isLoadingHistory}>
-                <Send className="h-4 w-4 mr-2" />
-                提问
-              </Button>
-            )}
+            <Button type="submit" disabled={!query.trim() || isAsking || isLoadingHistory}>
+              {isAsking ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <>
+                  <Send className="h-4 w-4 mr-2" />
+                  提问
+                </>
+              )}
+            </Button>
           </form>
 
+          {/* 空状态提示 */}
           {messages.length === 0 && (
             <Card className="bg-muted/30">
               <CardContent className="pt-6">

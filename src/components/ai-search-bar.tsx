@@ -153,7 +153,7 @@ export function AISearchBar() {
 
       {/* 搜索历史下拉 */}
       {showHistory && history.length > 0 && (
-        <Card className="absolute z-10 w-full max-w-[calc(100%-120px)] shadow-lg">
+        <Card className="shadow-lg">
           <CardHeader className="py-2 px-3 flex flex-row items-center justify-between">
             <span className="text-sm font-medium text-muted-foreground flex items-center gap-1">
               <Clock className="h-3 w-3" />
@@ -169,7 +169,7 @@ export function AISearchBar() {
               清空
             </Button>
           </CardHeader>
-          <CardContent className="py-1 px-1">
+          <CardContent className="py-1 px-1 max-h-[300px] overflow-y-auto">
             <div className="space-y-1">
               {history.map((item) => (
                 <div
@@ -179,13 +179,13 @@ export function AISearchBar() {
                 >
                   <div className="flex items-center gap-2 flex-1 min-w-0">
                     <Search className="h-3 w-3 text-muted-foreground flex-shrink-0" />
-                    <span className="text-sm truncate">{item.query}</span>
+                    <span className="text-sm truncate max-w-[200px]">{item.query}</span>
                     <Badge variant="secondary" className="text-xs flex-shrink-0">
                       {item.resultCount} 结果
                     </Badge>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs text-muted-foreground">
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    <span className="text-xs text-muted-foreground hidden sm:inline">
                       {formatDate(item.createdAt)}
                     </span>
                     <Button
