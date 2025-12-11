@@ -3,6 +3,7 @@
 import { motion } from "framer-motion"
 import { Card, CardContent } from "@/components/ui/card"
 import { FileText, Tag, FolderOpen, Calendar } from "lucide-react"
+import { useState, useEffect } from "react"
 
 interface StatsCardsProps {
   noteCount: number
@@ -17,6 +18,20 @@ export function StatsCards({
   categoryCount,
   recentNoteDate,
 }: StatsCardsProps) {
+  const [mounted, setMounted] = useState(false)
+  
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  const formatRecentDate = () => {
+    if (!mounted || !recentNoteDate) return "暂无"
+    return new Date(recentNoteDate).toLocaleDateString("zh-CN", {
+      month: "short",
+      day: "numeric",
+    })
+  }
+
   const stats = [
     {
       icon: FileText,
@@ -42,12 +57,7 @@ export function StatsCards({
     {
       icon: Calendar,
       label: "最近更新",
-      value: recentNoteDate
-        ? new Date(recentNoteDate).toLocaleDateString("zh-CN", {
-            month: "short",
-            day: "numeric",
-          })
-        : "暂无",
+      value: formatRecentDate(),
       color: "text-foreground",
       bgColor: "bg-muted",
     },

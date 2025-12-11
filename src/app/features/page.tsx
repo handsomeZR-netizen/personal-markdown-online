@@ -4,7 +4,7 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { CoreFeatureCards, ContentFeatureCards, ExportFeatureCards, SpecialFeatureCards, SpecialFeatureCards2, MobileFeatureCards, CollaborationFeatureCards, ProductivityFeatureCards } from "@/components/features"
+import { CoreFeatureCards, ContentFeatureCards, ExportFeatureCards, SpecialFeatureCards, SpecialFeatureCards2, MobileFeatureCards, CollaborationFeatureCards, ProductivityFeatureCards, PerformanceFeatureCards } from "@/components/features"
 import { 
   FolderTree, 
   Users, 
@@ -30,7 +30,8 @@ import {
   Star,
   TrendingUp,
   Bell,
-  Code2
+  Code2,
+  Gauge
 } from "lucide-react"
 
 export default async function FeaturesPage() {
@@ -327,6 +328,19 @@ export default async function FeaturesPage() {
           <Badge variant="secondary" className="text-xs">点击查看实现详情</Badge>
         </div>
         <ProductivityFeatureCards />
+      </section>
+
+      {/* 性能优化 - 使用可点击弹窗的客户端组件 */}
+      <section className="mb-12">
+        <div className="flex items-center gap-2 mb-6">
+          <Gauge className="h-6 w-6 text-primary" />
+          <h2 className="text-2xl font-bold">性能优化</h2>
+          <Badge className="bg-gradient-to-r from-emerald-500 to-teal-500 text-white">
+            最新
+          </Badge>
+          <Badge variant="secondary" className="text-xs">点击查看实现详情</Badge>
+        </div>
+        <PerformanceFeatureCards />
       </section>
 
       {/* 移动端与体验 */}

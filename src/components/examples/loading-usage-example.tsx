@@ -190,7 +190,6 @@ export function SmartLoadingExample() {
           throw new Error('网络错误');
         }
         await new Promise(resolve => setTimeout(resolve, 2000));
-        return '数据加载成功';
       });
     } catch (err) {
       console.error('加载失败:', err);

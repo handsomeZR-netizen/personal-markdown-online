@@ -319,7 +319,7 @@ async function createNotes(
         isPublic: i % 5 === 0, // Make 20% of notes public
         publicSlug: i % 5 === 0 ? `note-${i}` : null,
         updatedAt: new Date(),
-        tags: {
+        Tag: {
           connect: noteTags.map(tag => ({ id: tag.id }))
         }
       }

@@ -4,7 +4,7 @@ import { getTags } from "@/lib/actions/tags"
 import { getCategories } from "@/lib/actions/categories"
 import { getFolders } from "@/lib/actions/folders"
 import { getUserPreferences } from "@/lib/actions/preferences"
-import { NoteCard } from "@/components/notes/note-card"
+import { PaginatedNotesList } from "@/components/notes/notes-list-client"
 import { Pagination } from "@/components/pagination"
 import { SortSelector } from "@/components/sort-selector"
 import { SearchBar } from "@/components/search-bar"
@@ -217,14 +217,13 @@ export default async function NotesPage({
                         initialSortOrder={userPrefs.sortOrder as SortOrder}
                     />
 
-                    {/* 笔记列表 */}
+                    {/* 笔记列表 - 使用优化后的组件 */}
                     {notes.length > 0 ? (
                         <>
-                            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4" role="list" aria-label="笔记列表">
-                                {notes.map((note) => (
-                                    <NoteCard key={note.id} note={note} />
-                                ))}
-                            </div>
+                            <PaginatedNotesList 
+                                notes={notes} 
+                                totalCount={totalCount}
+                            />
                             
                             {/* 分页 */}
                             <Suspense fallback={<PaginationFallback />}>

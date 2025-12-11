@@ -21,19 +21,19 @@ async function getPublicNote(slug: string) {
       isPublic: true,
     },
     include: {
-      owner: {
+      User_Note_ownerIdToUser: {
         select: {
           name: true,
           email: true,
         },
       },
-      tags: {
+      Tag: {
         select: {
           id: true,
           name: true,
         },
       },
-      category: {
+      Category: {
         select: {
           id: true,
           name: true,
@@ -101,7 +101,7 @@ export default async function PublicNotePage({ params }: PublicNotePageProps) {
               {/* Metadata */}
               <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
                 <div>
-                  作者: {note.owner.name || note.owner.email}
+                  作者: {note.User_Note_ownerIdToUser.name || note.User_Note_ownerIdToUser.email}
                 </div>
                 <div>
                   更新于{' '}
@@ -113,12 +113,12 @@ export default async function PublicNotePage({ params }: PublicNotePageProps) {
               </div>
 
               {/* Tags and Category */}
-              {(note.tags.length > 0 || note.category) && (
+              {(note.Tag.length > 0 || note.Category) && (
                 <div className="flex flex-wrap items-center gap-2">
-                  {note.category && (
-                    <Badge variant="outline">{note.category.name}</Badge>
+                  {note.Category && (
+                    <Badge variant="outline">{note.Category.name}</Badge>
                   )}
-                  {note.tags.map((tag) => (
+                  {note.Tag.map((tag) => (
                     <Badge key={tag.id} variant="secondary">
                       {tag.name}
                     </Badge>

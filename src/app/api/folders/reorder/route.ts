@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
     const parseResult = reorderRequestSchema.safeParse(body);
     if (!parseResult.success) {
       return NextResponse.json(
-        { error: parseResult.error.errors[0]?.message || 'Invalid request format' },
+        { error: parseResult.error.issues[0]?.message || 'Invalid request format' },
         { status: 400 }
       );
     }

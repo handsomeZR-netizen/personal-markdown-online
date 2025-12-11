@@ -173,10 +173,11 @@ export function CollaborativeTiptapEditor({
   );
 
   // Build extensions array
-  const extensions = [
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const extensions: any[] = [
     StarterKit.configure({
       // Disable history when using collaboration
-      history: !enableCollaboration || !ydoc,
+      history: (!enableCollaboration || !ydoc) ? {} : false,
     }),
     Image.configure({
       inline: true,

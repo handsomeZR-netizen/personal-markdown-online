@@ -30,6 +30,11 @@ export function SharedNotesSection() {
   const [notes, setNotes] = useState<SharedNote[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [mounted, setMounted] = useState(false)
+  
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   useEffect(() => {
     async function fetchSharedNotes() {
@@ -124,10 +129,10 @@ export function SharedNotesSection() {
                       </span>
                     </div>
                     <span>
-                      {formatDistanceToNow(new Date(note.sharedAt), {
+                      {mounted ? formatDistanceToNow(new Date(note.sharedAt), {
                         addSuffix: true,
                         locale: zhCN,
-                      })}
+                      }) : ''}
                     </span>
                   </div>
                 </CardContent>

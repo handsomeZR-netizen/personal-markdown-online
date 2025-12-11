@@ -86,11 +86,11 @@ export async function POST(request: NextRequest) {
         parentId: validated.newParentId,
       },
       include: {
-        parent: true,
+        Folder: true,
         _count: {
           select: {
-            children: true,
-            notes: true,
+            other_Folder: true,
+            Note: true,
           },
         },
       },

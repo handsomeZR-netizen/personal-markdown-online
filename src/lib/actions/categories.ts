@@ -5,6 +5,7 @@ import { auth } from "@/auth"
 import { withCache, queryCache } from "@/lib/cache"
 import { createCategorySchema, type CreateCategoryInput } from "@/lib/validations/categories"
 import { validateData, sanitizeString } from "@/lib/validation-utils"
+import { randomUUID } from "crypto"
 
 type ActionResult<T = void> = 
   | { success: true; data: T }
@@ -63,6 +64,7 @@ export async function createCategory(name: string): Promise<ActionResult<{ id: s
 
         const category = await prisma.category.create({
             data: {
+                id: randomUUID(),
                 name: validation.data.name,
             },
         })
@@ -92,7 +94,7 @@ export async function deleteCategory(categoryId: string): Promise<ActionResult> 
             where: { id: categoryId },
             include: {
                 _count: {
-                    select: { notes: true }
+                    select: { Note: true }
                 }
             }
         })
@@ -102,8 +104,8 @@ export async function deleteCategory(categoryId: string): Promise<ActionResult> 
         }
 
         // Check if category has notes
-        if (category._count.notes > 0) {
-            return { success: false, error: `该分类下还有 ${category._count.notes} 篇笔记，无法删除` }
+        if (category._count.Note > 0) {
+            return { success: false, error: `该分类下还有 ${category._count.Note} 篇笔记，无法删除` }
         }
 
         await prisma.category.delete({

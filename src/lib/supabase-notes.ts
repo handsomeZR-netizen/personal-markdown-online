@@ -43,7 +43,7 @@ export async function getUserNotes(userId: string) {
             { userId: userId },
             { ownerId: userId },
             {
-              collaborators: {
+              Collaborator: {
                 some: { userId: userId },
               },
             },
@@ -118,22 +118,31 @@ export async function getNoteById(id: string, userId: string) {
             { userId: userId },
             { ownerId: userId },
             {
-              collaborators: {
+              Collaborator: {
                 some: { userId: userId },
               },
             },
           ],
         },
         include: {
-          tags: true,
-          category: true,
-          folder: true,
+          Tag: true,
+          Category: true,
+          Folder: true,
         },
       })
+      
       if (!note) {
         return { error: 'Note not found', data: null }
       }
-      return { data: note, error: null }
+      
+      // Transform to expected format
+      const transformedNote = {
+        ...note,
+        tags: note.Tag,
+        category: note.Category,
+        folder: note.Folder,
+      }
+      return { data: transformedNote, error: null }
     } catch (error) {
       console.error('Get note error (Prisma):', error)
       return { error: (error as Error).message, data: null }

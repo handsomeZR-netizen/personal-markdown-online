@@ -4,6 +4,7 @@
  */
 
 import { PrismaClient } from '@prisma/client';
+import { randomUUID } from 'crypto';
 
 const prisma = new PrismaClient();
 
@@ -750,7 +751,7 @@ async function seedChineseData() {
       if (existingTag) {
         tags.push(existingTag);
       } else {
-        const tag = await prisma.tag.create({ data: { name: tagName } });
+        const tag = await prisma.tag.create({ data: { id: randomUUID(), name: tagName } });
         tags.push(tag);
       }
     }
@@ -764,7 +765,7 @@ async function seedChineseData() {
       if (existingCategory) {
         categories.push(existingCategory);
       } else {
-        const category = await prisma.category.create({ data: { name: categoryName } });
+        const category = await prisma.category.create({ data: { id: randomUUID(), name: categoryName } });
         categories.push(category);
       }
     }
@@ -781,7 +782,7 @@ async function seedChineseData() {
         folders.push(existingFolder);
       } else {
         const folder = await prisma.folder.create({
-          data: { name: folderName, userId: user.id }
+          data: { id: randomUUID(), name: folderName, userId: user.id, updatedAt: new Date() }
         });
         folders.push(folder);
       }
@@ -809,13 +810,15 @@ async function seedChineseData() {
 
       await prisma.note.create({
         data: {
+          id: randomUUID(),
           title: noteData.title,
           content: noteData.content,
           userId: user.id,
           ownerId: user.id,
           categoryId: category?.id,
           folderId: folder?.id,
-          tags: {
+          updatedAt: new Date(),
+          Tag: {
             connect: noteTags.map(t => ({ id: t.id }))
           }
         }
@@ -835,10 +838,12 @@ async function seedChineseData() {
       if (!existingTemplate) {
         await prisma.noteTemplate.create({
           data: {
+            id: randomUUID(),
             name: template.name,
             description: template.description,
             content: template.content,
-            userId: user.id
+            userId: user.id,
+            updatedAt: new Date()
           }
         });
         templateCount++;

@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Edit } from "lucide-react"
 import Link from "next/link"
 import { DeleteNoteIconButton } from "@/components/notes/delete-note-icon-button"
+import { useState, useEffect } from "react"
 
 interface AnimatedNoteCardProps {
   note: {
@@ -18,6 +19,17 @@ interface AnimatedNoteCardProps {
 }
 
 export function AnimatedNoteCard({ note, index }: AnimatedNoteCardProps) {
+  const [mounted, setMounted] = useState(false)
+  
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  const formatDate = (date: Date) => {
+    if (!mounted) return ''
+    return new Date(date).toLocaleDateString("zh-CN")
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 50 }}
@@ -58,7 +70,7 @@ export function AnimatedNoteCard({ note, index }: AnimatedNoteCardProps) {
             animate={{ opacity: 1 }}
             transition={{ delay: index * 0.1 + 0.4 }}
           >
-            {note.updatedAt.toLocaleDateString("zh-CN")}
+            {formatDate(note.updatedAt)}
           </motion.span>
           <div className="flex gap-2">
             <motion.div

@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
           { userId: session.user.id },
           { ownerId: session.user.id },
           {
-            collaborators: {
+            Collaborator: {
               some: {
                 userId: session.user.id,
                 role: 'editor',
@@ -77,9 +77,9 @@ export async function POST(request: NextRequest) {
         folderId: validated.folderId,
       },
       include: {
-        folder: true,
-        tags: true,
-        category: true,
+        Folder: true,
+        Tag: true,
+        Category: true,
       },
     });
 

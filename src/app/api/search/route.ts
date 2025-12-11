@@ -44,11 +44,11 @@ export async function GET(request: NextRequest) {
         },
       },
       include: {
-        parent: true,
+        Folder: true,
         _count: {
           select: {
-            children: true,
-            notes: true,
+            other_Folder: true,
+            Note: true,
           },
         },
       },
@@ -64,7 +64,7 @@ export async function GET(request: NextRequest) {
               { userId: session.user.id },
               { ownerId: session.user.id },
               {
-                collaborators: {
+                Collaborator: {
                   some: {
                     userId: session.user.id,
                   },
@@ -91,10 +91,10 @@ export async function GET(request: NextRequest) {
         ],
       },
       include: {
-        folder: true,
-        tags: true,
-        category: true,
-        owner: {
+        Folder: true,
+        Tag: true,
+        Category: true,
+        User_Note_ownerIdToUser: {
           select: {
             id: true,
             name: true,

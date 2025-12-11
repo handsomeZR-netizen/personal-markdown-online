@@ -11,7 +11,7 @@ interface UseScrollToCursorOptions {
   /**
    * Reference to the editor container element
    */
-  editorRef?: RefObject<HTMLElement>;
+  editorRef?: RefObject<HTMLElement | null>;
   
   /**
    * Whether to enable auto-scroll

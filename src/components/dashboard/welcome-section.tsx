@@ -32,11 +32,11 @@ const shortcuts = [
 
 export function WelcomeSection({ userName, noteCount }: WelcomeSectionProps) {
   const [mounted, setMounted] = useState(false)
-  const [greeting, setGreeting] = useState('你好')
-  const [quote, setQuote] = useState('保持渴望，保持愚蠢。 — 史蒂夫·乔布斯')
+  const [greeting, setGreeting] = useState('')
+  const [quote, setQuote] = useState('')
   const [focusScore] = useState(85)
   const [isRefreshing, setIsRefreshing] = useState(false)
-  const [encourageMsg, setEncourageMsg] = useState(encourageMessages[0])
+  const [encourageMsg, setEncourageMsg] = useState('')
   const [isWaving, setIsWaving] = useState(false)
   const [showSparkles, setShowSparkles] = useState(false)
   const [typedGreeting, setTypedGreeting] = useState('')
@@ -97,6 +97,10 @@ export function WelcomeSection({ userName, noteCount }: WelcomeSectionProps) {
     if (hour < 12) setGreeting('早上好')
     else if (hour < 18) setGreeting('下午好')
     else setGreeting('晚上好')
+    
+    // 设置初始鼓励消息
+    setEncourageMsg(encourageMessages[Math.floor(Math.random() * encourageMessages.length)])
+    setQuote('保持渴望，保持愚蠢。 — 史蒂夫·乔布斯')
 
     // 加载名言
     fetchQuote()
@@ -155,7 +159,7 @@ export function WelcomeSection({ userName, noteCount }: WelcomeSectionProps) {
               {/* 打字机效果的问候语 */}
               <div className="flex items-center gap-2 mb-2">
                 <h1 className="text-4xl font-extrabold text-foreground tracking-tight relative">
-                  {mounted ? (
+                  {mounted && typedGreeting ? (
                     <>
                       {typedGreeting.split('').map((char, index) => (
                         <motion.span
@@ -186,7 +190,7 @@ export function WelcomeSection({ userName, noteCount }: WelcomeSectionProps) {
                       />
                     </>
                   ) : (
-                    `${greeting}，${userName || '用户'}`
+                    <span className="opacity-0">你好，{userName || '用户'}</span>
                   )}
                 </h1>
                 {/* 可点击的挥手 emoji */}
@@ -212,13 +216,13 @@ export function WelcomeSection({ userName, noteCount }: WelcomeSectionProps) {
               >
                 <AnimatePresence mode="wait">
                   <motion.p 
-                    key={encourageMsg}
+                    key={encourageMsg || 'loading'}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
                     className="text-muted-foreground text-lg inline-flex items-center gap-2"
                   >
-                    {encourageMsg}
+                    {mounted ? encourageMsg : <span className="opacity-0">加载中...</span>}
                     <Sparkles className={`w-4 h-4 transition-all ${showSparkles ? 'text-yellow-500 animate-spin' : 'text-muted-foreground/50 group-hover:text-yellow-500'}`} />
                   </motion.p>
                 </AnimatePresence>

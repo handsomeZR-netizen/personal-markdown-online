@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { auth } from '@/auth';
+import { randomUUID } from 'crypto';
 
 /**
  * GET /api/categories
@@ -56,7 +57,7 @@ export async function POST(request: NextRequest) {
     }
 
     const category = await prisma.category.create({
-      data: { name: trimmedName },
+      data: { id: randomUUID(), name: trimmedName },
     });
 
     return NextResponse.json({ success: true, data: category }, { status: 201 });
@@ -97,7 +98,7 @@ export async function DELETE(request: NextRequest) {
     const category = await prisma.category.findUnique({
       where: { id: categoryId },
       include: {
-        _count: { select: { notes: true } },
+        _count: { select: { Note: true } },
       },
     });
 
@@ -108,9 +109,9 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    if (category._count.notes > 0) {
+    if (category._count.Note > 0) {
       return NextResponse.json(
-        { success: false, error: `该分类下还有 ${category._count.notes} 篇笔记，无法删除` },
+        { success: false, error: `该分类下还有 ${category._count.Note} 篇笔记，无法删除` },
         { status: 400 }
       );
     }

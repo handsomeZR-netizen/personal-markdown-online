@@ -72,7 +72,7 @@ export function useSmartLoading<T = void>(options: {
  * 多个加载状态管理 Hook
  */
 export function useLoadingStates() {
-  const managerRef = useRef<LoadingStateManager>();
+  const managerRef = useRef<LoadingStateManager>(undefined);
   const [states, setStates] = useState<Map<string, boolean>>(new Map());
 
   useEffect(() => {
@@ -81,7 +81,7 @@ export function useLoadingStates() {
     }
 
     const unsubscribe = managerRef.current.subscribe(setStates);
-    return unsubscribe;
+    return () => { unsubscribe(); };
   }, []);
 
   const setLoading = useCallback((key: string, loading: boolean) => {
@@ -120,7 +120,7 @@ export function useDebouncedLoading<T extends (...args: any[]) => Promise<any>>(
   delay: number = 300
 ) {
   const [loading, setLoading] = useState(false);
-  const timeoutRef = useRef<NodeJS.Timeout>();
+  const timeoutRef = useRef<NodeJS.Timeout>(undefined);
 
   const debouncedFn = useCallback(
     async (...args: Parameters<T>) => {
@@ -289,7 +289,7 @@ export function usePolling<T>(
   const [data, setData] = useState<T | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
-  const intervalRef = useRef<NodeJS.Timeout>();
+  const intervalRef = useRef<NodeJS.Timeout>(undefined);
 
   const { immediate = true, enabled = true } = options;
 

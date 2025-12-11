@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { auth } from '@/auth';
+import { randomUUID } from 'crypto';
 
 /**
  * GET /api/tags
@@ -56,7 +57,7 @@ export async function POST(request: NextRequest) {
     }
 
     const tag = await prisma.tag.create({
-      data: { name: trimmedName },
+      data: { id: randomUUID(), name: trimmedName },
     });
 
     return NextResponse.json({ success: true, data: tag }, { status: 201 });

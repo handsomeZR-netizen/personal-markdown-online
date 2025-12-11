@@ -7,6 +7,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
+import { randomUUID } from 'crypto';
 
 const useTemplateSchema = z.object({
   title: z.string().min(1, 'Title is required').max(200),
@@ -44,11 +45,13 @@ export async function POST(
     const [note] = await prisma.$transaction([
       prisma.note.create({
         data: {
+          id: randomUUID(),
           title: validatedData.title,
           content: template.content,
           userId: session.user.id,
           ownerId: session.user.id,
           folderId: validatedData.folderId,
+          updatedAt: new Date(),
         },
       }),
       prisma.noteTemplate.update({

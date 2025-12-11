@@ -277,7 +277,7 @@ async function exportData(options: ExportOptions = {}): Promise<ExportData> {
       console.log('📝 Exporting notes...');
       const notes = await prisma.note.findMany({
         include: {
-          tags: {
+          Tag: {
             select: { id: true }
           }
         },
@@ -287,8 +287,8 @@ async function exportData(options: ExportOptions = {}): Promise<ExportData> {
       // Transform notes to include tag IDs
       exportData.notes = notes.map(note => ({
         ...note,
-        tagIds: note.tags.map(tag => tag.id),
-        tags: undefined // Remove the tags object, keep only IDs
+        tagIds: note.Tag.map(tag => tag.id),
+        Tag: undefined // Remove the Tag object, keep only IDs
       }));
       
       exportData.metadata.recordCounts.notes = exportData.notes.length;

@@ -19,7 +19,7 @@ interface UseKeyboardViewportOptions {
   /**
    * Reference to the editor element that should be adjusted
    */
-  editorRef?: RefObject<HTMLElement>;
+  editorRef?: RefObject<HTMLElement | null>;
   
   /**
    * Whether to enable automatic height adjustment

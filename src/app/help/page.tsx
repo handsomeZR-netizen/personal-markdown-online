@@ -198,7 +198,7 @@ export default async function HelpPage() {
           }
 
           return (
-            <Link key={section.title} href={section.href || "#"} target={section.external ? "_blank" : undefined}>
+            <Link key={section.title} href={section.href || "#"} target={'external' in section && section.external ? "_blank" : undefined}>
               <Card className="h-full hover:shadow-lg transition-all duration-300 hover:scale-105 cursor-pointer group">
                 <CardHeader>
                   <div className={`w-12 h-12 rounded-lg ${section.bgColor} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>

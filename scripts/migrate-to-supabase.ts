@@ -86,13 +86,13 @@ async function migrate() {
     console.log('📦 迁移笔记数据...')
     const notes = await sqlite.note.findMany({
       include: {
-        tags: true
+        Tag: true
       }
     })
     
     for (const note of notes) {
       try {
-        const { tags, ...noteData } = note
+        const { Tag, ...noteData } = note
         
         await postgres.note.create({
           data: {
@@ -106,8 +106,8 @@ async function migrate() {
             categoryId: noteData.categoryId,
             createdAt: noteData.createdAt,
             updatedAt: noteData.updatedAt,
-            tags: {
-              connect: tags.map(tag => ({ id: tag.id }))
+            Tag: {
+              connect: Tag.map(tag => ({ id: tag.id }))
             }
           }
         })

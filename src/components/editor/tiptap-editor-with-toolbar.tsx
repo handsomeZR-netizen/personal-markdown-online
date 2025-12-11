@@ -93,7 +93,7 @@ export function TiptapEditorWithToolbar({
 
   // Handle multiple image uploads
   const handleMultipleImageUploads = useCallback(
-    async (files: File[]): Promise<string[]> {
+    async (files: File[]) => {
       setIsUploading(true);
       setUploadProgress(`上传 ${files.length} 张图片...`);
 
@@ -219,7 +219,7 @@ export function TiptapEditorWithToolbar({
 
                   if (coordinates) {
                     let pos = coordinates.pos;
-                    urls.forEach((url) => {
+                    urls.forEach((url: string) => {
                       const node = schema.nodes.image.create({ src: url });
                       const transaction = view.state.tr.insert(pos, node);
                       view.dispatch(transaction);

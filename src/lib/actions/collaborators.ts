@@ -209,7 +209,7 @@ export async function updateCollaboratorRole(input: UpdateCollaboratorRoleInput)
         role: validated.role,
       },
       include: {
-        user: {
+        User: {
           select: {
             id: true,
             name: true,

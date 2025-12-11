@@ -182,7 +182,7 @@ async function checkNoteAccess(userId: string, noteId: string): Promise<boolean>
           { userId: userId }, // User is creator
           { ownerId: userId }, // User is owner
           {
-            collaborators: {
+            Collaborator: {
               some: {
                 userId: userId,
               },

@@ -6,6 +6,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
+import { randomUUID } from 'crypto';
 
 // Validation schema for template creation
 const createTemplateSchema = z.object({
@@ -62,10 +63,12 @@ export async function POST(request: NextRequest) {
 
     const template = await prisma.noteTemplate.create({
       data: {
+        id: randomUUID(),
         name: validatedData.name,
         description: validatedData.description,
         content: validatedData.content,
         userId: session.user.id,
+        updatedAt: new Date(),
       },
     });
 

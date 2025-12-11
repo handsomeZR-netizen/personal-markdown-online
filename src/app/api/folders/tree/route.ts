@@ -26,8 +26,8 @@ export async function GET() {
       include: {
         _count: {
           select: {
-            notes: true,
-            children: true,
+            Note: true,
+            other_Folder: true,
           },
         },
       },
@@ -42,7 +42,7 @@ export async function GET() {
       type: 'folder' as const,
       createdAt: folder.createdAt,
       updatedAt: folder.updatedAt,
-      noteCount: folder._count.notes,
+      noteCount: folder._count.Note,
     }));
 
     // Build the tree structure

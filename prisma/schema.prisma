@@ -143,3 +143,43 @@ model UserPreference {
 
   @@index([userId])
 }
+
+// AI 对话历史
+model AIConversation {
+  id        String      @id @default(cuid())
+  title     String?
+  userId    String
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  messages  AIMessage[]
+
+  @@index([userId])
+  @@index([userId, updatedAt])
+}
+
+model AIMessage {
+  id             String         @id @default(cuid())
+  conversationId String
+  role           String         // 'user' | 'assistant'
+  content        String
+  relatedNotes   Json?          // 存储相关笔记信息
+  createdAt      DateTime       @default(now())
+  conversation   AIConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId])
+  @@index([conversationId, createdAt])
+}
+
+// AI 搜索历史
+model AISearchHistory {
+  id          String   @id @default(cuid())
+  userId      String
+  query       String
+  searchType  String   // 'semantic' | 'natural_language'
+  resultCount Int      @default(0)
+  createdAt   DateTime @default(now())
+
+  @@index([userId])
+  @@index([userId, searchType])
+  @@index([userId, createdAt])
+}

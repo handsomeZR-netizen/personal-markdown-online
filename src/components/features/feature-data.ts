@@ -414,7 +414,7 @@ const notes = await prisma.note.findMany({
     AND: [
       { OR: [
         { userId: session.user.id },
-        { collaborators: { some: { userId: session.user.id } } },
+        { Collaborator: { some: { userId: session.user.id } } },
       ]},
       { OR: [
         { title: { contains: searchTerm, mode: 'insensitive' } },
@@ -1573,7 +1573,7 @@ export async function saveNoteVersion(
       OR: [
         { userId },
         { ownerId: userId },
-        { collaborators: { some: { userId } } },
+        { Collaborator: { some: { userId } } },
       ],
     },
   })
@@ -1622,7 +1622,7 @@ export async function saveNoteVersion(
       OR: [
         { userId },
         { ownerId: userId },
-        { collaborators: { some: { userId, role: 'editor' } } },
+        { Collaborator: { some: { userId, role: 'editor' } } },
       ],
     },
   })

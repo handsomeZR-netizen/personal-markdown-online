@@ -97,7 +97,7 @@ export async function updateNoteSortOrder(noteId: string, sortOrder: number) {
         { userId: session.user.id },
         { ownerId: session.user.id },
         {
-          collaborators: {
+          Collaborator: {
             some: {
               userId: session.user.id,
               role: 'editor',
@@ -177,7 +177,7 @@ export async function batchUpdateNoteSortOrders(
         { userId: session.user.id },
         { ownerId: session.user.id },
         {
-          collaborators: {
+          Collaborator: {
             some: {
               userId: session.user.id,
               role: 'editor',

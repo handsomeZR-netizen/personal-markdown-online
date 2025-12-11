@@ -58,7 +58,8 @@ export async function getNote(id: string) {
 }
 
 /**
- * 获取笔记列表
+ * 获取笔记列表 - 优化版
+ * 使用数据库级分页，避免加载全部数据到内存
  */
 export async function getNotes(params?: {
     page?: number
@@ -81,83 +82,118 @@ export async function getNotes(params?: {
     const userId = session.user.id
     const { prisma } = await import('@/lib/prisma')
 
-    // 获取用户协作的笔记ID列表
-    const collaborations = await prisma.collaborator.findMany({
-        where: { userId },
-        select: { noteId: true, role: true },
-    })
-    const collaborationMap = new Map(collaborations.map(c => [c.noteId, c.role]))
-    const collaboratedNoteIds = collaborations.map(c => c.noteId)
+    const page = params?.page || 1
+    const pageSize = params?.pageSize || 20
+    const sortBy = params?.sortBy || 'updatedAt'
+    const sortOrder = params?.sortOrder || 'desc'
+    const ownership = params?.ownership || 'all'
+    const query = params?.query?.toLowerCase()
 
-    const { data: allNotes, error } = await getUserNotes(userId)
+    // 构建查询条件
+    const baseWhere: any = {}
     
-    if (error || !allNotes) {
+    // 所有权筛选
+    if (ownership === 'mine') {
+        baseWhere.OR = [
+            { userId },
+            { ownerId: userId }
+        ]
+    } else if (ownership === 'shared') {
+        baseWhere.Collaborator = {
+            some: { userId }
+        }
+        baseWhere.NOT = {
+            OR: [
+                { userId },
+                { ownerId: userId }
+            ]
+        }
+    } else {
+        // 'all' - 用户拥有的 + 协作的
+        baseWhere.OR = [
+            { userId },
+            { ownerId: userId },
+            { Collaborator: { some: { userId } } }
+        ]
+    }
+
+    // 搜索过滤
+    if (query) {
+        baseWhere.AND = [
+            {
+                OR: [
+                    { title: { contains: query, mode: 'insensitive' } },
+                    { content: { contains: query, mode: 'insensitive' } }
+                ]
+            }
+        ]
+    }
+
+    try {
+        // 并行执行计数和分页查询
+        const [totalCount, notes, collaborations] = await Promise.all([
+            prisma.note.count({ where: baseWhere }),
+            prisma.note.findMany({
+                where: baseWhere,
+                orderBy: { [sortBy]: sortOrder },
+                skip: (page - 1) * pageSize,
+                take: pageSize,
+                select: {
+                    id: true,
+                    title: true,
+                    content: true,
+                    summary: true,
+                    createdAt: true,
+                    updatedAt: true,
+                    userId: true,
+                    ownerId: true,
+                    Tag: {
+                        select: { id: true, name: true }
+                    },
+                    Category: {
+                        select: { id: true, name: true }
+                    },
+                }
+            }),
+            prisma.collaborator.findMany({
+                where: { userId },
+                select: { noteId: true, role: true }
+            })
+        ])
+
+        const collaborationMap = new Map(collaborations.map(c => [c.noteId, c.role]))
+
+        // 添加协作信息，并映射字段名
+        const formattedNotes = notes.map(note => ({
+            id: note.id,
+            title: note.title,
+            content: note.content,
+            summary: note.summary,
+            userId: note.userId,
+            ownerId: note.ownerId,
+            createdAt: new Date(note.createdAt),
+            updatedAt: new Date(note.updatedAt),
+            tags: note.Tag || [],
+            category: note.Category || null,
+            isShared: collaborationMap.has(note.id),
+            isOwner: note.ownerId === userId || note.userId === userId,
+            collaboratorRole: collaborationMap.get(note.id) || null,
+        }))
+
+        return {
+            notes: formattedNotes,
+            totalCount,
+            totalPages: Math.ceil(totalCount / pageSize),
+            currentPage: page,
+        }
+    } catch (error) {
+        console.error('获取笔记列表失败:', error)
         return {
             notes: [],
             totalCount: 0,
             totalPages: 0,
             currentPage: 1,
         }
-    }
-
-    // 为每个笔记添加协作信息
-    let notes = allNotes.map(note => ({
-        ...note,
-        isShared: collaboratedNoteIds.includes(note.id),
-        isOwner: note.ownerId === userId || note.userId === userId,
-        collaboratorRole: collaborationMap.get(note.id) || null,
-    }))
-
-    // 所有权筛选
-    const ownership = params?.ownership || 'all'
-    if (ownership === 'mine') {
-        notes = notes.filter(note => note.isOwner)
-    } else if (ownership === 'shared') {
-        notes = notes.filter(note => note.isShared && !note.isOwner)
-    }
-
-    // 搜索过滤
-    if (params?.query) {
-        const query = params.query.toLowerCase()
-        notes = notes.filter(note => 
-            note.title.toLowerCase().includes(query) ||
-            note.content.toLowerCase().includes(query)
-        )
-    }
-
-    // 排序
-    const sortBy = params?.sortBy || 'updatedAt'
-    const sortOrder = params?.sortOrder || 'desc'
-    notes.sort((a, b) => {
-        const aValue = a[sortBy as keyof typeof a]
-        const bValue = b[sortBy as keyof typeof b]
-        if (sortOrder === 'asc') {
-            return aValue > bValue ? 1 : -1
-        } else {
-            return aValue < bValue ? 1 : -1
-        }
-    })
-
-    // 分页
-    const page = params?.page || 1
-    const pageSize = params?.pageSize || 20
-    const start = (page - 1) * pageSize
-    const paginatedNotes = notes.slice(start, start + pageSize)
-
-    // 转换日期
-    const formattedNotes = paginatedNotes.map(note => ({
-        ...note,
-        createdAt: new Date(note.createdAt),
-        updatedAt: new Date(note.updatedAt),
-        tags: [],
-        category: null,
-    }))
-
-    return {
-        notes: formattedNotes,
-        totalCount: notes.length,
-        totalPages: Math.ceil(notes.length / pageSize),
-        currentPage: page,
     }
 }
 
@@ -510,7 +546,7 @@ export async function searchAll(params: {
                             { userId: session.user.id },
                             { ownerId: session.user.id },
                             {
-                                collaborators: {
+                                Collaborator: {
                                     some: {
                                         userId: session.user.id,
                                     },

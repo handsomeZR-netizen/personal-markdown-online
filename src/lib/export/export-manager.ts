@@ -112,54 +112,174 @@ export class ExportManager {
     return new Blob([full], { type: 'text/markdown;charset=utf-8' });
   }
 
+  // 内联 KaTeX 核心样式（避免 CSP 问题）
+  private getKatexInlineStyles(): string {
+    return `
+      .katex{font:normal 1.21em KaTeX_Main,Times New Roman,serif;line-height:1.2;text-indent:0;text-rendering:auto}
+      .katex-display{display:block;margin:1em 0;text-align:center}
+      .katex-display>.katex{display:block;text-align:center;white-space:nowrap}
+      .katex .katex-html{display:inline-block}
+      .katex .base{position:relative;display:inline-block;white-space:nowrap;width:min-content}
+      .katex .strut{display:inline-block}
+      .katex .mord{display:inline-block}
+      .katex .mbin{display:inline-block}
+      .katex .mrel{display:inline-block}
+      .katex .mopen{display:inline-block}
+      .katex .mclose{display:inline-block}
+      .katex .mpunct{display:inline-block}
+      .katex .minner{display:inline-block}
+      .katex .mfrac{display:inline-block;vertical-align:middle;text-align:center}
+      .katex .mfrac>span{display:block}
+      .katex .mfrac .frac-line{display:block;border-bottom:1px solid;margin:0.1em 0}
+      .katex .msupsub{display:inline-block;text-align:left}
+      .katex .msup{display:inline-block}
+      .katex .msub{display:inline-block}
+      .katex .sqrt{display:inline-block}
+      .katex .sqrt>.sqrt-sign{display:inline-block}
+      .katex .op-symbol{display:inline-block}
+      .katex .op-limits{display:inline-block}
+      .katex .mtable{display:inline-block}
+      .katex .arraycolsep{display:inline-block}
+      .katex .col-align-c{text-align:center}
+      .katex .col-align-l{text-align:left}
+      .katex .col-align-r{text-align:right}
+    `;
+  }
+
   public async exportToPDF(note: NoteData): Promise<Blob> {
     const container = document.createElement('div');
     container.id = 'pdf-export-' + Date.now();
     const processed = this.processContent(note.content);
     const sanitized = this.sanitizeContentForPDF(processed);
     
+    // A4 纸张宽度 210mm，减去左右边距各 20mm = 170mm 内容区
+    const contentWidth = 694;
+    
+    // 使用唯一 ID 限定样式作用域，避免影响页面其他元素
+    const containerId = 'pdf-export-container-' + Date.now();
+    
+    // 使用内联样式，避免 CSP 阻止外部 CSS
+    // 所有样式都限定在 #containerId 内部
     container.innerHTML = `
-      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
       <style>
-        body,p,div:not(.katex):not(.katex-display),h1,h2,h3,h4,h5,h6,li{color:#333!important}
-        .katex-display{display:block;margin:1em 0;text-align:center}
-        .katex{font-size:1.1em;color:#000}
+        #${containerId} .katex{font:normal 1.21em KaTeX_Main,Times New Roman,serif;line-height:1.2;text-indent:0;text-rendering:auto}
+        #${containerId} .katex-display{display:block;margin:1em 0;text-align:center}
+        #${containerId} .katex-display>.katex{display:block;text-align:center;white-space:nowrap}
+        #${containerId} .katex .katex-html{display:inline-block}
+        #${containerId} .katex .base{position:relative;display:inline-block;white-space:nowrap;width:min-content}
+        #${containerId} .katex .strut{display:inline-block}
+        #${containerId} .katex .mord{display:inline-block}
+        #${containerId} .katex .mbin{display:inline-block}
+        #${containerId} .katex .mrel{display:inline-block}
+        #${containerId} .katex .mopen{display:inline-block}
+        #${containerId} .katex .mclose{display:inline-block}
+        #${containerId} .katex .mpunct{display:inline-block}
+        #${containerId} .katex .minner{display:inline-block}
+        #${containerId} .katex .mfrac{display:inline-block;vertical-align:middle;text-align:center}
+        #${containerId} .katex .mfrac>span{display:block}
+        #${containerId} .katex .mfrac .frac-line{display:block;border-bottom:1px solid;margin:0.1em 0}
+        #${containerId} .katex .msupsub{display:inline-block;text-align:left}
+        #${containerId} .katex .msup{display:inline-block}
+        #${containerId} .katex .msub{display:inline-block}
+        #${containerId} .katex .sqrt{display:inline-block}
+        #${containerId} .katex .sqrt>.sqrt-sign{display:inline-block}
+        #${containerId} .katex .op-symbol{display:inline-block}
+        #${containerId} .katex .op-limits{display:inline-block}
+        #${containerId} .katex .mtable{display:inline-block}
+        #${containerId} .katex .arraycolsep{display:inline-block}
+        #${containerId} .katex .col-align-c{text-align:center}
+        #${containerId} .katex .col-align-l{text-align:left}
+        #${containerId} .katex .col-align-r{text-align:right}
+        #${containerId} *{color:#333333!important}
+        #${containerId} .katex-display{display:block;margin:1em 0;text-align:center;overflow-x:visible!important}
+        #${containerId} .katex{font-size:1.1em;color:#000000!important}
+        #${containerId} .katex .base{white-space:nowrap!important}
+        #${containerId} .katex-html{overflow-x:visible!important}
       </style>
-      <div style="width:794px;padding:50px;background:#fff;font-family:'Microsoft YaHei',sans-serif;font-size:14px;line-height:1.8;color:#333">
-        <h1 style="font-size:26px;font-weight:bold;margin:0 0 20px;padding-bottom:15px;border-bottom:2px solid #333;color:#000">${this.escapeHtml(note.title)}</h1>
-        ${(note.author || note.createdAt || note.updatedAt) ? `<div style="font-size:12px;color:#666;margin-bottom:25px;padding-bottom:15px;border-bottom:1px solid #eee">
+      <div id="${containerId}" style="width:${contentWidth}px;padding:40px 50px;background-color:#ffffff;font-family:'Microsoft YaHei','SimSun',sans-serif;font-size:14px;line-height:1.8;color:#333333;box-sizing:content-box">
+        <h1 style="font-size:24px;font-weight:bold;margin:0 0 20px;padding-bottom:15px;border-bottom:2px solid #333333;color:#000000">${this.escapeHtml(note.title)}</h1>
+        ${(note.author || note.createdAt || note.updatedAt) ? `<div style="font-size:12px;color:#666666;margin-bottom:25px;padding-bottom:15px;border-bottom:1px solid #eeeeee">
           ${note.author ? `<p style="margin:5px 0"><strong>作者:</strong> ${this.escapeHtml(note.author)}</p>` : ''}
           ${note.createdAt ? `<p style="margin:5px 0"><strong>创建时间:</strong> ${note.createdAt.toLocaleString('zh-CN')}</p>` : ''}
           ${note.updatedAt ? `<p style="margin:5px 0"><strong>更新时间:</strong> ${note.updatedAt.toLocaleString('zh-CN')}</p>` : ''}
         </div>` : ''}
-        <div style="font-size:14px;line-height:1.8;color:#333">${sanitized}</div>
+        <div style="font-size:14px;line-height:1.8;color:#333333;overflow-wrap:break-word;word-wrap:break-word">${sanitized}</div>
       </div>`;
     
-    container.style.cssText = 'position:fixed;left:-10000px;top:0;z-index:-1';
+    // 使用 visibility:hidden 和 pointer-events:none 隐藏容器，避免影响页面布局
+    // position:absolute 配合 top:0;left:0 确保不影响滚动位置
+    container.style.cssText = 'position:absolute;left:-9999px;top:-9999px;visibility:hidden;pointer-events:none;z-index:-9999;overflow:hidden';
+    
+    // 保存当前滚动位置
+    const scrollX = window.scrollX;
+    const scrollY = window.scrollY;
+    
     document.body.appendChild(container);
     await document.fonts.ready;
     await new Promise(resolve => setTimeout(resolve, 500));
     
+    // 恢复滚动位置（以防被改变）
+    window.scrollTo(scrollX, scrollY);
+    
     try {
-      const contentDiv = container.querySelector('div[style*="width:794px"]') as HTMLElement;
+      const contentDiv = container.querySelector(`#${containerId}`) as HTMLElement;
       if (!contentDiv) throw new Error('Container not found');
+      
+      // 获取实际渲染后的尺寸
+      const actualWidth = contentDiv.scrollWidth;
+      const actualHeight = contentDiv.scrollHeight;
       
       const canvas = await html2canvas(contentDiv, {
         scale: 2,
         useCORS: true,
         allowTaint: true,
         logging: false,
-        backgroundColor: '#fff',
-        width: 794,
-        windowWidth: 794,
-        onclone: (doc) => {
+        backgroundColor: '#ffffff',
+        width: Math.max(contentWidth + 100, actualWidth),
+        height: actualHeight,
+        windowWidth: Math.max(contentWidth + 100, actualWidth),
+        scrollX: 0,
+        scrollY: 0,
+        onclone: (doc, element) => {
+          // 移除所有 oklch 颜色，替换为标准颜色
           const style = doc.createElement('style');
-          style.textContent = '*{--background:#fff!important;--foreground:#333!important}body{background:#fff!important;color:#333!important}';
+          style.textContent = `
+            *{
+              --background:#ffffff!important;
+              --foreground:#333333!important;
+              --primary:#000000!important;
+              --muted:#f5f5f5!important;
+              --border:#dddddd!important;
+              color:#333333!important;
+              background-color:transparent!important;
+            }
+            body{background-color:#ffffff!important;color:#333333!important}
+            .katex-display{overflow:visible!important}
+            .katex{overflow:visible!important;color:#000000!important}
+          `;
           doc.head.appendChild(style);
-          doc.querySelectorAll('link[rel="stylesheet"]').forEach(link => {
-            const href = link.getAttribute('href') || '';
-            if (!href.includes('katex')) link.remove();
+          
+          // 遍历所有元素，移除 oklch 颜色
+          doc.querySelectorAll('*').forEach((el) => {
+            const htmlEl = el as HTMLElement;
+            const computedStyle = window.getComputedStyle(htmlEl);
+            const color = computedStyle.color;
+            const bgColor = computedStyle.backgroundColor;
+            
+            // 如果包含 oklch，替换为标准颜色
+            if (color.includes('oklch') || color.includes('color(')) {
+              htmlEl.style.color = '#333333';
+            }
+            if (bgColor.includes('oklch') || bgColor.includes('color(')) {
+              htmlEl.style.backgroundColor = 'transparent';
+            }
           });
+          
+          // 确保克隆的元素可见
+          element.style.position = 'static';
+          element.style.left = '0';
+          element.style.top = '0';
+          element.style.backgroundColor = '#ffffff';
         }
       });
       

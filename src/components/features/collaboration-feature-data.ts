@@ -605,7 +605,7 @@ export function PermissionGuard({
       id: noteId,
       OR: [
         { userId: session.user.id },
-        { collaborators: { some: { userId: session.user.id, permission: 'admin' } } },
+        { Collaborator: { some: { userId: session.user.id, permission: 'admin' } } },
       ],
     },
   })

@@ -109,7 +109,7 @@ export function LoadingExamples() {
           </LoadingButton>
 
           <AsyncButton
-            onClick={() => simulateAsync()}
+            onClick={async () => { await simulateAsync(); }}
             loaderVariant={selectedVariant}
             variant="secondary"
             successMessage="操作成功！"

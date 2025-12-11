@@ -81,7 +81,7 @@ export async function GET() {
       // 用户使用的标签数量（通过笔记关联）
       prisma.tag.count({
         where: {
-          notes: {
+          Note: {
             some: { userId },
           },
         },

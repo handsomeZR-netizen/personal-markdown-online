@@ -1,13 +1,9 @@
-import { Metadata } from 'next';
+"use client"
+
 import Link from 'next/link';
 import { WifiOff, RefreshCw, Home } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-
-export const metadata: Metadata = {
-  title: '离线模式 - 知识库',
-  description: '您当前处于离线状态',
-};
 
 export default function OfflinePage() {
   return (

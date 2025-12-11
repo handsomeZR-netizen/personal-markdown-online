@@ -28,21 +28,21 @@ export async function GET(
         userId: session.user.id,
       },
       include: {
-        parent: true,
-        children: {
+        Folder: true,
+        other_Folder: {
           orderBy: { name: 'asc' },
         },
-        notes: {
+        Note: {
           orderBy: { updatedAt: 'desc' },
           include: {
-            tags: true,
-            category: true,
+            Tag: true,
+            Category: true,
           },
         },
         _count: {
           select: {
-            children: true,
-            notes: true,
+            other_Folder: true,
+            Note: true,
           },
         },
       },
@@ -140,11 +140,11 @@ export async function PATCH(
         }),
       },
       include: {
-        parent: true,
+        Folder: true,
         _count: {
           select: {
-            children: true,
-            notes: true,
+            other_Folder: true,
+            Note: true,
           },
         },
       },
@@ -180,8 +180,8 @@ export async function DELETE(
       include: {
         _count: {
           select: {
-            children: true,
-            notes: true,
+            other_Folder: true,
+            Note: true,
           },
         },
       },
@@ -195,7 +195,7 @@ export async function DELETE(
     }
 
     // Check if folder has children or notes
-    if (folder._count.children > 0 || folder._count.notes > 0) {
+    if (folder._count.other_Folder > 0 || folder._count.Note > 0) {
       return NextResponse.json(
         { error: '文件夹不为空，请先删除其中的内容' },
         { status: 400 }

@@ -320,18 +320,28 @@ export async function getFolders(sortBy?: string, sortOrder?: string) {
         userId: session.user.id,
       },
       include: {
-        parent: true,
+        Folder: true, // parent folder
         _count: {
           select: {
-            children: true,
-            notes: true,
+            other_Folder: true, // children count
+            Note: true, // notes count
           },
         },
       },
       orderBy,
     });
 
-    return { success: true, data: folders };
+    // Transform to expected format
+    const transformedFolders = folders.map(folder => ({
+      ...folder,
+      parent: folder.Folder,
+      _count: {
+        children: folder._count.other_Folder,
+        notes: folder._count.Note,
+      },
+    }));
+
+    return { success: true, data: transformedFolders };
   } catch (error) {
     console.error('Get folders error:', error);
     return {
@@ -441,7 +451,7 @@ export async function moveNoteToFolder(noteId: string, folderId: string | null) 
           { userId: session.user.id },
           { ownerId: session.user.id },
           {
-            collaborators: {
+            Collaborator: {
               some: {
                 userId: session.user.id,
                 role: 'editor',

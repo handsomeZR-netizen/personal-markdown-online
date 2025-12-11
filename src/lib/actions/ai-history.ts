@@ -2,29 +2,14 @@
 
 import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
-import { z } from 'zod';
+import { revalidatePath } from 'next/cache';
 
-// 验证 schemas
-const saveSearchHistorySchema = z.object({
-  query: z.string().min(1),
-  searchType: z.enum(['semantic', 'natural_language']),
-  resultCount: z.number().int().min(0),
-});
+/**
+ * AI History Actions
+ * 管理 AI 对话历史和搜索历史
+ */
 
-const createConversationSchema = z.object({
-  title: z.string().optional(),
-});
-
-const addMessageSchema = z.object({
-  conversationId: z.string(),
-  role: z.enum(['user', 'assistant']),
-  content: z.string().min(1),
-  relatedNotes: z.array(z.object({
-    id: z.string(),
-    title: z.string(),
-    similarity: z.number(),
-  })).optional(),
-});
+// ==================== 搜索历史 ====================
 
 /**
  * 保存搜索历史
@@ -40,14 +25,12 @@ export async function saveSearchHistory(
       return { success: false, error: '未登录' };
     }
 
-    const validated = saveSearchHistorySchema.parse({ query, searchType, resultCount });
-
     const history = await prisma.aISearchHistory.create({
       data: {
         userId: session.user.id,
-        query: validated.query,
-        searchType: validated.searchType,
-        resultCount: validated.resultCount,
+        query,
+        searchType,
+        resultCount,
       },
     });
 
@@ -68,7 +51,7 @@ export async function getSearchHistory(
   try {
     const session = await auth();
     if (!session?.user?.id) {
-      return { success: false, error: '未登录' };
+      return { success: false, error: '未登录', data: [] };
     }
 
     const history = await prisma.aISearchHistory.findMany({
@@ -83,7 +66,38 @@ export async function getSearchHistory(
     return { success: true, data: history };
   } catch (error) {
     console.error('获取搜索历史失败:', error);
-    return { success: false, error: '获取搜索历史失败' };
+    return { success: false, error: '获取搜索历史失败', data: [] };
+  }
+}
+
+/**
+ * 搜索历史记录（模糊搜索）
+ */
+export async function searchHistory(
+  keyword: string,
+  searchType?: 'semantic' | 'natural_language',
+  limit: number = 20
+) {
+  try {
+    const session = await auth();
+    if (!session?.user?.id) {
+      return { success: false, error: '未登录', data: [] };
+    }
+
+    const history = await prisma.aISearchHistory.findMany({
+      where: {
+        userId: session.user.id,
+        query: { contains: keyword, mode: 'insensitive' },
+        ...(searchType && { searchType }),
+      },
+      orderBy: { createdAt: 'desc' },
+      take: limit,
+    });
+
+    return { success: true, data: history };
+  } catch (error) {
+    console.error('搜索历史失败:', error);
+    return { success: false, error: '搜索历史失败', data: [] };
   }
 }
 
@@ -97,11 +111,8 @@ export async function deleteSearchHistory(id: string) {
       return { success: false, error: '未登录' };
     }
 
-    await prisma.aISearchHistory.deleteMany({
-      where: {
-        id,
-        userId: session.user.id,
-      },
+    await prisma.aISearchHistory.delete({
+      where: { id, userId: session.user.id },
     });
 
     return { success: true };
@@ -135,6 +146,7 @@ export async function clearSearchHistory(searchType?: 'semantic' | 'natural_lang
   }
 }
 
+// ==================== 对话历史 ====================
 
 /**
  * 创建新对话
@@ -149,7 +161,7 @@ export async function createConversation(title?: string) {
     const conversation = await prisma.aIConversation.create({
       data: {
         userId: session.user.id,
-        title: title || '新对话',
+        title: title || null,
       },
     });
 
@@ -177,10 +189,7 @@ export async function addMessageToConversation(
 
     // 验证对话属于当前用户
     const conversation = await prisma.aIConversation.findFirst({
-      where: {
-        id: conversationId,
-        userId: session.user.id,
-      },
+      where: { id: conversationId, userId: session.user.id },
     });
 
     if (!conversation) {
@@ -192,24 +201,24 @@ export async function addMessageToConversation(
         conversationId,
         role,
         content,
-        relatedNotes: relatedNotes ? JSON.stringify(relatedNotes) : null,
+        relatedNotes: relatedNotes ? JSON.parse(JSON.stringify(relatedNotes)) : null,
       },
     });
+
+    // 如果是用户的第一条消息，更新对话标题
+    if (role === 'user' && !conversation.title) {
+      const title = content.length > 50 ? content.substring(0, 50) + '...' : content;
+      await prisma.aIConversation.update({
+        where: { id: conversationId },
+        data: { title },
+      });
+    }
 
     // 更新对话的 updatedAt
     await prisma.aIConversation.update({
       where: { id: conversationId },
       data: { updatedAt: new Date() },
     });
-
-    // 如果是第一条用户消息且对话没有标题，自动设置标题
-    if (role === 'user' && conversation.title === '新对话') {
-      const truncatedTitle = content.length > 30 ? content.substring(0, 30) + '...' : content;
-      await prisma.aIConversation.update({
-        where: { id: conversationId },
-        data: { title: truncatedTitle },
-      });
-    }
 
     return { success: true, data: message };
   } catch (error) {
@@ -225,43 +234,91 @@ export async function getConversations(limit: number = 20) {
   try {
     const session = await auth();
     if (!session?.user?.id) {
-      return { success: false, error: '未登录' };
+      return { success: false, error: '未登录', data: [] };
     }
 
     const conversations = await prisma.aIConversation.findMany({
       where: { userId: session.user.id },
       orderBy: { updatedAt: 'desc' },
       take: limit,
-      include: {
-        messages: {
-          take: 1,
-          orderBy: { createdAt: 'asc' },
-        },
+      select: {
+        id: true,
+        title: true,
+        updatedAt: true,
+        _count: { select: { messages: true } },
       },
     });
 
-    return { success: true, data: conversations };
+    return { 
+      success: true, 
+      data: conversations.map(c => ({
+        id: c.id,
+        title: c.title,
+        updatedAt: c.updatedAt,
+        messageCount: c._count.messages,
+      }))
+    };
   } catch (error) {
     console.error('获取对话列表失败:', error);
-    return { success: false, error: '获取对话列表失败' };
+    return { success: false, error: '获取对话列表失败', data: [] };
   }
 }
 
 /**
- * 获取对话详情（包含所有消息）
+ * 搜索对话（按标题或消息内容）
+ */
+export async function searchConversations(keyword: string, limit: number = 20) {
+  try {
+    const session = await auth();
+    if (!session?.user?.id) {
+      return { success: false, error: '未登录', data: [] };
+    }
+
+    const conversations = await prisma.aIConversation.findMany({
+      where: {
+        userId: session.user.id,
+        OR: [
+          { title: { contains: keyword, mode: 'insensitive' } },
+          { messages: { some: { content: { contains: keyword, mode: 'insensitive' } } } },
+        ],
+      },
+      orderBy: { updatedAt: 'desc' },
+      take: limit,
+      select: {
+        id: true,
+        title: true,
+        updatedAt: true,
+        _count: { select: { messages: true } },
+      },
+    });
+
+    return { 
+      success: true, 
+      data: conversations.map(c => ({
+        id: c.id,
+        title: c.title,
+        updatedAt: c.updatedAt,
+        messageCount: c._count.messages,
+      }))
+    };
+  } catch (error) {
+    console.error('搜索对话失败:', error);
+    return { success: false, error: '搜索对话失败', data: [] };
+  }
+}
+
+/**
+ * 获取单个对话及其消息
  */
 export async function getConversation(conversationId: string) {
   try {
     const session = await auth();
     if (!session?.user?.id) {
-      return { success: false, error: '未登录' };
+      return { success: false, error: '未登录', data: null };
     }
 
     const conversation = await prisma.aIConversation.findFirst({
-      where: {
-        id: conversationId,
-        userId: session.user.id,
-      },
+      where: { id: conversationId, userId: session.user.id },
       include: {
         messages: {
           orderBy: { createdAt: 'asc' },
@@ -270,25 +327,25 @@ export async function getConversation(conversationId: string) {
     });
 
     if (!conversation) {
-      return { success: false, error: '对话不存在' };
+      return { success: false, error: '对话不存在', data: null };
     }
 
-    // 解析 relatedNotes JSON
-    const messagesWithParsedNotes = conversation.messages.map(msg => ({
-      ...msg,
-      relatedNotes: msg.relatedNotes ? JSON.parse(msg.relatedNotes) : null,
-    }));
-
-    return {
-      success: true,
+    return { 
+      success: true, 
       data: {
         ...conversation,
-        messages: messagesWithParsedNotes,
-      },
+        messages: conversation.messages.map(m => ({
+          id: m.id,
+          role: m.role,
+          content: m.content,
+          relatedNotes: m.relatedNotes as Array<{ id: string; title: string; similarity: number }> | null,
+          createdAt: m.createdAt,
+        })),
+      }
     };
   } catch (error) {
-    console.error('获取对话详情失败:', error);
-    return { success: false, error: '获取对话详情失败' };
+    console.error('获取对话失败:', error);
+    return { success: false, error: '获取对话失败', data: null };
   }
 }
 
@@ -302,17 +359,36 @@ export async function deleteConversation(conversationId: string) {
       return { success: false, error: '未登录' };
     }
 
-    await prisma.aIConversation.deleteMany({
-      where: {
-        id: conversationId,
-        userId: session.user.id,
-      },
+    await prisma.aIConversation.delete({
+      where: { id: conversationId, userId: session.user.id },
     });
 
     return { success: true };
   } catch (error) {
     console.error('删除对话失败:', error);
     return { success: false, error: '删除对话失败' };
+  }
+}
+
+/**
+ * 更新对话标题
+ */
+export async function updateConversationTitle(conversationId: string, title: string) {
+  try {
+    const session = await auth();
+    if (!session?.user?.id) {
+      return { success: false, error: '未登录' };
+    }
+
+    await prisma.aIConversation.update({
+      where: { id: conversationId, userId: session.user.id },
+      data: { title },
+    });
+
+    return { success: true };
+  } catch (error) {
+    console.error('更新对话标题失败:', error);
+    return { success: false, error: '更新对话标题失败' };
   }
 }
 

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
 import { createFolderSchema } from '@/lib/validations/folders';
+import { randomUUID } from 'crypto';
 
 /**
  * API routes for folder operations
@@ -23,11 +24,11 @@ export async function GET() {
         userId: session.user.id,
       },
       include: {
-        parent: true,
+        Folder: true,
         _count: {
           select: {
-            children: true,
-            notes: true,
+            other_Folder: true,
+            Note: true,
           },
         },
       },
@@ -76,16 +77,18 @@ export async function POST(request: NextRequest) {
 
     const folder = await prisma.folder.create({
       data: {
+        id: randomUUID(),
         name: validated.name,
         parentId: validated.parentId || null,
         userId: session.user.id,
+        updatedAt: new Date(),
       },
       include: {
-        parent: true,
+        Folder: true,
         _count: {
           select: {
-            children: true,
-            notes: true,
+            other_Folder: true,
+            Note: true,
           },
         },
       },

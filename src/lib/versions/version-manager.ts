@@ -99,7 +99,7 @@ export async function getNoteVersions(
           { userId },
           { ownerId: userId },
           {
-            collaborators: {
+            Collaborator: {
               some: { userId },
             },
           },
@@ -233,7 +233,7 @@ export async function restoreNoteVersion(
           { userId },
           { ownerId: userId },
           {
-            collaborators: {
+            Collaborator: {
               some: {
                 userId,
                 role: 'editor',
