@@ -196,9 +196,12 @@ async function createTags(): Promise<any[]> {
   console.log(`🏷️  Creating tags...`);
   const tags = [];
   
-  for (const tagName of sampleTags) {
+  for (let i = 0; i < sampleTags.length; i++) {
     const tag = await prisma.tag.create({
-      data: { name: tagName }
+      data: { 
+        id: `tag-${i + 1}-${Date.now()}`,
+        name: sampleTags[i] 
+      }
     });
     tags.push(tag);
   }
@@ -214,9 +217,12 @@ async function createCategories(): Promise<any[]> {
   console.log(`📁 Creating categories...`);
   const categories = [];
   
-  for (const categoryName of sampleCategories) {
+  for (let i = 0; i < sampleCategories.length; i++) {
     const category = await prisma.category.create({
-      data: { name: categoryName }
+      data: { 
+        id: `cat-${i + 1}-${Date.now()}`,
+        name: sampleCategories[i] 
+      }
     });
     categories.push(category);
   }
@@ -239,9 +245,11 @@ async function createFolders(users: any[], count: number): Promise<any[]> {
     // Create root folder
     const folder = await prisma.folder.create({
       data: {
+        id: `folder-${i + 1}-${Date.now()}`,
         name: `${folderName} ${Math.floor(i / sampleFolderNames.length) + 1}`,
         userId: user.id,
-        sortOrder: i
+        sortOrder: i,
+        updatedAt: new Date()
       }
     });
     folders.push(folder);
@@ -250,10 +258,12 @@ async function createFolders(users: any[], count: number): Promise<any[]> {
     if (i % 3 === 0 && folders.length < count) {
       const subfolder = await prisma.folder.create({
         data: {
+          id: `subfolder-${i + 1}-${Date.now()}`,
           name: `${folderName} - Subfolder`,
           userId: user.id,
           parentId: folder.id,
-          sortOrder: 0
+          sortOrder: 0,
+          updatedAt: new Date()
         }
       });
       folders.push(subfolder);
@@ -296,6 +306,7 @@ async function createNotes(
     
     const note = await prisma.note.create({
       data: {
+        id: `note-${i + 1}-${Date.now()}`,
         title,
         content: JSON.stringify(content),
         contentType: 'tiptap-json',
@@ -307,6 +318,7 @@ async function createNotes(
         sortOrder: i,
         isPublic: i % 5 === 0, // Make 20% of notes public
         publicSlug: i % 5 === 0 ? `note-${i}` : null,
+        updatedAt: new Date(),
         tags: {
           connect: noteTags.map(tag => ({ id: tag.id }))
         }
@@ -318,6 +330,7 @@ async function createNotes(
     if (i % 4 === 0) {
       await prisma.noteVersion.create({
         data: {
+          id: `version-${i + 1}-${Date.now()}`,
           noteId: note.id,
           title: `${title} (v1)`,
           content: JSON.stringify(content),
@@ -348,6 +361,7 @@ async function createCollaborators(users: any[], notes: any[]): Promise<number> 
       if (collaboratorUser.id !== note.ownerId) {
         await prisma.collaborator.create({
           data: {
+            id: `collab-${i + 1}-${Date.now()}`,
             noteId: note.id,
             userId: collaboratorUser.id,
             role: i % 2 === 0 ? 'editor' : 'viewer'
@@ -373,11 +387,13 @@ async function createTemplates(users: any[]): Promise<number> {
     const user = users[count % users.length];
     await prisma.noteTemplate.create({
       data: {
+        id: `template-${count + 1}-${Date.now()}`,
         name: template.name,
         description: template.description,
         content: template.content,
         userId: user.id,
-        usageCount: Math.floor(Math.random() * 10)
+        usageCount: Math.floor(Math.random() * 10),
+        updatedAt: new Date()
       }
     });
     count++;
