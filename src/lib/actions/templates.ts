@@ -74,12 +74,15 @@ export async function createTemplate(
     throw new Error('Unauthorized');
   }
 
+  const { createId } = await import('@paralleldrive/cuid2')
   const template = await prisma.noteTemplate.create({
     data: {
+      id: createId(),
       name: input.name,
       description: input.description,
       content: input.content,
       userId: session.user.id,
+      updatedAt: new Date(),
     },
   });
 
@@ -110,12 +113,15 @@ export async function saveNoteAsTemplate(
     throw new Error('Note not found');
   }
 
+  const { createId: createId2 } = await import('@paralleldrive/cuid2')
   const template = await prisma.noteTemplate.create({
     data: {
+      id: createId2(),
       name,
       description,
       content: note.content,
       userId: session.user.id,
+      updatedAt: new Date(),
     },
   });
 

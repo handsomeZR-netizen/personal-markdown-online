@@ -43,11 +43,14 @@ export async function createFolder(input: CreateFolderInput) {
       }
     }
 
+    const { createId } = await import('@paralleldrive/cuid2')
     const folder = await prisma.folder.create({
       data: {
+        id: createId(),
         name: validated.name,
         parentId: validated.parentId || null,
         userId: session.user.id,
+        updatedAt: new Date(),
       },
       include: {
         parent: true,

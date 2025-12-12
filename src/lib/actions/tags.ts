@@ -61,8 +61,10 @@ export async function createTag(name: string): Promise<ActionResult<{ id: string
             return { success: true, data: existingTag }
         }
 
+        const { createId } = await import('@paralleldrive/cuid2')
         const tag = await prisma.tag.create({
             data: {
+                id: createId(),
                 name: validation.data.name,
             },
         })
