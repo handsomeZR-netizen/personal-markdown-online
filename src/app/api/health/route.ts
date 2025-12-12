@@ -1,16 +1,26 @@
-/**
- * Health Check API Endpoint
- * 
- * Simple endpoint to verify server connectivity.
- * Used by NetworkStatusManager to check real network status.
- */
+import { NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
 
-import { NextResponse } from 'next/server';
+export const dynamic = "force-dynamic";
 
 export async function GET() {
-  return NextResponse.json({ status: 'ok' }, { status: 200 });
-}
+  const health = {
+    status: "ok",
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    environment: process.env.NODE_ENV,
+    database: "unknown",
+  };
 
-export async function HEAD() {
-  return new NextResponse(null, { status: 200 });
+  try {
+    // 测试数据库连接
+    await prisma.$queryRaw`SELECT 1`;
+    health.database = "connected";
+  } catch (error) {
+    health.database = "disconnected";
+    health.status = "degraded";
+  }
+
+  const statusCode = health.status === "ok" ? 200 : 503;
+  return NextResponse.json(health, { status: statusCode });
 }

@@ -501,7 +501,9 @@ vercel --prod
 
 ### 🐳 Docker 部署
 
-#### 快速开始
+> 📖 **完整文档**: [DOCKER_DEPLOYMENT.md](./DOCKER_DEPLOYMENT.md)
+
+#### 快速开始（5 分钟部署）
 
 ```bash
 # 1. 复制环境变量配置文件
@@ -509,17 +511,24 @@ cp .env.docker.example .env.docker
 
 # 2. 编辑 .env.docker，修改以下必填项：
 #    - POSTGRES_PASSWORD (数据库密码)
-#    - NEXTAUTH_SECRET (认证密钥)
+#    - NEXTAUTH_SECRET (认证密钥，使用 openssl rand -base64 32 生成)
+#    - AUTH_SECRET (与 NEXTAUTH_SECRET 相同)
 
 # 3. 启动服务
 docker-compose --env-file .env.docker up -d
 
-# 4. 查看日志
-docker-compose logs -f
+# 4. 等待服务启动（约 30 秒），然后运行数据库迁移
+docker-compose exec app npx prisma migrate deploy
 
-# 5. 停止服务
-docker-compose down
+# 5. 访问应用
+# 打开浏览器访问 http://localhost:3000
 ```
+
+#### ⚠️ 重要提示
+
+1. **首次部署必须运行数据库迁移**，否则应用无法正常工作
+2. **生产环境请使用强密码**，至少 32 位随机字符串
+3. **健康检查端点**: `http://localhost:3000/api/health`
 
 #### 环境变量说明
 
@@ -527,10 +536,44 @@ docker-compose down
 |------|------|------|
 | `POSTGRES_PASSWORD` | ✅ | 数据库密码，请使用强密码 |
 | `NEXTAUTH_SECRET` | ✅ | 认证密钥，使用 `openssl rand -base64 32` 生成 |
+| `AUTH_SECRET` | ✅ | Auth 密钥，与 NEXTAUTH_SECRET 相同 |
 | `NEXTAUTH_URL` | ✅ | 应用访问地址，如 `http://localhost:3000` |
 | `APP_PORT` | ❌ | 应用端口，默认 3000 |
 | `POSTGRES_PORT` | ❌ | 数据库端口，默认 5432 |
 | `DATABASE_MODE` | ❌ | 数据库模式，默认 `local` |
+| `DEEPSEEK_API_KEY` | ❌ | AI 功能 API 密钥（可选） |
+
+#### 常用命令
+
+```bash
+# 查看服务状态
+docker-compose ps
+
+# 查看日志
+docker-compose logs -f
+
+# 重启服务
+docker-compose restart
+
+# 停止服务（保留数据）
+docker-compose down
+
+# 停止服务并删除数据（危险！）
+docker-compose down -v
+
+# 重新构建并启动
+docker-compose --env-file .env.docker up -d --build
+```
+
+#### 数据备份与恢复
+
+```bash
+# 备份数据库
+docker-compose exec postgres pg_dump -U postgres noteapp > backup.sql
+
+# 恢复数据库
+docker-compose exec -T postgres psql -U postgres noteapp < backup.sql
+```
 
 #### 单独构建镜像
 
@@ -542,6 +585,7 @@ docker build -t note-app .
 docker run -p 3000:8080 \
   -e DATABASE_URL="postgresql://..." \
   -e NEXTAUTH_SECRET="your-secret" \
+  -e AUTH_SECRET="your-secret" \
   note-app
 ```
 
