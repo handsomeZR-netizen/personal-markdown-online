@@ -44,6 +44,7 @@ next-env.d.ts
 
 # documentation
 /doc
+/docs
 
 .vercel
 .env*.local
