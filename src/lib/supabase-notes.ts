@@ -28,6 +28,7 @@ export interface UpdateNoteData {
   summary?: string | null
   embedding?: string | null
   categoryId?: string | null
+  tagIds?: string[]
 }
 
 /**
@@ -265,11 +266,26 @@ export async function updateNote(id: string, userId: string, updates: UpdateNote
       
       if (isOwner) {
         // User is owner, allow update
+        const { tagIds, ...otherUpdates } = updates
+        
+        const updateData: any = {
+          ...otherUpdates,
+          updatedAt: new Date(),
+        }
+        
+        // 如果提供了 tagIds，更新标签关联
+        if (tagIds !== undefined) {
+          updateData.Tag = {
+            set: tagIds.map(tagId => ({ id: tagId })),
+          }
+        }
+        
         const updatedNote = await prisma.note.update({
           where: { id },
-          data: {
-            ...updates,
-            updatedAt: new Date(),
+          data: updateData,
+          include: {
+            Tag: true,
+            Category: true,
           },
         })
         return { data: updatedNote, error: null }
@@ -286,11 +302,26 @@ export async function updateNote(id: string, userId: string, updates: UpdateNote
       
       if (collaborator) {
         // User is an editor collaborator, allow update
+        const { tagIds, ...otherUpdates } = updates
+        
+        const updateData: any = {
+          ...otherUpdates,
+          updatedAt: new Date(),
+        }
+        
+        // 如果提供了 tagIds，更新标签关联
+        if (tagIds !== undefined) {
+          updateData.Tag = {
+            set: tagIds.map(tagId => ({ id: tagId })),
+          }
+        }
+        
         const updatedNote = await prisma.note.update({
           where: { id },
-          data: {
-            ...updates,
-            updatedAt: new Date(),
+          data: updateData,
+          include: {
+            Tag: true,
+            Category: true,
           },
         })
         return { data: updatedNote, error: null }

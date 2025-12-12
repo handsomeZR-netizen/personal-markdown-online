@@ -319,6 +319,18 @@ export async function updateNote(id: string, formData: FormData): Promise<never>
 
     const title = formData.get("title") as string
     const content = formData.get("content") as string
+    const tagIdsJson = formData.get("tagIds") as string
+    const categoryId = formData.get("categoryId") as string | null
+
+    // 解析标签 ID
+    let tagIds: string[] = []
+    if (tagIdsJson) {
+        try {
+            tagIds = JSON.parse(tagIdsJson)
+        } catch (e) {
+            console.error('Failed to parse tagIds:', e)
+        }
+    }
 
     const validation = validateData(updateNoteSchema, { 
         id,
@@ -362,6 +374,8 @@ export async function updateNote(id: string, formData: FormData): Promise<never>
     if (content !== undefined) updateData.content = content
     if (summary !== null) updateData.summary = summary
     if (embedding !== null) updateData.embedding = embedding
+    if (tagIds.length > 0 || tagIdsJson) updateData.tagIds = tagIds
+    if (categoryId !== null) updateData.categoryId = categoryId || null
 
     const { error } = await updateNoteSupabase(id, session.user.id, updateData)
 
