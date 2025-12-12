@@ -132,6 +132,7 @@ export class NextAuthAdapter implements AuthAdapter {
     try {
       const { prisma } = await import('../prisma');
       const bcrypt = await import('bcryptjs');
+      const { createId } = await import('@paralleldrive/cuid2');
       
       // Check if user already exists
       const existingUser = await prisma.user.findUnique({
@@ -145,12 +146,17 @@ export class NextAuthAdapter implements AuthAdapter {
       // Hash password
       const hashedPassword = await bcrypt.hash(userData.password, 10);
       
+      // Generate unique ID (schema doesn't have @default(cuid()))
+      const userId = createId();
+      
       // Create user
       const user = await prisma.user.create({
         data: {
+          id: userId,
           email: userData.email,
           password: hashedPassword,
           name: userData.name || null,
+          updatedAt: new Date(),
         },
         select: {
           id: true,
