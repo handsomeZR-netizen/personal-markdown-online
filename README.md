@@ -498,6 +498,52 @@ vercel --prod
 - **[VERCEL_DEPLOYMENT.md](./VERCEL_DEPLOYMENT.md)** - Vercel 技术细节
 - **[修复总结.md](./修复总结.md)** - 水合不匹配问题详解
 
+### 🐳 Docker 部署
+
+#### 快速开始
+
+```bash
+# 1. 复制环境变量配置文件
+cp .env.docker.example .env.docker
+
+# 2. 编辑 .env.docker，修改以下必填项：
+#    - POSTGRES_PASSWORD (数据库密码)
+#    - NEXTAUTH_SECRET (认证密钥)
+
+# 3. 启动服务
+docker-compose --env-file .env.docker up -d
+
+# 4. 查看日志
+docker-compose logs -f
+
+# 5. 停止服务
+docker-compose down
+```
+
+#### 环境变量说明
+
+| 变量 | 必填 | 说明 |
+|------|------|------|
+| `POSTGRES_PASSWORD` | ✅ | 数据库密码，请使用强密码 |
+| `NEXTAUTH_SECRET` | ✅ | 认证密钥，使用 `openssl rand -base64 32` 生成 |
+| `NEXTAUTH_URL` | ✅ | 应用访问地址，如 `http://localhost:3000` |
+| `APP_PORT` | ❌ | 应用端口，默认 3000 |
+| `POSTGRES_PORT` | ❌ | 数据库端口，默认 5432 |
+| `DATABASE_MODE` | ❌ | 数据库模式，默认 `local` |
+
+#### 单独构建镜像
+
+```bash
+# 构建镜像
+docker build -t note-app .
+
+# 运行容器
+docker run -p 3000:8080 \
+  -e DATABASE_URL="postgresql://..." \
+  -e NEXTAUTH_SECRET="your-secret" \
+  note-app
+```
+
 ### 部署到其他平台
 
 项目支持部署到任何支持 Node.js 的平台：

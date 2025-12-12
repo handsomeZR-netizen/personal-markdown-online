@@ -1,0 +1,81 @@
+# ================================
+# Note App - Docker Compose
+# ================================
+# 使用方法 / Usage:
+# 1. 复制 .env.docker.example 为 .env.docker
+#    Copy .env.docker.example to .env.docker
+# 2. 修改 .env.docker 中的配置
+#    Modify settings in .env.docker
+# 3. 运行: docker-compose up -d
+#    Run: docker-compose up -d
+
+version: '3.8'
+
+services:
+  # PostgreSQL 数据库
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: noteapp-postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?请设置 POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB:-noteapp}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - noteapp-network
+
+  # Note App 应用
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: noteapp-web
+    ports:
+      - "${APP_PORT:-3000}:8080"
+    environment:
+      - DATABASE_MODE=${DATABASE_MODE:-local}
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-noteapp}
+      - DIRECT_URL=postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-noteapp}
+      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET:?请设置 NEXTAUTH_SECRET}
+      - AUTH_SECRET=${AUTH_SECRET:-${NEXTAUTH_SECRET}}
+      - NEXTAUTH_URL=${NEXTAUTH_URL:-http://localhost:3000}
+      - LOCAL_STORAGE_PATH=/app/uploads
+      # Supabase 配置 (可选)
+      - NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL:-}
+      - NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY:-}
+      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY:-}
+      # AI 功能 (可选)
+      - DEEPSEEK_API_KEY=${DEEPSEEK_API_KEY:-}
+    volumes:
+      - uploads_data:/app/uploads
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+    networks:
+      - noteapp-network
+
+volumes:
+  postgres_data:
+    driver: local
+  uploads_data:
+    driver: local
+
+networks:
+  noteapp-network:
+    driver: bridge
