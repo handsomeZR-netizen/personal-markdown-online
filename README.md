@@ -7,11 +7,12 @@
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178C6?style=flat-square&logo=typescript)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.0-38B2AC?style=flat-square&logo=tailwind-css)
 ![Prisma](https://img.shields.io/badge/Prisma-6.19.0-2D3748?style=flat-square&logo=prisma)
-![Supabase](https://img.shields.io/badge/Supabase-2.83.0-3ECF8E?style=flat-square&logo=supabase)
+![Neon](https://img.shields.io/badge/Neon-Serverless_Postgres-00E599?style=flat-square&logo=postgresql)
+![Vercel](https://img.shields.io/badge/Vercel-Deployed-black?style=flat-square&logo=vercel)
 
 一个功能完整、体验优雅的现代化在线笔记管理平台
 
-[在线演示](https://your-app.vercel.app) · [功能特性](#-核心功能) · [快速开始](#-快速开始) · [技术架构](#-技术架构)
+[🚀 在线演示](https://xzr5.top) · [功能特性](#-核心功能) · [快速开始](#-快速开始) · [技术架构](#-技术架构)
 
 </div>
 
