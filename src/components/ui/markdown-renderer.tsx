@@ -14,6 +14,36 @@ interface MarkdownRendererProps {
 }
 
 /**
+ * 预处理 LaTeX 公式格式
+ * 将 AI 常用的 \[...\] 和 \(...\) 格式转换为标准的 $$...$$ 和 $...$ 格式
+ */
+function preprocessLatex(content: string): string {
+  if (!content) return content;
+  
+  // 将 \[...\] 转换为 $$...$$（块级公式）
+  let processed = content.replace(/\\\[([\s\S]*?)\\\]/g, (_, formula) => {
+    return `$$${formula.trim()}$$`;
+  });
+  
+  // 将 \(...\) 转换为 $...$（行内公式）
+  processed = processed.replace(/\\\(([\s\S]*?)\\\)/g, (_, formula) => {
+    return `$${formula.trim()}$`;
+  });
+  
+  // 处理 [ ... ] 格式（某些 AI 模型使用的格式，但要避免误匹配普通方括号）
+  // 只匹配包含 LaTeX 命令的方括号内容
+  processed = processed.replace(/\[\s*(\\[a-zA-Z]+[\s\S]*?)\s*\]/g, (match, formula) => {
+    // 检查是否包含 LaTeX 命令
+    if (/\\[a-zA-Z]+/.test(formula)) {
+      return `$$${formula.trim()}$$`;
+    }
+    return match;
+  });
+  
+  return processed;
+}
+
+/**
  * Markdown 渲染组件
  * 支持 GFM、数学公式（KaTeX）、代码高亮
  */
@@ -21,6 +51,8 @@ export const MarkdownRenderer = memo(function MarkdownRenderer({
   content, 
   className 
 }: MarkdownRendererProps) {
+  // 预处理 LaTeX 公式格式
+  const processedContent = useMemo(() => preprocessLatex(content), [content]);
   const components = useMemo(() => ({
     // 自定义代码块渲染
     code: ({ className: codeClassName, children, ...props }: React.ComponentProps<'code'> & { inline?: boolean }) => {
@@ -130,7 +162,7 @@ export const MarkdownRenderer = memo(function MarkdownRenderer({
         rehypePlugins={[rehypeKatex, rehypeHighlight]}
         components={components}
       >
-        {content}
+        {processedContent}
       </ReactMarkdown>
     </div>
   );
