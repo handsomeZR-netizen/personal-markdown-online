@@ -1,0 +1,1798 @@
+{
+  "metadata": {
+    "exportDate": "2025-12-12T00:21:17.756Z",
+    "databaseMode": "local",
+    "version": "1.0.0",
+    "recordCounts": {
+      "users": 3,
+      "userPreferences": 3,
+      "tags": 25,
+      "categories": 10,
+      "folders": 25,
+      "notes": 51,
+      "collaborators": 8,
+      "noteVersions": 20,
+      "noteTemplates": 2
+    }
+  },
+  "users": [
+    {
+      "id": "cmiydoyg90000unh0js5b7egz",
+      "email": "user1@example.com",
+      "password": "$2b$10$ebPjOKHe626c2OP0XGdW6O5GBDpx4DXGu7LZ3FXjKoHTQBPHdNYaa",
+      "name": "User 1",
+      "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=user1",
+      "color": "#FF6B6B",
+      "webhookUrl": null,
+      "createdAt": "2025-12-09T09:29:01.543Z",
+      "updatedAt": "2025-12-09T09:29:01.543Z"
+    },
+    {
+      "id": "cmiydoygv0002unh05hagqcvw",
+      "email": "user2@example.com",
+      "password": "$2b$10$ebPjOKHe626c2OP0XGdW6O5GBDpx4DXGu7LZ3FXjKoHTQBPHdNYaa",
+      "name": "User 2",
+      "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=user2",
+      "color": "#4ECDC4",
+      "webhookUrl": null,
+      "createdAt": "2025-12-09T09:29:01.568Z",
+      "updatedAt": "2025-12-09T09:29:01.568Z"
+    },
+    {
+      "id": "cmiydoygy0004unh0zfohds18",
+      "email": "user3@example.com",
+      "password": "$2b$10$ebPjOKHe626c2OP0XGdW6O5GBDpx4DXGu7LZ3FXjKoHTQBPHdNYaa",
+      "name": "User 3",
+      "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=user3",
+      "color": "#45B7D1",
+      "webhookUrl": null,
+      "createdAt": "2025-12-09T09:29:01.571Z",
+      "updatedAt": "2025-12-09T09:29:01.571Z"
+    }
+  ],
+  "folders": [
+    {
+      "id": "cmiydoyhl000ounh0gzjgwfzg",
+      "name": "Work Projects - Subfolder",
+      "parentId": "cmiydoyhh000munh037rtgqg4",
+      "userId": "cmiydoyg90000unh0js5b7egz",
+      "createdAt": "2025-12-09T09:29:01.594Z",
+      "updatedAt": "2025-12-09T09:29:01.594Z",
+      "sortOrder": 0
+    },
+    {
+      "id": "cmiydoyhq000wunh0objx25gk",
+      "name": "Research - Subfolder",
+      "parentId": "cmiydoyhp000uunh0nt3qtjkm",
+      "userId": "cmiydoyg90000unh0js5b7egz",
+      "createdAt": "2025-12-09T09:29:01.598Z",
+      "updatedAt": "2025-12-09T09:29:01.598Z",
+      "sortOrder": 0
+    },
+    {
+      "id": "cmizas4io002cun2sssblngjf",
+      "name": "生活记录",
+      "parentId": null,
+      "userId": "cmiydoygy0004unh0zfohds18",
+      "createdAt": "2025-12-10T00:55:16.704Z",
+      "updatedAt": "2025-12-10T00:55:16.704Z",
+      "sortOrder": 0
+    },
+    {
+      "id": "cmizas4hb001gun2sh3znriqj",
+      "name": "读书笔记",
+      "parentId": null,
+      "userId": "cmiydoygv0002unh05hagqcvw",
+      "createdAt": "2025-12-10T00:55:16.655Z",
+      "updatedAt": "2025-12-10T00:55:16.655Z",
+      "sortOrder": 0
+    },
+    {
+      "id": "cmizas4hc001iun2sinbz4tpv",
+      "name": "生活记录",
+      "parentId": null,
+      "userId": "cmiydoygv0002unh05hagqcvw",
+      "createdAt": "2025-12-10T00:55:16.657Z",
+      "updatedAt": "2025-12-10T00:55:16.657Z",
+      "sortOrder": 0
+    },
+    {
+      "id": "cmizas4ih0024un2sspxvh2ae",
+      "name": "工作项目",
+      "parentId": null,
+      "userId": "cmiydoygy0004unh0zfohds18",
+      "createdAt": "2025-12-10T00:55:16.697Z",
+      "updatedAt": "2025-12-10T00:55:16.697Z",
+      "sortOrder": 0
+    },
+    {
+      "id": "cmizas4ij0026un2sx1sv6vyk",
+      "name": "学习笔记",
+      "parentId": null,
+      "userId": "cmiydoygy0004unh0zfohds18",
+      "createdAt": "2025-12-10T00:55:16.699Z",
+      "updatedAt": "2025-12-10T00:55:16.699Z",
+      "sortOrder": 0
+    },
+    {
+      "id": "cmizas4ik0028un2soyccgv5u",
+      "name": "技术文档",
+      "parentId": null,
+      "userId": "cmiydoygy0004unh0zfohds18",
+      "createdAt": "2025-12-10T00:55:16.701Z",
+      "updatedAt": "2025-12-10T00:55:16.701Z",
+      "sortOrder": 0
+    },
+    {
+      "id": "cmizas4im002aun2swmaep9ts",
+      "name": "读书笔记",
+      "parentId": null,
+      "userId": "cmiydoygy0004unh0zfohds18",
+      "createdAt": "2025-12-10T00:55:16.702Z",
+      "updatedAt": "2025-12-10T00:55:16.702Z",
+      "sortOrder": 0
+    },
+    {
+      "id": "cmiydoyhh000munh037rtgqg4",
+      "name": "Work Projects 1",
+      "parentId": null,
+      "userId": "cmiydoyg90000unh0js5b7egz",
+      "createdAt": "2025-12-09T09:29:01.589Z",
+      "updatedAt": "2025-12-09T09:29:01.589Z",
+      "sortOrder": 0
+    },
+    {
+      "id": "cmizas4f3000gun2sbilem38i",
+      "name": "工作项目",
+      "parentId": null,
+      "userId": "cmiydoyg90000unh0js5b7egz",
+      "createdAt": "2025-12-10T00:55:16.575Z",
+      "updatedAt": "2025-12-10T00:55:16.575Z",
+      "sortOrder": 0
+    },
+    {
+      "id": "cmizas4fd000iun2s35bb98ep",
+      "name": "学习笔记",
+      "parentId": null,
+      "userId": "cmiydoyg90000unh0js5b7egz",
+      "createdAt": "2025-12-10T00:55:16.585Z",
+      "updatedAt": "2025-12-10T00:55:16.585Z",
+      "sortOrder": 0
+    },
+    {
+      "id": "cmizas4ff000kun2sbtdtu1a9",
+      "name": "技术文档",
+      "parentId": null,
+      "userId": "cmiydoyg90000unh0js5b7egz",
+      "createdAt": "2025-12-10T00:55:16.587Z",
+      "updatedAt": "2025-12-10T00:55:16.587Z",
+      "sortOrder": 0
+    },
+    {
+      "id": "cmizas4fg000mun2sxn2gl8xv",
+      "name": "读书笔记",
+      "parentId": null,
+      "userId": "cmiydoyg90000unh0js5b7egz",
+      "createdAt": "2025-12-10T00:55:16.589Z",
+      "updatedAt": "2025-12-10T00:55:16.589Z",
+      "sortOrder": 0
+    },
+    {
+      "id": "cmizas4fi000oun2sor8d0zvp",
+      "name": "生活记录",
+      "parentId": null,
+      "userId": "cmiydoyg90000unh0js5b7egz",
+      "createdAt": "2025-12-10T00:55:16.590Z",
+      "updatedAt": "2025-12-10T00:55:16.590Z",
+      "sortOrder": 0
+    },
+    {
+      "id": "cmizas4h6001aun2so1y7tuj5",
+      "name": "工作项目",
+      "parentId": null,
+      "userId": "cmiydoygv0002unh05hagqcvw",
+      "createdAt": "2025-12-10T00:55:16.651Z",
+      "updatedAt": "2025-12-10T00:55:16.651Z",
+      "sortOrder": 0
+    },
+    {
+      "id": "cmizas4h8001cun2swfe988uh",
+      "name": "学习笔记",
+      "parentId": null,
+      "userId": "cmiydoygv0002unh05hagqcvw",
+      "createdAt": "2025-12-10T00:55:16.652Z",
+      "updatedAt": "2025-12-10T00:55:16.652Z",
+      "sortOrder": 0
+    },
+    {
+      "id": "cmizas4h9001eun2s4rixy85z",
+      "name": "技术文档",
+      "parentId": null,
+      "userId": "cmiydoygv0002unh05hagqcvw",
+      "createdAt": "2025-12-10T00:55:16.654Z",
+      "updatedAt": "2025-12-10T00:55:16.654Z",
+      "sortOrder": 0
+    },
+    {
+      "id": "cmiydoyhn000qunh0dob508du",
+      "name": "Personal Notes 1",
+      "parentId": null,
+      "userId": "cmiydoygv0002unh05hagqcvw",
+      "createdAt": "2025-12-09T09:29:01.595Z",
+      "updatedAt": "2025-12-09T09:29:01.595Z",
+      "sortOrder": 1
+    },
+    {
+      "id": "cmiydoyho000sunh0wbyfickj",
+      "name": "Meeting Notes 1",
+      "parentId": null,
+      "userId": "cmiydoygy0004unh0zfohds18",
+      "createdAt": "2025-12-09T09:29:01.596Z",
+      "updatedAt": "2025-12-09T09:29:01.596Z",
+      "sortOrder": 2
+    },
+    {
+      "id": "cmiydoyhp000uunh0nt3qtjkm",
+      "name": "Research 1",
+      "parentId": null,
+      "userId": "cmiydoyg90000unh0js5b7egz",
+      "createdAt": "2025-12-09T09:29:01.598Z",
+      "updatedAt": "2025-12-09T09:29:01.598Z",
+      "sortOrder": 3
+    },
+    {
+      "id": "cmiydoyhs000yunh0hzc7qb36",
+      "name": "Ideas & Brainstorming 1",
+      "parentId": null,
+      "userId": "cmiydoygv0002unh05hagqcvw",
+      "createdAt": "2025-12-09T09:29:01.601Z",
+      "updatedAt": "2025-12-09T09:29:01.601Z",
+      "sortOrder": 4
+    },
+    {
+      "id": "cmiydoyhu0010unh0fgml3roc",
+      "name": "Documentation 1",
+      "parentId": null,
+      "userId": "cmiydoygy0004unh0zfohds18",
+      "createdAt": "2025-12-09T09:29:01.602Z",
+      "updatedAt": "2025-12-09T09:29:01.602Z",
+      "sortOrder": 5
+    },
+    {
+      "id": "cmiydoyhv0012unh0ya427lvg",
+      "name": "Archive 1",
+      "parentId": null,
+      "userId": "cmiydoyg90000unh0js5b7egz",
+      "createdAt": "2025-12-09T09:29:01.603Z",
+      "updatedAt": "2025-12-09T09:29:01.603Z",
+      "sortOrder": 6
+    },
+    {
+      "id": "cmiydoyhv0014unh04591vx4q",
+      "name": "Drafts 1",
+      "parentId": null,
+      "userId": "cmiydoygv0002unh05hagqcvw",
+      "createdAt": "2025-12-09T09:29:01.604Z",
+      "updatedAt": "2025-12-09T09:29:01.604Z",
+      "sortOrder": 7
+    }
+  ],
+  "notes": [
+    {
+      "id": "cmiydoyhy0016unh0fo7ta6q8",
+      "title": "Project Planning 1",
+      "content": "{\"type\":\"doc\",\"content\":[{\"type\":\"heading\",\"attrs\":{\"level\":1},\"content\":[{\"type\":\"text\",\"text\":\"Project Overview\"}]},{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"This is a comprehensive project plan with key milestones and deliverables.\"}]},{\"type\":\"bulletList\",\"content\":[{\"type\":\"listItem\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Phase 1: Research and Planning\"}]}]},{\"type\":\"listItem\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Phase 2: Development\"}]}]},{\"type\":\"listItem\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Phase 3: Testing and Deployment\"}]}]}]}]}",
+      "summary": "Summary of Project Planning 1",
+      "embedding": null,
+      "userId": "cmiydoyg90000unh0js5b7egz",
+      "categoryId": "cmiydoyhb000gunh0unnlrupj",
+      "createdAt": "2025-12-09T09:29:01.606Z",
+      "updatedAt": "2025-12-09T09:29:01.606Z",
+      "contentType": "tiptap-json",
+      "folderId": "cmiydoyhh000munh037rtgqg4",
+      "ownerId": "cmiydoyg90000unh0js5b7egz",
+      "isPublic": true,
+      "publicSlug": "note-0",
+      "sortOrder": 0,
+      "tagIds": [
+        "cmiydoyh10006unh0fwdih8zb",
+        "cmiydoyh40007unh0s4bmyfw1",
+        "cmiydoyh50008unh0m88n4ghz",
+        "cmiydoyh50009unh0g2ulu0b0"
+      ]
+    },
+    {
+      "id": "cmiydoyii001aunh0gf6fgjfy",
+      "title": "Meeting Notes 1",
+      "content": "{\"type\":\"doc\",\"content\":[{\"type\":\"heading\",\"attrs\":{\"level\":2},\"content\":[{\"type\":\"text\",\"text\":\"Meeting Summary\"}]},{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Key discussion points from today's meeting:\"}]},{\"type\":\"orderedList\",\"content\":[{\"type\":\"listItem\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Review current progress\"}]}]},{\"type\":\"listItem\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Discuss blockers and challenges\"}]}]},{\"type\":\"listItem\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Plan next steps\"}]}]}]}]}",
+      "summary": "Summary of Meeting Notes 1",
+      "embedding": null,
+      "userId": "cmiydoygv0002unh05hagqcvw",
+      "categoryId": "cmiydoyhd000hunh0yidwfvdu",
+      "createdAt": "2025-12-09T09:29:01.626Z",
+      "updatedAt": "2025-12-09T09:29:01.626Z",
+      "contentType": "tiptap-json",
+      "folderId": "cmiydoyhl000ounh0gzjgwfzg",
+      "ownerId": "cmiydoygv0002unh05hagqcvw",
+      "isPublic": false,
+      "publicSlug": null,
+      "sortOrder": 1,
+      "tagIds": [
+        "cmiydoyh40007unh0s4bmyfw1",
+        "cmiydoyh50008unh0m88n4ghz"
+      ]
+    },
+    {
+      "id": "cmiydoyil001cunh01rslxbp9",
+      "title": "Research Findings 1",
+      "content": "{\"type\":\"doc\",\"content\":[{\"type\":\"heading\",\"attrs\":{\"level\":1},\"content\":[{\"type\":\"text\",\"text\":\"Project Overview\"}]},{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"This is a comprehensive project plan with key milestones and deliverables.\"}]},{\"type\":\"bulletList\",\"content\":[{\"type\":\"listItem\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Phase 1: Research and Planning\"}]}]},{\"type\":\"listItem\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Phase 2: Development\"}]}]},{\"type\":\"listItem\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Phase 3: Testing and Deployment\"}]}]}]}]}",
+      "summary": "Summary of Research Findings 1",
+      "embedding": null,
+      "userId": "cmiydoygy0004unh0zfohds18",
+      "categoryId": "cmiydoyhe000iunh07aym431d",
+      "createdAt": "2025-12-09T09:29:01.629Z",
+      "updatedAt": "2025-12-09T09:29:01.629Z",
+      "contentType": "tiptap-json",
+      "folderId": "cmiydoyhn000qunh0dob508du",
+      "ownerId": "cmiydoygy0004unh0zfohds18",
+      "isPublic": false,
+      "publicSlug": null,
+      "sortOrder": 2,
+      "tagIds": [
+        "cmiydoyh50008unh0m88n4ghz",
+        "cmiydoyh50009unh0g2ulu0b0",
+        "cmiydoyh6000aunh0xsr9zewd"
+      ]
+    },
+    {
+      "id": "cmiydoyio001eunh0w40vcs7z",
+      "title": "Todo List 1",
+      "content": "{\"type\":\"doc\",\"content\":[{\"type\":\"heading\",\"attrs\":{\"level\":2},\"content\":[{\"type\":\"text\",\"text\":\"Meeting Summary\"}]},{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Key discussion points from today's meeting:\"}]},{\"type\":\"orderedList\",\"content\":[{\"type\":\"listItem\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Review current progress\"}]}]},{\"type\":\"listItem\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Discuss blockers and challenges\"}]}]},{\"type\":\"listItem\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Plan next steps\"}]}]}]}]}",
+      "summary": "Summary of Todo List 1",
+      "embedding": null,
+      "userId": "cmiydoyg90000unh0js5b7egz",
+      "categoryId": "cmiydoyhf000junh0jmrp546r",
+      "createdAt": "2025-12-09T09:29:01.633Z",
+      "updatedAt": "2025-12-09T09:29:01.633Z",
+      "contentType": "tiptap-json",
+      "folderId": "cmiydoyho000sunh0wbyfickj",
+      "ownerId": "cmiydoyg90000unh0js5b7egz",
+      "isPublic": false,
+      "publicSlug": null,
+      "sortOrder": 3,
+      "tagIds": [
+        "cmiydoyh50009unh0g2ulu0b0",
+        "cmiydoyh6000aunh0xsr9zewd",
+        "cmiydoyh7000bunh0o1p91wq2"
+      ]
+    },
+    {
+      "id": "cmiydoyir001gunh02c6f3vcz",
+      "title": "Ideas for Next Quarter 1",
+      "content": "{\"type\":\"doc\",\"content\":[{\"type\":\"heading\",\"attrs\":{\"level\":1},\"content\":[{\"type\":\"text\",\"text\":\"Project Overview\"}]},{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"This is a comprehensive project plan with key milestones and deliverables.\"}]},{\"type\":\"bulletList\",\"content\":[{\"type\":\"listItem\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Phase 1: Research and Planning\"}]}]},{\"type\":\"listItem\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Phase 2: Development\"}]}]},{\"type\":\"listItem\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Phase 3: Testing and Deployment\"}]}]}]}]}",
+      "summary": "Summary of Ideas for Next Quarter 1",
+      "embedding": null,
+      "userId": "cmiydoygv0002unh05hagqcvw",
+      "categoryId": "cmiydoyhg000kunh014tmabwp",
+      "createdAt": "2025-12-09T09:29:01.635Z",
+      "updatedAt": "2025-12-09T09:29:01.635Z",
+      "contentType": "tiptap-json",
+      "folderId": "cmiydoyhp000uunh0nt3qtjkm",
+      "ownerId": "cmiydoygv0002unh05hagqcvw",
+      "isPublic": false,
+      "publicSlug": null,
+      "sortOrder": 4,
+      "tagIds": [
+        "cmiydoyh6000aunh0xsr9zewd",
+        "cmiydoyh7000bunh0o1p91wq2",
+        "cmiydoyh8000cunh0y4cu1psf"
+      ]
+    },
+    {
+      "id": "cmiydoyiv001kunh0mis0u3cw",
+      "title": "Technical Documentation 1",
+      "content": "{\"type\":\"doc\",\"content\":[{\"type\":\"heading\",\"attrs\":{\"level\":2},\"content\":[{\"type\":\"text\",\"text\":\"Meeting Summary\"}]},{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Key discussion points from today's meeting:\"}]},{\"type\":\"orderedList\",\"content\":[{\"type\":\"listItem\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Review current progress\"}]}]},{\"type\":\"listItem\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Discuss blockers and challenges\"}]}]},{\"type\":\"listItem\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Plan next steps\"}]}]}]}]}",
+      "summary": "Summary of Technical Documentation 1",
+      "embedding": null,
+      "userId": "cmiydoygy0004unh0zfohds18",
+      "categoryId": "cmiydoyhb000gunh0unnlrupj",
+      "createdAt": "2025-12-09T09:29:01.639Z",
+      "updatedAt": "2025-12-09T09:29:01.639Z",
+      "contentType": "tiptap-json",
+      "folderId": "cmiydoyhq000wunh0objx25gk",
+      "ownerId": "cmiydoygy0004unh0zfohds18",
+      "isPublic": true,
+      "publicSlug": "note-5",
+      "sortOrder": 5,
+      "tagIds": [
+        "cmiydoyh7000bunh0o1p91wq2",
+        "cmiydoyh8000cunh0y4cu1psf",
+        "cmiydoyh8000dunh0njtnh50u"
+      ]
+    },
+    {
+      "id": "cmiydoyix001munh04ujbet4x",
+      "title": "Design Concepts 1",
+      "content": "{\"type\":\"doc\",\"content\":[{\"type\":\"heading\",\"attrs\":{\"level\":1},\"content\":[{\"type\":\"text\",\"text\":\"Project Overview\"}]},{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"This is a comprehensive project plan with key milestones and deliverables.\"}]},{\"type\":\"bulletList\",\"content\":[{\"type\":\"listItem\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Phase 1: Research and Planning\"}]}]},{\"type\":\"listItem\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Phase 2: Development\"}]}]},{\"type\":\"listItem\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Phase 3: Testing and Deployment\"}]}]}]}]}",
+      "summary": "Summary of Design Concepts 1",
+      "embedding": null,
+      "userId": "cmiydoyg90000unh0js5b7egz",
+      "categoryId": "cmiydoyhd000hunh0yidwfvdu",
+      "createdAt": "2025-12-09T09:29:01.642Z",
+      "updatedAt": "2025-12-09T09:29:01.642Z",
+      "contentType": "tiptap-json",
+      "folderId": "cmiydoyhs000yunh0hzc7qb36",
+      "ownerId": "cmiydoyg90000unh0js5b7egz",
+      "isPublic": false,
+      "publicSlug": null,
+      "sortOrder": 6,
+      "tagIds": [
+        "cmiydoyh8000cunh0y4cu1psf",
+        "cmiydoyh8000dunh0njtnh50u",
+        "cmiydoyh9000eunh07irwyh8e",
+        "cmiydoyha000funh0xyso6arm"
+      ]
+    },
+    {
+      "id": "cmiydoyj0001ounh0y3et1eii",
+      "title": "Code Review Notes 1",
+      "content": "{\"type\":\"doc\",\"content\":[{\"type\":\"heading\",\"attrs\":{\"level\":2},\"content\":[{\"type\":\"text\",\"text\":\"Meeting Summary\"}]},{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Key discussion points from today's meeting:\"}]},{\"type\":\"orderedList\",\"content\":[{\"type\":\"listItem\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Review current progress\"}]}]},{\"type\":\"listItem\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Discuss blockers and challenges\"}]}]},{\"type\":\"listItem\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Plan next steps\"}]}]}]}]}",
+      "summary": "Summary of Code Review Notes 1",
+      "embedding": null,
+      "userId": "cmiydoygv0002unh05hagqcvw",
+      "categoryId": "cmiydoyhe000iunh07aym431d",
+      "createdAt": "2025-12-09T09:29:01.644Z",
+      "updatedAt": "2025-12-09T09:29:01.644Z",
+      "contentType": "tiptap-json",
+      "folderId": "cmiydoyhu0010unh0fgml3roc",
+      "ownerId": "cmiydoygv0002unh05hagqcvw",
+      "isPublic": false,
+      "publicSlug": null,
+      "sortOrder": 7,
+      "tagIds": [
+        "cmiydoyh10006unh0fwdih8zb",
+        "cmiydoyh8000dunh0njtnh50u",
+        "cmiydoyh9000eunh07irwyh8e",
+        "cmiydoyha000funh0xyso6arm"
+      ]
+    },
+    {
+      "id": "cmiydoyj2001qunh08eormscw",
+      "title": "Sprint Retrospective 1",
+      "content": "{\"type\":\"doc\",\"content\":[{\"type\":\"heading\",\"attrs\":{\"level\":1},\"content\":[{\"type\":\"text\",\"text\":\"Project Overview\"}]},{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"This is a comprehensive project plan with key milestones and deliverables.\"}]},{\"type\":\"bulletList\",\"content\":[{\"type\":\"listItem\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Phase 1: Research and Planning\"}]}]},{\"type\":\"listItem\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Phase 2: Development\"}]}]},{\"type\":\"listItem\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Phase 3: Testing and Deployment\"}]}]}]}]}",
+      "summary": "Summary of Sprint Retrospective 1",
+      "embedding": null,
+      "userId": "cmiydoygy0004unh0zfohds18",
+      "categoryId": "cmiydoyhf000junh0jmrp546r",
+      "createdAt": "2025-12-09T09:29:01.646Z",
+      "updatedAt": "2025-12-09T09:29:01.646Z",
+      "contentType": "tiptap-json",
+      "folderId": "cmiydoyhv0012unh0ya427lvg",
+      "ownerId": "cmiydoygy0004unh0zfohds18",
+      "isPublic": false,
+      "publicSlug": null,
+      "sortOrder": 8,
+      "tagIds": [
+        "cmiydoyh9000eunh07irwyh8e",
+        "cmiydoyha000funh0xyso6arm"
+      ]
+    },
+    {
+      "id": "cmiydoyj5001uunh008jgussa",
+      "title": "Client Feedback 1",
+      "content": "{\"type\":\"doc\",\"content\":[{\"type\":\"heading\",\"attrs\":{\"level\":2},\"content\":[{\"type\":\"text\",\"text\":\"Meeting Summary\"}]},{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Key discussion points from today's meeting:\"}]},{\"type\":\"orderedList\",\"content\":[{\"type\":\"listItem\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Review current progress\"}]}]},{\"type\":\"listItem\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Discuss blockers and challenges\"}]}]},{\"type\":\"listItem\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Plan next steps\"}]}]}]}]}",
+      "summary": "Summary of Client Feedback 1",
+      "embedding": null,
+      "userId": "cmiydoyg90000unh0js5b7egz",
+      "categoryId": "cmiydoyhg000kunh014tmabwp",
+      "createdAt": "2025-12-09T09:29:01.649Z",
+      "updatedAt": "2025-12-09T09:29:01.649Z",
+      "contentType": "tiptap-json",
+      "folderId": "cmiydoyhv0014unh04591vx4q",
+      "ownerId": "cmiydoyg90000unh0js5b7egz",
+      "isPublic": false,
+      "publicSlug": null,
+      "sortOrder": 9,
+      "tagIds": [
+        "cmiydoyh10006unh0fwdih8zb",
+        "cmiydoyh40007unh0s4bmyfw1",
+        "cmiydoyh50008unh0m88n4ghz",
+        "cmiydoyha000funh0xyso6arm"
+      ]
+    },
+    {
+      "id": "cmiydoyj7001wunh0x2qg9n7f",
+      "title": "Project Planning 2",
+      "content": "{\"type\":\"doc\",\"content\":[{\"type\":\"heading\",\"attrs\":{\"level\":1},\"content\":[{\"type\":\"text\",\"text\":\"Project Overview\"}]},{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"This is a comprehensive project plan with key milestones and deliverables.\"}]},{\"type\":\"bulletList\",\"content\":[{\"type\":\"listItem\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Phase 1: Research and Planning\"}]}]},{\"type\":\"listItem\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Phase 2: Development\"}]}]},{\"type\":\"listItem\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Phase 3: Testing and Deployment\"}]}]}]}]}",
+      "summary": "Summary of Project Planning 2",
+      "embedding": null,
+      "userId": "cmiydoygv0002unh05hagqcvw",
+      "categoryId": "cmiydoyhb000gunh0unnlrupj",
+      "createdAt": "2025-12-09T09:29:01.652Z",
+      "updatedAt": "2025-12-09T09:29:01.652Z",
+      "contentType": "tiptap-json",
+      "folderId": "cmiydoyhh000munh037rtgqg4",
+      "ownerId": "cmiydoygv0002unh05hagqcvw",
+      "isPublic": true,
+      "publicSlug": "note-10",
+      "sortOrder": 10,
+      "tagIds": [
+        "cmiydoyh10006unh0fwdih8zb",
+        "cmiydoyh40007unh0s4bmyfw1",
+        "cmiydoyh50008unh0m88n4ghz",
+        "cmiydoyh50009unh0g2ulu0b0"
+      ]
+    },
+    {
+      "id": "cmiydoyj9001yunh0ynyka0km",
+      "title": "Meeting Notes 2",
+      "content": "{\"type\":\"doc\",\"content\":[{\"type\":\"heading\",\"attrs\":{\"level\":2},\"content\":[{\"type\":\"text\",\"text\":\"Meeting Summary\"}]},{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Key discussion points from today's meeting:\"}]},{\"type\":\"orderedList\",\"content\":[{\"type\":\"listItem\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Review current progress\"}]}]},{\"type\":\"listItem\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Discuss blockers and challenges\"}]}]},{\"type\":\"listItem\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Plan next steps\"}]}]}]}]}",
+      "summary": "Summary of Meeting Notes 2",
+      "embedding": null,
+      "userId": "cmiydoygy0004unh0zfohds18",
+      "categoryId": "cmiydoyhd000hunh0yidwfvdu",
+      "createdAt": "2025-12-09T09:29:01.654Z",
+      "updatedAt": "2025-12-09T09:29:01.654Z",
+      "contentType": "tiptap-json",
+      "folderId": "cmiydoyhl000ounh0gzjgwfzg",
+      "ownerId": "cmiydoygy0004unh0zfohds18",
+      "isPublic": false,
+      "publicSlug": null,
+      "sortOrder": 11,
+      "tagIds": [
+        "cmiydoyh40007unh0s4bmyfw1",
+        "cmiydoyh50008unh0m88n4ghz",
+        "cmiydoyh50009unh0g2ulu0b0"
+      ]
+    },
+    {
+      "id": "cmiydoyjb0020unh05xkp6i3j",
+      "title": "Research Findings 2",
+      "content": "{\"type\":\"doc\",\"content\":[{\"type\":\"heading\",\"attrs\":{\"level\":1},\"content\":[{\"type\":\"text\",\"text\":\"Project Overview\"}]},{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"This is a comprehensive project plan with key milestones and deliverables.\"}]},{\"type\":\"bulletList\",\"content\":[{\"type\":\"listItem\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Phase 1: Research and Planning\"}]}]},{\"type\":\"listItem\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Phase 2: Development\"}]}]},{\"type\":\"listItem\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Phase 3: Testing and Deployment\"}]}]}]}]}",
+      "summary": "Summary of Research Findings 2",
+      "embedding": null,
+      "userId": "cmiydoyg90000unh0js5b7egz",
+      "categoryId": "cmiydoyhe000iunh07aym431d",
+      "createdAt": "2025-12-09T09:29:01.656Z",
+      "updatedAt": "2025-12-09T09:29:01.656Z",
+      "contentType": "tiptap-json",
+      "folderId": "cmiydoyhn000qunh0dob508du",
+      "ownerId": "cmiydoyg90000unh0js5b7egz",
+      "isPublic": false,
+      "publicSlug": null,
+      "sortOrder": 12,
+      "tagIds": [
+        "cmiydoyh50008unh0m88n4ghz",
+        "cmiydoyh50009unh0g2ulu0b0",
+        "cmiydoyh6000aunh0xsr9zewd"
+      ]
+    },
+    {
+      "id": "cmiydoyje0024unh0oatsk8qs",
+      "title": "Todo List 2",
+      "content": "{\"type\":\"doc\",\"content\":[{\"type\":\"heading\",\"attrs\":{\"level\":2},\"content\":[{\"type\":\"text\",\"text\":\"Meeting Summary\"}]},{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Key discussion points from today's meeting:\"}]},{\"type\":\"orderedList\",\"content\":[{\"type\":\"listItem\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Review current progress\"}]}]},{\"type\":\"listItem\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Discuss blockers and challenges\"}]}]},{\"type\":\"listItem\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Plan next steps\"}]}]}]}]}",
+      "summary": "Summary of Todo List 2",
+      "embedding": null,
+      "userId": "cmiydoygv0002unh05hagqcvw",
+      "categoryId": "cmiydoyhf000junh0jmrp546r",
+      "createdAt": "2025-12-09T09:29:01.658Z",
+      "updatedAt": "2025-12-09T09:29:01.658Z",
+      "contentType": "tiptap-json",
+      "folderId": "cmiydoyho000sunh0wbyfickj",
+      "ownerId": "cmiydoygv0002unh05hagqcvw",
+      "isPublic": false,
+      "publicSlug": null,
+      "sortOrder": 13,
+      "tagIds": [
+        "cmiydoyh50009unh0g2ulu0b0",
+        "cmiydoyh6000aunh0xsr9zewd"
+      ]
+    },
+    {
+      "id": "cmiydoyjg0026unh0wtekk3yg",
+      "title": "Ideas for Next Quarter 2",
+      "content": "{\"type\":\"doc\",\"content\":[{\"type\":\"heading\",\"attrs\":{\"level\":1},\"content\":[{\"type\":\"text\",\"text\":\"Project Overview\"}]},{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"This is a comprehensive project plan with key milestones and deliverables.\"}]},{\"type\":\"bulletList\",\"content\":[{\"type\":\"listItem\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Phase 1: Research and Planning\"}]}]},{\"type\":\"listItem\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Phase 2: Development\"}]}]},{\"type\":\"listItem\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Phase 3: Testing and Deployment\"}]}]}]}]}",
+      "summary": "Summary of Ideas for Next Quarter 2",
+      "embedding": null,
+      "userId": "cmiydoygy0004unh0zfohds18",
+      "categoryId": "cmiydoyhg000kunh014tmabwp",
+      "createdAt": "2025-12-09T09:29:01.660Z",
+      "updatedAt": "2025-12-09T09:29:01.660Z",
+      "contentType": "tiptap-json",
+      "folderId": "cmiydoyhp000uunh0nt3qtjkm",
+      "ownerId": "cmiydoygy0004unh0zfohds18",
+      "isPublic": false,
+      "publicSlug": null,
+      "sortOrder": 14,
+      "tagIds": [
+        "cmiydoyh6000aunh0xsr9zewd",
+        "cmiydoyh7000bunh0o1p91wq2",
+        "cmiydoyh8000cunh0y4cu1psf"
+      ]
+    },
+    {
+      "id": "cmiydoyji0028unh0sh10gtw8",
+      "title": "Technical Documentation 2",
+      "content": "{\"type\":\"doc\",\"content\":[{\"type\":\"heading\",\"attrs\":{\"level\":2},\"content\":[{\"type\":\"text\",\"text\":\"Meeting Summary\"}]},{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Key discussion points from today's meeting:\"}]},{\"type\":\"orderedList\",\"content\":[{\"type\":\"listItem\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Review current progress\"}]}]},{\"type\":\"listItem\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Discuss blockers and challenges\"}]}]},{\"type\":\"listItem\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Plan next steps\"}]}]}]}]}",
+      "summary": "Summary of Technical Documentation 2",
+      "embedding": null,
+      "userId": "cmiydoyg90000unh0js5b7egz",
+      "categoryId": "cmiydoyhb000gunh0unnlrupj",
+      "createdAt": "2025-12-09T09:29:01.662Z",
+      "updatedAt": "2025-12-09T09:29:01.662Z",
+      "contentType": "tiptap-json",
+      "folderId": "cmiydoyhq000wunh0objx25gk",
+      "ownerId": "cmiydoyg90000unh0js5b7egz",
+      "isPublic": true,
+      "publicSlug": "note-15",
+      "sortOrder": 15,
+      "tagIds": [
+        "cmiydoyh7000bunh0o1p91wq2",
+        "cmiydoyh8000cunh0y4cu1psf",
+        "cmiydoyh8000dunh0njtnh50u",
+        "cmiydoyh9000eunh07irwyh8e"
+      ]
+    },
+    {
+      "id": "cmiydoyjk002aunh08pc4kaxn",
+      "title": "Design Concepts 2",
+      "content": "{\"type\":\"doc\",\"content\":[{\"type\":\"heading\",\"attrs\":{\"level\":1},\"content\":[{\"type\":\"text\",\"text\":\"Project Overview\"}]},{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"This is a comprehensive project plan with key milestones and deliverables.\"}]},{\"type\":\"bulletList\",\"content\":[{\"type\":\"listItem\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Phase 1: Research and Planning\"}]}]},{\"type\":\"listItem\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Phase 2: Development\"}]}]},{\"type\":\"listItem\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Phase 3: Testing and Deployment\"}]}]}]}]}",
+      "summary": "Summary of Design Concepts 2",
+      "embedding": null,
+      "userId": "cmiydoygv0002unh05hagqcvw",
+      "categoryId": "cmiydoyhd000hunh0yidwfvdu",
+      "createdAt": "2025-12-09T09:29:01.664Z",
+      "updatedAt": "2025-12-09T09:29:01.664Z",
+      "contentType": "tiptap-json",
+      "folderId": "cmiydoyhs000yunh0hzc7qb36",
+      "ownerId": "cmiydoygv0002unh05hagqcvw",
+      "isPublic": false,
+      "publicSlug": null,
+      "sortOrder": 16,
+      "tagIds": [
+        "cmiydoyh8000cunh0y4cu1psf",
+        "cmiydoyh8000dunh0njtnh50u"
+      ]
+    },
+    {
+      "id": "cmiydoyjm002eunh0mvwcc0p5",
+      "title": "Code Review Notes 2",
+      "content": "{\"type\":\"doc\",\"content\":[{\"type\":\"heading\",\"attrs\":{\"level\":2},\"content\":[{\"type\":\"text\",\"text\":\"Meeting Summary\"}]},{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Key discussion points from today's meeting:\"}]},{\"type\":\"orderedList\",\"content\":[{\"type\":\"listItem\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Review current progress\"}]}]},{\"type\":\"listItem\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Discuss blockers and challenges\"}]}]},{\"type\":\"listItem\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Plan next steps\"}]}]}]}]}",
+      "summary": "Summary of Code Review Notes 2",
+      "embedding": null,
+      "userId": "cmiydoygy0004unh0zfohds18",
+      "categoryId": "cmiydoyhe000iunh07aym431d",
+      "createdAt": "2025-12-09T09:29:01.667Z",
+      "updatedAt": "2025-12-09T09:29:01.667Z",
+      "contentType": "tiptap-json",
+      "folderId": "cmiydoyhu0010unh0fgml3roc",
+      "ownerId": "cmiydoygy0004unh0zfohds18",
+      "isPublic": false,
+      "publicSlug": null,
+      "sortOrder": 17,
+      "tagIds": [
+        "cmiydoyh8000dunh0njtnh50u",
+        "cmiydoyh9000eunh07irwyh8e"
+      ]
+    },
+    {
+      "id": "cmiydoyjo002gunh0egtsovko",
+      "title": "Sprint Retrospective 2",
+      "content": "{\"type\":\"doc\",\"content\":[{\"type\":\"heading\",\"attrs\":{\"level\":1},\"content\":[{\"type\":\"text\",\"text\":\"Project Overview\"}]},{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"This is a comprehensive project plan with key milestones and deliverables.\"}]},{\"type\":\"bulletList\",\"content\":[{\"type\":\"listItem\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Phase 1: Research and Planning\"}]}]},{\"type\":\"listItem\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Phase 2: Development\"}]}]},{\"type\":\"listItem\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Phase 3: Testing and Deployment\"}]}]}]}]}",
+      "summary": "Summary of Sprint Retrospective 2",
+      "embedding": null,
+      "userId": "cmiydoyg90000unh0js5b7egz",
+      "categoryId": "cmiydoyhf000junh0jmrp546r",
+      "createdAt": "2025-12-09T09:29:01.668Z",
+      "updatedAt": "2025-12-09T09:29:01.668Z",
+      "contentType": "tiptap-json",
+      "folderId": "cmiydoyhv0012unh0ya427lvg",
+      "ownerId": "cmiydoyg90000unh0js5b7egz",
+      "isPublic": false,
+      "publicSlug": null,
+      "sortOrder": 18,
+      "tagIds": [
+        "cmiydoyh10006unh0fwdih8zb",
+        "cmiydoyh9000eunh07irwyh8e",
+        "cmiydoyha000funh0xyso6arm"
+      ]
+    },
+    {
+      "id": "cmiydoyjp002iunh07xx4z09n",
+      "title": "Client Feedback 2",
+      "content": "{\"type\":\"doc\",\"content\":[{\"type\":\"heading\",\"attrs\":{\"level\":2},\"content\":[{\"type\":\"text\",\"text\":\"Meeting Summary\"}]},{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Key discussion points from today's meeting:\"}]},{\"type\":\"orderedList\",\"content\":[{\"type\":\"listItem\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Review current progress\"}]}]},{\"type\":\"listItem\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Discuss blockers and challenges\"}]}]},{\"type\":\"listItem\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Plan next steps\"}]}]}]}]}",
+      "summary": "Summary of Client Feedback 2",
+      "embedding": null,
+      "userId": "cmiydoygv0002unh05hagqcvw",
+      "categoryId": "cmiydoyhg000kunh014tmabwp",
+      "createdAt": "2025-12-09T09:29:01.670Z",
+      "updatedAt": "2025-12-09T09:29:01.670Z",
+      "contentType": "tiptap-json",
+      "folderId": "cmiydoyhv0014unh04591vx4q",
+      "ownerId": "cmiydoygv0002unh05hagqcvw",
+      "isPublic": false,
+      "publicSlug": null,
+      "sortOrder": 19,
+      "tagIds": [
+        "cmiydoyh10006unh0fwdih8zb",
+        "cmiydoyh40007unh0s4bmyfw1",
+        "cmiydoyha000funh0xyso6arm"
+      ]
+    },
+    {
+      "id": "cmizas4fs000qun2s213mbqyx",
+      "title": "Next.js 15 新特性总结",
+      "content": "# Next.js 15 新特性总结\n\n## 主要更新\n\n### 1. React 19 支持\nNext.js 15 完全支持 React 19，包括新的并发特性和改进的服务器组件。\n\n### 2. Turbopack 稳定版\n- 开发服务器启动速度提升 76%\n- 热更新速度提升 96%",
+      "summary": null,
+      "embedding": null,
+      "userId": "cmiydoyg90000unh0js5b7egz",
+      "categoryId": "cmizas4ev000dun2snkprur0w",
+      "createdAt": "2025-12-10T00:55:16.600Z",
+      "updatedAt": "2025-12-10T00:55:16.600Z",
+      "contentType": "tiptap-json",
+      "folderId": "cmizas4ff000kun2sbtdtu1a9",
+      "ownerId": "cmiydoyg90000unh0js5b7egz",
+      "isPublic": false,
+      "publicSlug": null,
+      "sortOrder": 0,
+      "tagIds": [
+        "cmizas4dz0001un2su3obtemb",
+        "cmizas4e20003un2s2kpouvyk"
+      ]
+    },
+    {
+      "id": "cmizas4g7000sun2srty702ub",
+      "title": "每周工作计划模板",
+      "content": "# 每周工作计划\r\n\r\n## 本周目标\r\n- [ ] 完成项目 A 的需求分析\r\n- [ ] 代码审查 3 个 PR\r\n- [ ] 参加周三的技术分享会",
+      "summary": "本周需完成项目A需求分析、审查3个PR并参加周三技术分享会。",
+      "embedding": "[0.03044665566612282,0,0.07611663916530705,0.03044665566612282,0.06089331133224564,0,0,0,0,0,0,0,0.07611663916530705,0,0,0,0,0,0,0,0.10656329483142986,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.45669983499184225,0.03044665566612282,0,0,0,0,0,0.3044665566612282,0,0,0.3044665566612282,0,0,0,0,0,0.3044665566612282,0,0,0,0,0.07611663916530705,0,0,0,0,0,0,0,0.03044665566612282,0,0,0,0,0,0.1522332783306141,0,0,0,0,0,0,0,0,0,0.06089331133224564,0,0,0,0,0,0,0,0,0,0,0.3044665566612282,0,0.3044665566612282,0,0,0,0.3044665566612282,0,0.07611663916530705,0,0,0,0.03805831958265352,0,0,0,0,0.0888027456928582,0,0,0,0.1522332783306141,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.06089331133224564,0,0,0,0.03044665566612282,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.07611663916530705,0,0,0,0,0,0,0,0,0.0888027456928582,0,0,0,0,0,0,0,0,0,0,0.03044665566612282,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.06089331133224564,0,0,0.03044665566612282,0,0,0,0,0,0,0.16491938485816526,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.07611663916530705,0.1522332783306141,0,0,0,0,0,0,0,0,0,0,0,0.0888027456928582,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.06089331133224564,0,0,0,0,0,0,0,0.07611663916530705,0,0,0,0,0,0,0,0,0,0,0,0.07611663916530705,0,0,0.0888027456928582,0,0,0,0,0,0,0,0,0.03044665566612282,0,0,0,0,0,0,0,0,0,0.03044665566612282,0,0,0,0,0,0,0,0.07611663916530705,0,0,0,0,0.0888027456928582,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.07611663916530705,0,0,0,0,0,0,0,0,0,0,0,0,0.03805831958265352,0,0,0,0,0,0,0]",
+      "userId": "cmiydoyg90000unh0js5b7egz",
+      "categoryId": "cmizas4eg000aun2sw152ys53",
+      "createdAt": "2025-12-10T00:55:16.616Z",
+      "updatedAt": "2025-12-10T15:25:18.948Z",
+      "contentType": "tiptap-json",
+      "folderId": "cmizas4f3000gun2sbilem38i",
+      "ownerId": "cmiydoyg90000unh0js5b7egz",
+      "isPublic": false,
+      "publicSlug": null,
+      "sortOrder": 0,
+      "tagIds": [
+        "cmizas4dp0000un2sz0wuppc7",
+        "cmizas4e60005un2s97m7jfmd",
+        "cmizas4eb0008un2sfg6jytuv"
+      ]
+    },
+    {
+      "id": "cmizas4gb000uun2svk75ik1u",
+      "title": "TypeScript 高级类型技巧",
+      "content": "# TypeScript 高级类型技巧\n\n## 1. 条件类型\n\n```typescript\ntype IsString<T> = T extends string ? true : false;\n```",
+      "summary": null,
+      "embedding": null,
+      "userId": "cmiydoyg90000unh0js5b7egz",
+      "categoryId": "cmizas4ev000dun2snkprur0w",
+      "createdAt": "2025-12-10T00:55:16.620Z",
+      "updatedAt": "2025-12-10T00:55:16.620Z",
+      "contentType": "tiptap-json",
+      "folderId": "cmizas4ff000kun2sbtdtu1a9",
+      "ownerId": "cmiydoyg90000unh0js5b7egz",
+      "isPublic": false,
+      "publicSlug": null,
+      "sortOrder": 0,
+      "tagIds": [
+        "cmizas4dz0001un2su3obtemb",
+        "cmizas4e20003un2s2kpouvyk"
+      ]
+    },
+    {
+      "id": "cmizas4gg000wun2ska0lcfnw",
+      "title": "《原子习惯》读书笔记",
+      "content": "# 《原子习惯》读书笔记\n\n## 核心观点\n\n> 习惯是自我提升的复利。\n\n### 四大习惯法则\n1. 让它显而易见\n2. 让它有吸引力\n3. 让它简单易行\n4. 让它令人愉悦",
+      "summary": null,
+      "embedding": null,
+      "userId": "cmiydoyg90000unh0js5b7egz",
+      "categoryId": "cmizas4ew000eun2skldd247f",
+      "createdAt": "2025-12-10T00:55:16.624Z",
+      "updatedAt": "2025-12-10T00:55:16.624Z",
+      "contentType": "tiptap-json",
+      "folderId": "cmizas4fg000mun2sxn2gl8xv",
+      "ownerId": "cmiydoyg90000unh0js5b7egz",
+      "isPublic": false,
+      "publicSlug": null,
+      "sortOrder": 0,
+      "tagIds": [
+        "cmizas4dz0001un2su3obtemb",
+        "cmizas4e00002un2seiz7ai7m",
+        "cmizas4e40004un2scudhkwi1"
+      ]
+    },
+    {
+      "id": "cmizas4gl000yun2sdc4b3jnf",
+      "title": "React Hooks 最佳实践",
+      "content": "# React Hooks 最佳实践\n\n## useState\n\n### ✅ 正确用法\n```jsx\nconst [count, setCount] = useState(0);\nsetCount(prev => prev + 1);\n```",
+      "summary": null,
+      "embedding": null,
+      "userId": "cmiydoyg90000unh0js5b7egz",
+      "categoryId": "cmizas4ev000dun2snkprur0w",
+      "createdAt": "2025-12-10T00:55:16.629Z",
+      "updatedAt": "2025-12-10T00:55:16.629Z",
+      "contentType": "tiptap-json",
+      "folderId": "cmizas4ff000kun2sbtdtu1a9",
+      "ownerId": "cmiydoyg90000unh0js5b7egz",
+      "isPublic": false,
+      "publicSlug": null,
+      "sortOrder": 0,
+      "tagIds": [
+        "cmizas4dz0001un2su3obtemb",
+        "cmizas4e20003un2s2kpouvyk"
+      ]
+    },
+    {
+      "id": "cmizas4go0010un2sgvbfudfr",
+      "title": "2024 年度目标规划",
+      "content": "# 2024 年度目标规划\n\n## 职业发展\n- [ ] 晋升到高级工程师\n- [ ] 完成 3 个重要项目\n\n## 学习成长\n- [ ] 阅读 24 本书\n- [ ] 学习 Rust 语言基础",
+      "summary": null,
+      "embedding": null,
+      "userId": "cmiydoyg90000unh0js5b7egz",
+      "categoryId": "cmizas4et000cun2shar68ys0",
+      "createdAt": "2025-12-10T00:55:16.633Z",
+      "updatedAt": "2025-12-10T00:55:16.633Z",
+      "contentType": "tiptap-json",
+      "folderId": "cmizas4fi000oun2sor8d0zvp",
+      "ownerId": "cmiydoyg90000unh0js5b7egz",
+      "isPublic": false,
+      "publicSlug": null,
+      "sortOrder": 0,
+      "tagIds": [
+        "cmizas4eb0008un2sfg6jytuv",
+        "cmizas4e00002un2seiz7ai7m",
+        "cmizas4ec0009un2s590nidt6"
+      ]
+    },
+    {
+      "id": "cmizas4gs0012un2suklr6i0u",
+      "title": "Git 常用命令速查",
+      "content": "# Git 常用命令速查\n\n## 基础操作\n\n```bash\ngit init\ngit clone <url>\ngit status\ngit add .\ngit commit -m \"message\"\n```",
+      "summary": null,
+      "embedding": null,
+      "userId": "cmiydoyg90000unh0js5b7egz",
+      "categoryId": "cmizas4ev000dun2snkprur0w",
+      "createdAt": "2025-12-10T00:55:16.636Z",
+      "updatedAt": "2025-12-10T00:55:16.636Z",
+      "contentType": "tiptap-json",
+      "folderId": "cmizas4ff000kun2sbtdtu1a9",
+      "ownerId": "cmiydoyg90000unh0js5b7egz",
+      "isPublic": false,
+      "publicSlug": null,
+      "sortOrder": 0,
+      "tagIds": [
+        "cmizas4e20003un2s2kpouvyk",
+        "cmizas4dp0000un2sz0wuppc7"
+      ]
+    },
+    {
+      "id": "cmizas4gv0014un2sie412tfo",
+      "title": "项目复盘：电商平台重构",
+      "content": "# 项目复盘：电商平台重构\n\n## 项目背景\n- 项目周期：3 个月\n- 团队规模：5 人\n- 技术栈：Next.js + TypeScript + PostgreSQL",
+      "summary": null,
+      "embedding": null,
+      "userId": "cmiydoyg90000unh0js5b7egz",
+      "categoryId": "cmizas4eg000aun2sw152ys53",
+      "createdAt": "2025-12-10T00:55:16.640Z",
+      "updatedAt": "2025-12-10T00:55:16.640Z",
+      "contentType": "tiptap-json",
+      "folderId": "cmizas4f3000gun2sbilem38i",
+      "ownerId": "cmiydoyg90000unh0js5b7egz",
+      "isPublic": false,
+      "publicSlug": null,
+      "sortOrder": 0,
+      "tagIds": [
+        "cmizas4dp0000un2sz0wuppc7",
+        "cmizas4e60005un2s97m7jfmd",
+        "cmizas4e80006un2s13tv1cy5"
+      ]
+    },
+    {
+      "id": "cmizas4gz0016un2snmczukg4",
+      "title": "CSS Grid 布局完全指南",
+      "content": "# CSS Grid 布局完全指南\r\n\r\n## 基础概念\r\n\r\n```css\r\n.container {\r\n  display: grid;\r\n  grid-template-columns: 1fr 2fr 1fr;\r\n  gap: 20px;\r\n}\r\n```",
+      "summary": "CSS Grid 布局通过定义容器为 `display: grid`，并使用 `grid-template-columns` 和 `gap` 等属性来创建灵活的二维网格结构。",
+      "embedding": "[0.04865919255242922,0,0,0,0,0,0.07298878882864383,0,0,0,0,0,0.04865919255242922,0,0,0,0.14465050876949415,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.04865919255242922,0,0,0.4865919255242922,0.04865919255242922,0,0,0,0,0,0,0,0,0,0.029195515531457533,0,0,0.17030717393350225,0.1557094161677735,0,0,0,0,0,0.029195515531457533,0,0,0,0,0,0,0,0.036494394414321916,0,0,0,0,0,0.14597757765728767,0,0,0,0,0,0,0,0,0.036494394414321916,0.036494394414321916,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.2627596397831177,0,0,0.09731838510485843,0.036494394414321916,0,0,0.21763929759813797,0.013270688877935241,0,0,0,0,0,0,0.013270688877935241,0.029195515531457533,0,0,0,0,0,0,0,0,0,0,0.29195515531457533,0.013270688877935241,0.29195515531457533,0,0,0.07298878882864383,0,0,0,0,0,0,0,0,0,0.04865919255242922,0,0,0.029195515531457533,0,0,0,0,0,0,0,0,0,0.013270688877935241,0,0,0,0,0.036494394414321916,0,0,0,0,0.013270688877935241,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.013270688877935241,0,0,0,0,0.04865919255242922,0.14597757765728767,0,0.07298878882864383,0,0.029195515531457533,0,0.09488542547723698,0,0,0,0,0,0.2676255590383607,0,0,0,0,0,0.036494394414321916,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.013270688877935241,0,0,0.14465050876949415,0,0.09731838510485843,0,0.07298878882864383,0,0,0,0.07298878882864383,0,0,0,0.03981206663380572,0,0,0,0,0,0.013270688877935241,0,0,0,0.07298878882864383,0,0,0,0,0,0,0,0,0.04865919255242922,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.013270688877935241,0,0,0,0,0,0,0,0.14597757765728767,0,0,0,0,0,0,0.11678206212583013,0,0,0,0.013270688877935241,0.013270688877935241,0,0,0,0,0,0.04865919255242922,0,0,0,0,0,0.026541377755870482,0,0,0.14465050876949415,0,0,0,0,0,0,0,0.013270688877935241,0,0,0,0,0,0,0,0,0,0.04246620440939277,0,0,0.1313798198915589,0,0,0,0.07298878882864383,0,0.2676255590383607,0,0,0.13381277951918036,0,0,0,0,0,0.029195515531457533,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.029195515531457533,0,0,0,0,0,0,0,0,0,0,0]",
+      "userId": "cmiydoyg90000unh0js5b7egz",
+      "categoryId": "cmizas4ev000dun2snkprur0w",
+      "createdAt": "2025-12-10T00:55:16.643Z",
+      "updatedAt": "2025-12-10T14:54:36.625Z",
+      "contentType": "tiptap-json",
+      "folderId": "cmizas4ff000kun2sbtdtu1a9",
+      "ownerId": "cmiydoyg90000unh0js5b7egz",
+      "isPublic": false,
+      "publicSlug": null,
+      "sortOrder": 0,
+      "tagIds": [
+        "cmizas4dz0001un2su3obtemb",
+        "cmizas4e20003un2s2kpouvyk"
+      ]
+    },
+    {
+      "id": "cmizas4h20018un2s5syxvcmz",
+      "title": "日常灵感收集",
+      "content": "# 日常灵感收集\n\n## 产品创意\n\n### 智能笔记应用\n- 自动整理和分类笔记\n- AI 生成摘要和标签\n- 跨设备实时同步",
+      "summary": null,
+      "embedding": null,
+      "userId": "cmiydoyg90000unh0js5b7egz",
+      "categoryId": "cmizas4et000cun2shar68ys0",
+      "createdAt": "2025-12-10T00:55:16.646Z",
+      "updatedAt": "2025-12-10T00:55:16.646Z",
+      "contentType": "tiptap-json",
+      "folderId": "cmizas4fi000oun2sor8d0zvp",
+      "ownerId": "cmiydoyg90000unh0js5b7egz",
+      "isPublic": false,
+      "publicSlug": null,
+      "sortOrder": 0,
+      "tagIds": [
+        "cmizas4dz0001un2su3obtemb",
+        "cmizas4e00002un2seiz7ai7m",
+        "cmizas4ea0007un2s5isu11vh"
+      ]
+    },
+    {
+      "id": "cmizas4hg001kun2sff6i8q6p",
+      "title": "Next.js 15 新特性总结",
+      "content": "# Next.js 15 新特性总结\n\n## 主要更新\n\n### 1. React 19 支持\nNext.js 15 完全支持 React 19，包括新的并发特性和改进的服务器组件。\n\n### 2. Turbopack 稳定版\n- 开发服务器启动速度提升 76%\n- 热更新速度提升 96%",
+      "summary": null,
+      "embedding": null,
+      "userId": "cmiydoygv0002unh05hagqcvw",
+      "categoryId": "cmizas4ev000dun2snkprur0w",
+      "createdAt": "2025-12-10T00:55:16.660Z",
+      "updatedAt": "2025-12-10T00:55:16.660Z",
+      "contentType": "tiptap-json",
+      "folderId": "cmizas4h9001eun2s4rixy85z",
+      "ownerId": "cmiydoygv0002unh05hagqcvw",
+      "isPublic": false,
+      "publicSlug": null,
+      "sortOrder": 0,
+      "tagIds": [
+        "cmizas4dz0001un2su3obtemb",
+        "cmizas4e20003un2s2kpouvyk"
+      ]
+    },
+    {
+      "id": "cmizas4hj001mun2saxm43alu",
+      "title": "每周工作计划模板",
+      "content": "# 每周工作计划\n\n## 本周目标\n- [ ] 完成项目 A 的需求分析\n- [ ] 代码审查 3 个 PR\n- [ ] 参加周三的技术分享会",
+      "summary": null,
+      "embedding": null,
+      "userId": "cmiydoygv0002unh05hagqcvw",
+      "categoryId": "cmizas4eg000aun2sw152ys53",
+      "createdAt": "2025-12-10T00:55:16.663Z",
+      "updatedAt": "2025-12-10T00:55:16.663Z",
+      "contentType": "tiptap-json",
+      "folderId": "cmizas4h6001aun2so1y7tuj5",
+      "ownerId": "cmiydoygv0002unh05hagqcvw",
+      "isPublic": false,
+      "publicSlug": null,
+      "sortOrder": 0,
+      "tagIds": [
+        "cmizas4dp0000un2sz0wuppc7",
+        "cmizas4e60005un2s97m7jfmd",
+        "cmizas4eb0008un2sfg6jytuv"
+      ]
+    },
+    {
+      "id": "cmizas4hn001oun2sipi3m4g0",
+      "title": "TypeScript 高级类型技巧",
+      "content": "# TypeScript 高级类型技巧\n\n## 1. 条件类型\n\n```typescript\ntype IsString<T> = T extends string ? true : false;\n```",
+      "summary": null,
+      "embedding": null,
+      "userId": "cmiydoygv0002unh05hagqcvw",
+      "categoryId": "cmizas4ev000dun2snkprur0w",
+      "createdAt": "2025-12-10T00:55:16.667Z",
+      "updatedAt": "2025-12-10T00:55:16.667Z",
+      "contentType": "tiptap-json",
+      "folderId": "cmizas4h9001eun2s4rixy85z",
+      "ownerId": "cmiydoygv0002unh05hagqcvw",
+      "isPublic": false,
+      "publicSlug": null,
+      "sortOrder": 0,
+      "tagIds": [
+        "cmizas4dz0001un2su3obtemb",
+        "cmizas4e20003un2s2kpouvyk"
+      ]
+    },
+    {
+      "id": "cmizas4hp001qun2s2ebjsqw3",
+      "title": "《原子习惯》读书笔记",
+      "content": "# 《原子习惯》读书笔记\n\n## 核心观点\n\n> 习惯是自我提升的复利。\n\n### 四大习惯法则\n1. 让它显而易见\n2. 让它有吸引力\n3. 让它简单易行\n4. 让它令人愉悦",
+      "summary": null,
+      "embedding": null,
+      "userId": "cmiydoygv0002unh05hagqcvw",
+      "categoryId": "cmizas4ew000eun2skldd247f",
+      "createdAt": "2025-12-10T00:55:16.670Z",
+      "updatedAt": "2025-12-10T00:55:16.670Z",
+      "contentType": "tiptap-json",
+      "folderId": "cmizas4hb001gun2sh3znriqj",
+      "ownerId": "cmiydoygv0002unh05hagqcvw",
+      "isPublic": false,
+      "publicSlug": null,
+      "sortOrder": 0,
+      "tagIds": [
+        "cmizas4dz0001un2su3obtemb",
+        "cmizas4e00002un2seiz7ai7m",
+        "cmizas4e40004un2scudhkwi1"
+      ]
+    },
+    {
+      "id": "cmizas4hs001sun2shecm5vot",
+      "title": "React Hooks 最佳实践",
+      "content": "# React Hooks 最佳实践\n\n## useState\n\n### ✅ 正确用法\n```jsx\nconst [count, setCount] = useState(0);\nsetCount(prev => prev + 1);\n```",
+      "summary": null,
+      "embedding": null,
+      "userId": "cmiydoygv0002unh05hagqcvw",
+      "categoryId": "cmizas4ev000dun2snkprur0w",
+      "createdAt": "2025-12-10T00:55:16.673Z",
+      "updatedAt": "2025-12-10T00:55:16.673Z",
+      "contentType": "tiptap-json",
+      "folderId": "cmizas4h9001eun2s4rixy85z",
+      "ownerId": "cmiydoygv0002unh05hagqcvw",
+      "isPublic": false,
+      "publicSlug": null,
+      "sortOrder": 0,
+      "tagIds": [
+        "cmizas4dz0001un2su3obtemb",
+        "cmizas4e20003un2s2kpouvyk"
+      ]
+    },
+    {
+      "id": "cmizas4hz001uun2s6shkpcco",
+      "title": "2024 年度目标规划",
+      "content": "# 2024 年度目标规划\n\n## 职业发展\n- [ ] 晋升到高级工程师\n- [ ] 完成 3 个重要项目\n\n## 学习成长\n- [ ] 阅读 24 本书\n- [ ] 学习 Rust 语言基础",
+      "summary": null,
+      "embedding": null,
+      "userId": "cmiydoygv0002unh05hagqcvw",
+      "categoryId": "cmizas4et000cun2shar68ys0",
+      "createdAt": "2025-12-10T00:55:16.679Z",
+      "updatedAt": "2025-12-10T00:55:16.679Z",
+      "contentType": "tiptap-json",
+      "folderId": "cmizas4hc001iun2sinbz4tpv",
+      "ownerId": "cmiydoygv0002unh05hagqcvw",
+      "isPublic": false,
+      "publicSlug": null,
+      "sortOrder": 0,
+      "tagIds": [
+        "cmizas4eb0008un2sfg6jytuv",
+        "cmizas4e00002un2seiz7ai7m",
+        "cmizas4ec0009un2s590nidt6"
+      ]
+    },
+    {
+      "id": "cmizas4i2001wun2sbnr385t7",
+      "title": "Git 常用命令速查",
+      "content": "# Git 常用命令速查\n\n## 基础操作\n\n```bash\ngit init\ngit clone <url>\ngit status\ngit add .\ngit commit -m \"message\"\n```",
+      "summary": null,
+      "embedding": null,
+      "userId": "cmiydoygv0002unh05hagqcvw",
+      "categoryId": "cmizas4ev000dun2snkprur0w",
+      "createdAt": "2025-12-10T00:55:16.683Z",
+      "updatedAt": "2025-12-10T00:55:16.683Z",
+      "contentType": "tiptap-json",
+      "folderId": "cmizas4h9001eun2s4rixy85z",
+      "ownerId": "cmiydoygv0002unh05hagqcvw",
+      "isPublic": false,
+      "publicSlug": null,
+      "sortOrder": 0,
+      "tagIds": [
+        "cmizas4e20003un2s2kpouvyk",
+        "cmizas4dp0000un2sz0wuppc7"
+      ]
+    },
+    {
+      "id": "cmizas4i6001yun2s7iwpt11u",
+      "title": "项目复盘：电商平台重构",
+      "content": "# 项目复盘：电商平台重构\n\n## 项目背景\n- 项目周期：3 个月\n- 团队规模：5 人\n- 技术栈：Next.js + TypeScript + PostgreSQL",
+      "summary": null,
+      "embedding": null,
+      "userId": "cmiydoygv0002unh05hagqcvw",
+      "categoryId": "cmizas4eg000aun2sw152ys53",
+      "createdAt": "2025-12-10T00:55:16.686Z",
+      "updatedAt": "2025-12-10T00:55:16.686Z",
+      "contentType": "tiptap-json",
+      "folderId": "cmizas4h6001aun2so1y7tuj5",
+      "ownerId": "cmiydoygv0002unh05hagqcvw",
+      "isPublic": false,
+      "publicSlug": null,
+      "sortOrder": 0,
+      "tagIds": [
+        "cmizas4dp0000un2sz0wuppc7",
+        "cmizas4e60005un2s97m7jfmd",
+        "cmizas4e80006un2s13tv1cy5"
+      ]
+    },
+    {
+      "id": "cmizas4i90020un2sydi80qhm",
+      "title": "CSS Grid 布局完全指南",
+      "content": "# CSS Grid 布局完全指南\n\n## 基础概念\n\n```css\n.container {\n  display: grid;\n  grid-template-columns: 1fr 2fr 1fr;\n  gap: 20px;\n}\n```",
+      "summary": null,
+      "embedding": null,
+      "userId": "cmiydoygv0002unh05hagqcvw",
+      "categoryId": "cmizas4ev000dun2snkprur0w",
+      "createdAt": "2025-12-10T00:55:16.689Z",
+      "updatedAt": "2025-12-10T00:55:16.689Z",
+      "contentType": "tiptap-json",
+      "folderId": "cmizas4h9001eun2s4rixy85z",
+      "ownerId": "cmiydoygv0002unh05hagqcvw",
+      "isPublic": false,
+      "publicSlug": null,
+      "sortOrder": 0,
+      "tagIds": [
+        "cmizas4dz0001un2su3obtemb",
+        "cmizas4e20003un2s2kpouvyk"
+      ]
+    },
+    {
+      "id": "cmizas4ic0022un2sm3mtdoop",
+      "title": "日常灵感收集",
+      "content": "# 日常灵感收集\n\n## 产品创意\n\n### 智能笔记应用\n- 自动整理和分类笔记\n- AI 生成摘要和标签\n- 跨设备实时同步",
+      "summary": null,
+      "embedding": null,
+      "userId": "cmiydoygv0002unh05hagqcvw",
+      "categoryId": "cmizas4et000cun2shar68ys0",
+      "createdAt": "2025-12-10T00:55:16.692Z",
+      "updatedAt": "2025-12-10T00:55:16.692Z",
+      "contentType": "tiptap-json",
+      "folderId": "cmizas4hc001iun2sinbz4tpv",
+      "ownerId": "cmiydoygv0002unh05hagqcvw",
+      "isPublic": false,
+      "publicSlug": null,
+      "sortOrder": 0,
+      "tagIds": [
+        "cmizas4dz0001un2su3obtemb",
+        "cmizas4e00002un2seiz7ai7m",
+        "cmizas4ea0007un2s5isu11vh"
+      ]
+    },
+    {
+      "id": "cmizas4iq002eun2so2xt97rs",
+      "title": "Next.js 15 新特性总结",
+      "content": "# Next.js 15 新特性总结\n\n## 主要更新\n\n### 1. React 19 支持\nNext.js 15 完全支持 React 19，包括新的并发特性和改进的服务器组件。\n\n### 2. Turbopack 稳定版\n- 开发服务器启动速度提升 76%\n- 热更新速度提升 96%",
+      "summary": null,
+      "embedding": null,
+      "userId": "cmiydoygy0004unh0zfohds18",
+      "categoryId": "cmizas4ev000dun2snkprur0w",
+      "createdAt": "2025-12-10T00:55:16.707Z",
+      "updatedAt": "2025-12-10T00:55:16.707Z",
+      "contentType": "tiptap-json",
+      "folderId": "cmizas4ik0028un2soyccgv5u",
+      "ownerId": "cmiydoygy0004unh0zfohds18",
+      "isPublic": false,
+      "publicSlug": null,
+      "sortOrder": 0,
+      "tagIds": [
+        "cmizas4dz0001un2su3obtemb",
+        "cmizas4e20003un2s2kpouvyk"
+      ]
+    },
+    {
+      "id": "cmizas4j0002gun2sogrkr1s8",
+      "title": "每周工作计划模板",
+      "content": "# 每周工作计划\n\n## 本周目标\n- [ ] 完成项目 A 的需求分析\n- [ ] 代码审查 3 个 PR\n- [ ] 参加周三的技术分享会",
+      "summary": null,
+      "embedding": null,
+      "userId": "cmiydoygy0004unh0zfohds18",
+      "categoryId": "cmizas4eg000aun2sw152ys53",
+      "createdAt": "2025-12-10T00:55:16.716Z",
+      "updatedAt": "2025-12-10T00:55:16.716Z",
+      "contentType": "tiptap-json",
+      "folderId": "cmizas4ih0024un2sspxvh2ae",
+      "ownerId": "cmiydoygy0004unh0zfohds18",
+      "isPublic": false,
+      "publicSlug": null,
+      "sortOrder": 0,
+      "tagIds": [
+        "cmizas4dp0000un2sz0wuppc7",
+        "cmizas4e60005un2s97m7jfmd",
+        "cmizas4eb0008un2sfg6jytuv"
+      ]
+    },
+    {
+      "id": "cmizas4j4002iun2skjuxkfy0",
+      "title": "TypeScript 高级类型技巧",
+      "content": "# TypeScript 高级类型技巧\n\n## 1. 条件类型\n\n```typescript\ntype IsString<T> = T extends string ? true : false;\n```",
+      "summary": null,
+      "embedding": null,
+      "userId": "cmiydoygy0004unh0zfohds18",
+      "categoryId": "cmizas4ev000dun2snkprur0w",
+      "createdAt": "2025-12-10T00:55:16.720Z",
+      "updatedAt": "2025-12-10T00:55:16.720Z",
+      "contentType": "tiptap-json",
+      "folderId": "cmizas4ik0028un2soyccgv5u",
+      "ownerId": "cmiydoygy0004unh0zfohds18",
+      "isPublic": false,
+      "publicSlug": null,
+      "sortOrder": 0,
+      "tagIds": [
+        "cmizas4dz0001un2su3obtemb",
+        "cmizas4e20003un2s2kpouvyk"
+      ]
+    },
+    {
+      "id": "cmizas4j7002kun2sy1hb37xf",
+      "title": "《原子习惯》读书笔记",
+      "content": "# 《原子习惯》读书笔记\n\n## 核心观点\n\n> 习惯是自我提升的复利。\n\n### 四大习惯法则\n1. 让它显而易见\n2. 让它有吸引力\n3. 让它简单易行\n4. 让它令人愉悦",
+      "summary": null,
+      "embedding": null,
+      "userId": "cmiydoygy0004unh0zfohds18",
+      "categoryId": "cmizas4ew000eun2skldd247f",
+      "createdAt": "2025-12-10T00:55:16.723Z",
+      "updatedAt": "2025-12-10T00:55:16.723Z",
+      "contentType": "tiptap-json",
+      "folderId": "cmizas4im002aun2swmaep9ts",
+      "ownerId": "cmiydoygy0004unh0zfohds18",
+      "isPublic": false,
+      "publicSlug": null,
+      "sortOrder": 0,
+      "tagIds": [
+        "cmizas4dz0001un2su3obtemb",
+        "cmizas4e00002un2seiz7ai7m",
+        "cmizas4e40004un2scudhkwi1"
+      ]
+    },
+    {
+      "id": "cmizas4je002mun2sgfwu3r0j",
+      "title": "React Hooks 最佳实践",
+      "content": "# React Hooks 最佳实践\n\n## useState\n\n### ✅ 正确用法\n```jsx\nconst [count, setCount] = useState(0);\nsetCount(prev => prev + 1);\n```",
+      "summary": null,
+      "embedding": null,
+      "userId": "cmiydoygy0004unh0zfohds18",
+      "categoryId": "cmizas4ev000dun2snkprur0w",
+      "createdAt": "2025-12-10T00:55:16.730Z",
+      "updatedAt": "2025-12-10T00:55:16.730Z",
+      "contentType": "tiptap-json",
+      "folderId": "cmizas4ik0028un2soyccgv5u",
+      "ownerId": "cmiydoygy0004unh0zfohds18",
+      "isPublic": false,
+      "publicSlug": null,
+      "sortOrder": 0,
+      "tagIds": [
+        "cmizas4dz0001un2su3obtemb",
+        "cmizas4e20003un2s2kpouvyk"
+      ]
+    },
+    {
+      "id": "cmizas4jh002oun2sdtzjxilx",
+      "title": "2024 年度目标规划",
+      "content": "# 2024 年度目标规划\n\n## 职业发展\n- [ ] 晋升到高级工程师\n- [ ] 完成 3 个重要项目\n\n## 学习成长\n- [ ] 阅读 24 本书\n- [ ] 学习 Rust 语言基础",
+      "summary": null,
+      "embedding": null,
+      "userId": "cmiydoygy0004unh0zfohds18",
+      "categoryId": "cmizas4et000cun2shar68ys0",
+      "createdAt": "2025-12-10T00:55:16.733Z",
+      "updatedAt": "2025-12-10T00:55:16.733Z",
+      "contentType": "tiptap-json",
+      "folderId": "cmizas4io002cun2sssblngjf",
+      "ownerId": "cmiydoygy0004unh0zfohds18",
+      "isPublic": false,
+      "publicSlug": null,
+      "sortOrder": 0,
+      "tagIds": [
+        "cmizas4eb0008un2sfg6jytuv",
+        "cmizas4e00002un2seiz7ai7m",
+        "cmizas4ec0009un2s590nidt6"
+      ]
+    },
+    {
+      "id": "cmizas4jk002qun2sm1afdtoa",
+      "title": "Git 常用命令速查",
+      "content": "# Git 常用命令速查\n\n## 基础操作\n\n```bash\ngit init\ngit clone <url>\ngit status\ngit add .\ngit commit -m \"message\"\n```",
+      "summary": null,
+      "embedding": null,
+      "userId": "cmiydoygy0004unh0zfohds18",
+      "categoryId": "cmizas4ev000dun2snkprur0w",
+      "createdAt": "2025-12-10T00:55:16.736Z",
+      "updatedAt": "2025-12-10T00:55:16.736Z",
+      "contentType": "tiptap-json",
+      "folderId": "cmizas4ik0028un2soyccgv5u",
+      "ownerId": "cmiydoygy0004unh0zfohds18",
+      "isPublic": false,
+      "publicSlug": null,
+      "sortOrder": 0,
+      "tagIds": [
+        "cmizas4e20003un2s2kpouvyk",
+        "cmizas4dp0000un2sz0wuppc7"
+      ]
+    },
+    {
+      "id": "cmizas4jn002sun2sluwrpg62",
+      "title": "项目复盘：电商平台重构",
+      "content": "# 项目复盘：电商平台重构\n\n## 项目背景\n- 项目周期：3 个月\n- 团队规模：5 人\n- 技术栈：Next.js + TypeScript + PostgreSQL",
+      "summary": null,
+      "embedding": null,
+      "userId": "cmiydoygy0004unh0zfohds18",
+      "categoryId": "cmizas4eg000aun2sw152ys53",
+      "createdAt": "2025-12-10T00:55:16.739Z",
+      "updatedAt": "2025-12-10T00:55:16.739Z",
+      "contentType": "tiptap-json",
+      "folderId": "cmizas4ih0024un2sspxvh2ae",
+      "ownerId": "cmiydoygy0004unh0zfohds18",
+      "isPublic": false,
+      "publicSlug": null,
+      "sortOrder": 0,
+      "tagIds": [
+        "cmizas4dp0000un2sz0wuppc7",
+        "cmizas4e60005un2s97m7jfmd",
+        "cmizas4e80006un2s13tv1cy5"
+      ]
+    },
+    {
+      "id": "cmizas4js002uun2swi284371",
+      "title": "CSS Grid 布局完全指南",
+      "content": "# CSS Grid 布局完全指南\n\n## 基础概念\n\n```css\n.container {\n  display: grid;\n  grid-template-columns: 1fr 2fr 1fr;\n  gap: 20px;\n}\n```",
+      "summary": null,
+      "embedding": null,
+      "userId": "cmiydoygy0004unh0zfohds18",
+      "categoryId": "cmizas4ev000dun2snkprur0w",
+      "createdAt": "2025-12-10T00:55:16.745Z",
+      "updatedAt": "2025-12-10T00:55:16.745Z",
+      "contentType": "tiptap-json",
+      "folderId": "cmizas4ik0028un2soyccgv5u",
+      "ownerId": "cmiydoygy0004unh0zfohds18",
+      "isPublic": false,
+      "publicSlug": null,
+      "sortOrder": 0,
+      "tagIds": [
+        "cmizas4dz0001un2su3obtemb",
+        "cmizas4e20003un2s2kpouvyk"
+      ]
+    },
+    {
+      "id": "cmizas4jw002wun2sd0ztb6ia",
+      "title": "日常灵感收集",
+      "content": "# 日常灵感收集\n\n## 产品创意\n\n### 智能笔记应用\n- 自动整理和分类笔记\n- AI 生成摘要和标签\n- 跨设备实时同步",
+      "summary": null,
+      "embedding": null,
+      "userId": "cmiydoygy0004unh0zfohds18",
+      "categoryId": "cmizas4et000cun2shar68ys0",
+      "createdAt": "2025-12-10T00:55:16.748Z",
+      "updatedAt": "2025-12-10T00:55:16.748Z",
+      "contentType": "tiptap-json",
+      "folderId": "cmizas4io002cun2sssblngjf",
+      "ownerId": "cmiydoygy0004unh0zfohds18",
+      "isPublic": false,
+      "publicSlug": null,
+      "sortOrder": 0,
+      "tagIds": [
+        "cmizas4dz0001un2su3obtemb",
+        "cmizas4e00002un2seiz7ai7m",
+        "cmizas4ea0007un2s5isu11vh"
+      ]
+    },
+    {
+      "id": "cmizesk3n0009une8orvdgaih",
+      "title": "数学笔记",
+      "content": "# 引言\r\n\r\n在代数学领域，二项式定理构成了一项基础且至关重要的公式，其精确描述二项式幂的代数展开形式。具体而言，对于任意实数 $a$ 与 $b$，以及非负整数 $n$，二项式定理的数学表述如下：\r\n\r\n$$\r\n(a+b)^n = \\sum_{k=0}^{n} \\binom{n}{k} a^{n-k} b^k\r\n$$\r\n\r\n其中，符号 $\\binom{n}{k}$ 表示二项式系数，其解析表达式为 $\\binom{n}{k} = \\frac{n!}{k!(n-k)!}$。该系数在组合意义上对应于从 $n$ 个相异元素中选取 $k$ 个元素的组合数目，并在展开式中决定了各代数项的系数权重。\r\n\r\n二项式定理不仅具有深刻的数学理论价值，还在多个学科领域中展现出广泛的应用前景。例如：\r\n\r\n- 在概率论中，该定理为二项分布的概率计算提供了关键数学工具；\r\n- 在组合数学中，它被广泛应用于解决各类计数问题；\r\n- 在数值分析中，二项式展开可用于构造函数逼近与近似计算算法。\r\n\r\n从历史发展的视角考察，二项式定理的雏形可追溯至古代印度及阿拉伯数学家的早期工作。然而，其现代形式的完整确立与推广，尤其是向非整数指数情形的扩展，主要归功于艾萨克·牛顿在17世纪所做出的奠基性贡献。\r\n\r\n为便于直观阐释，可考察一个简单特例：取 $n=3$，依据二项式定理对 $(a+b)^3$ 进行展开：\r\n\r\n$$\r\n\\begin{aligned}\r\n(a+b)^3 &= \\binom{3}{0}a^3b^0 + \\binom{3}{1}a^2b^1 + \\binom{3}{2}a^1b^2 + \\binom{3}{3}a^0b^3 \\\\\r\n&= a^3 + 3a^2b + 3ab^2 + b^3\r\n\\end{aligned}\r\n$$\r\n\r\n该展开式清晰地揭示了各项系数与组合数值之间的严格对应关系。\r\n\r\n此外，二项式定理与帕斯卡三角形（亦称杨辉三角）之间存在紧密的结构关联。帕斯卡三角形中的每一行数值序列，恰好对应于特定指数 $n$ 的二项式展开系数序列。例如，当 $n=4$ 时，其二项式展开系数依次为 1, 4, 6, 4, 1，此序列正是帕斯卡三角形中第五行所呈现的数值排列。\r\n\r\n综上所述，二项式定理作为数学体系中的一项核心分析工具，以其形式简洁且内涵丰富的代数结构，为众多学科领域提供了坚实的理论支撑，具有重要的学术研究价值与实践应用意义。",
+      "summary": "二项式定理描述了(a+b)^n的展开形式，其系数由组合数决定，在概率论、组合数学等领域有广泛应用，并与帕斯卡三角形紧密相关。",
+      "embedding": "[0.16162562037865366,0,0.028590550855902234,0.007215854828955177,0.028598803639274445,0,0.03411454904593962,0,0.06739215710661607,0.006915194211082045,0.0029636546618923044,0,0.02210742058453929,0.004815024117346016,0.16596466106596908,0.0057229193471023815,0.03930183031534156,0,0,0,0.008049432415016137,0.01165022867088699,0.013113257170644469,0,0.09899618387486535,0.018711701982927882,0,0.00465717161154505,0.011064310737731271,0.0027660776844328177,0.01181157355444079,0,0.0576266184256837,0.015674944878395058,0,0.16596466106596908,0.4367532532435888,0.011854618647569218,0.08298233053298454,0.017829094889049726,0.07880644989685673,0,0.04897576168815602,0.16596466106596908,0.009465382729668325,0.17160971756481153,0,0.002048946432913198,0.1097365194852654,0.08936558672782949,0.0044595946340855635,0.06638586442638764,0.10587737698694377,0,0.09846787700161451,0,0.09022681970649907,0.0057229193471023815,0.03587075730088376,0,0.07224275334794972,0.16596466106596908,0.036881035792437566,0.03285175817519348,0.027656720101201245,0,0.002048946432913198,0,0.018891304291995915,0,0.011374788845167608,0.012297749857518922,0.14386472223730967,0,0.010428499111019538,0.0027660776844328177,0.007620826273437354,0,0.06837713043450873,0,0.03940696047168672,0.003951539549189739,0.021451214695601444,0.007416436296755127,0.03378674487859444,0,0.0057229193471023815,0,0.25932708255760106,0.03738764342694908,0.0586043711602909,0.011854618647569218,0.19284099874790442,0.10148589293483144,0.012757827687384017,0,0.11440945996671563,0.07903079098379479,0.15008251172403336,0.006383256194844964,0.00934691085673727,0.0057229193471023815,0.030822008483679973,0,0.020687471757522755,0.011167394378144917,0.0516334501094126,0.023709237295138436,0.21998453113842173,0.036881035792437566,0.0044595946340855635,0.007844968222656101,0.034378394077950736,0,0.016135453159191435,0,0.0057229193471023815,0.0027660776844328177,0.03615658687508612,0.0057229193471023815,0.02132681437646028,0,0.08467584748263728,0.008734982161366792,0.0027660776844328177,0,0.014267137530232427,0,0.044652396905844056,0.04946742102319007,0.03319293221319382,0,0.05945163430172638,0,0.01742836916958422,0.011064310737731271,0.02749454663311348,0,0.007416436296755127,0,0.010104651132928046,0.015945624298495067,0,0.0016935169496527455,0.038720906058726974,0,0.01659646610659691,0.0016935169496527455,0.005729732346325123,0.08298233053298454,0.009220258948109392,0,0.04116918796989162,0.11064310737731271,0,0.009220258948109392,0.006706118044458248,0,0.023553255470828316,0.01869382171347454,0.0251600053649221,0.011064310737731271,0.01283287502719319,0.0057229193471023815,0.036881035792437566,0.007416436296755127,0.03722842388467403,0,0.022128621475462542,0,0.0057229193471023815,0.05276037064751486,0.0232555420135648,0,0,0,0.06010692499398757,0.010913775897762138,0,0,0.0981889447981423,0.0057229193471023815,0.007846628533391055,0.05077047020786541,0.11155500111943344,0,0.01686721974237472,0.008734982161366792,0.21628194065886996,0.005729732346325123,0,0,0.07454440453257147,0,0.17117483913823406,0,0.09086918820464322,0.0048813135607637965,0.01671805193887967,0,0.036935395595759764,0.026670077470172346,0.014460029339342675,0.011854618647569218,0.03352316229316667,0.04741847459027687,0.013548135597221964,0.004815024117346016,0.048678478681823796,0.002048946432913198,0.03238486734610564,0,0.005927309323784609,0.0016935169496527455,0.06717617233622558,0,0.04692612859925793,0,0,0,0.110131731670947,0,0.024621131037259148,0,0.0016935169496527455,0.02943215664224082,0.0029636546618923044,0.003951539549189739,0.024290469038352587,0,0.011854618647569218,0.02319501150070947,0.010604232907866176,0.009762627121527593,0.002048946432913198,0.0029636546618923044,0,0.014987720608970757,0,0,0.09155141282660476,0,0,0.013599111023800141,0.011064310737731271,0,0.02482377409106375,0.0029636546618923044,0.03175866971015458,0.0016935169496527455,0.03957618840803878,0.0016935169496527455,0.010025202189611006,0,0.010602888728260667,0.03319293221319382,0.028431754544733717,0,0.025402754244791183,0,0.017168758041307144,0.006717617233622557,0,0.0016935169496527455,0.013574700568981222,0,0.013903565080482417,0.0029636546618923044,0.033275678126830695,0.0037424633825659435,0.08778281492321086,0,0.0027660776844328177,0,0.018440517896218783,0,0.0387012046507182,0.008734982161366792,0.020541192656563904,0.002048946432913198,0.05294381695991977,0.0057229193471023815,0.07994268472591551,0,0.011927795305887548,0.0029636546618923044,0.006915194211082045,0,0.040920476064199914,0.002048946432913198,0,0.030942657730419935,0.0048813135607637965,0,0.08885205650452342,0.0048813135607637965,0.015657874946276545,0.012757827687384017,0,0.0016935169496527455,0.02886352003355183,0,0.0048813135607637965,0.011064310737731271,0.0027660776844328177,0,0.002048946432913198,0,0.0084889970315352,0,0,0,0.02338725999853779,0.0048813135607637965,0,0.05466296376379139,0.02359301554369168,0,0.0027660776844328177,0.012766512389689929,0.00777186578001558,0.06570164464730378,0,0.0057229193471023815,0.04300174057034919,0.0016935169496527455,0.002048946432913198,0,0.0016935169496527455,0.006383256194844964,0.026921634364550473,0.011064310737731271,0.05702375534061501,0.007215854828955177,0.01165022867088699,0,0.048653783945145294,0.0057229193471023815,0.0029636546618923044,0.07255634541473777,0,0.0057229193471023815,0.01838640406485733,0.012766512389689929,0.0016935169496527455,0,0,0.03319293221319382,0.05643434356170405,0.002048946432913198,0.007061547527718701,0.026607032964544246,0.016589653107374164,0.0027660776844328177,0.05206781518155383,0,0.0027660776844328177,0.0793019750705039,0,0.003951539549189739,0.018836176517746852,0,0.0056450564988424845,0.011064310737731271,0,0.02291892938530049,0.009220258948109392,0,0.003387033899305491,0.026475314979571254,0.012766512389689929,0,0.029095865669617468,0,0.019982367218645106,0,0.03524187864610701,0.01659646610659691,0.0056450564988424845,0.024621131037259148,0,0.011269205381022591,0,0]",
+      "userId": "cmiydoyg90000unh0js5b7egz",
+      "categoryId": null,
+      "createdAt": "2025-12-10T02:47:35.361Z",
+      "updatedAt": "2025-12-11T15:03:27.353Z",
+      "contentType": "yjs-binary",
+      "folderId": null,
+      "ownerId": "cmiydoyg90000unh0js5b7egz",
+      "isPublic": false,
+      "publicSlug": null,
+      "sortOrder": 0,
+      "tagIds": []
+    }
+  ],
+  "tags": [
+    {
+      "id": "cmiydoyh10006unh0fwdih8zb",
+      "name": "work"
+    },
+    {
+      "id": "cmiydoyh40007unh0s4bmyfw1",
+      "name": "personal"
+    },
+    {
+      "id": "cmiydoyh50008unh0m88n4ghz",
+      "name": "ideas"
+    },
+    {
+      "id": "cmiydoyh50009unh0g2ulu0b0",
+      "name": "todo"
+    },
+    {
+      "id": "cmiydoyh6000aunh0xsr9zewd",
+      "name": "important"
+    },
+    {
+      "id": "cmiydoyh7000bunh0o1p91wq2",
+      "name": "project"
+    },
+    {
+      "id": "cmiydoyh8000cunh0y4cu1psf",
+      "name": "meeting"
+    },
+    {
+      "id": "cmiydoyh8000dunh0njtnh50u",
+      "name": "research"
+    },
+    {
+      "id": "cmiydoyh9000eunh07irwyh8e",
+      "name": "draft"
+    },
+    {
+      "id": "cmiydoyha000funh0xyso6arm",
+      "name": "review"
+    },
+    {
+      "id": "cmizas4dp0000un2sz0wuppc7",
+      "name": "工作"
+    },
+    {
+      "id": "cmizas4dz0001un2su3obtemb",
+      "name": "学习"
+    },
+    {
+      "id": "cmizas4e00002un2seiz7ai7m",
+      "name": "生活"
+    },
+    {
+      "id": "cmizas4e20003un2s2kpouvyk",
+      "name": "技术"
+    },
+    {
+      "id": "cmizas4e40004un2scudhkwi1",
+      "name": "读书笔记"
+    },
+    {
+      "id": "cmizas4e60005un2s97m7jfmd",
+      "name": "项目管理"
+    },
+    {
+      "id": "cmizas4e80006un2s13tv1cy5",
+      "name": "会议记录"
+    },
+    {
+      "id": "cmizas4ea0007un2s5isu11vh",
+      "name": "灵感"
+    },
+    {
+      "id": "cmizas4eb0008un2sfg6jytuv",
+      "name": "待办"
+    },
+    {
+      "id": "cmizas4ec0009un2s590nidt6",
+      "name": "重要"
+    },
+    {
+      "id": "cmizg2ohl0000unqk29c3739i",
+      "name": "数学"
+    },
+    {
+      "id": "cmizg2oo40001unqkf9e7gtz8",
+      "name": "二项式定理"
+    },
+    {
+      "id": "cmizg2otz0002unqkigu92ipc",
+      "name": "公式"
+    },
+    {
+      "id": "cmizg2p0r0003unqkj5dofbu7",
+      "name": "代数"
+    },
+    {
+      "id": "cmizg2p6t0004unqkoda64r8p",
+      "name": "组合数学"
+    }
+  ],
+  "categories": [
+    {
+      "id": "cmiydoyhb000gunh0unnlrupj",
+      "name": "Work"
+    },
+    {
+      "id": "cmiydoyhd000hunh0yidwfvdu",
+      "name": "Personal"
+    },
+    {
+      "id": "cmiydoyhe000iunh07aym431d",
+      "name": "Projects"
+    },
+    {
+      "id": "cmiydoyhf000junh0jmrp546r",
+      "name": "Ideas"
+    },
+    {
+      "id": "cmiydoyhg000kunh014tmabwp",
+      "name": "Notes"
+    },
+    {
+      "id": "cmizas4eg000aun2sw152ys53",
+      "name": "工作笔记"
+    },
+    {
+      "id": "cmizas4ek000bun2sx4723z3d",
+      "name": "学习资料"
+    },
+    {
+      "id": "cmizas4et000cun2shar68ys0",
+      "name": "个人日记"
+    },
+    {
+      "id": "cmizas4ev000dun2snkprur0w",
+      "name": "技术文档"
+    },
+    {
+      "id": "cmizas4ew000eun2skldd247f",
+      "name": "读书心得"
+    }
+  ],
+  "collaborators": [
+    {
+      "id": "cmiydoyjs002kunh0jnene3n0",
+      "noteId": "cmiydoyhy0016unh0fo7ta6q8",
+      "userId": "cmiydoygv0002unh05hagqcvw",
+      "role": "editor",
+      "createdAt": "2025-12-09T09:29:01.672Z"
+    },
+    {
+      "id": "cmiydoyjv002munh0ra4h8nyf",
+      "noteId": "cmiydoyio001eunh0w40vcs7z",
+      "userId": "cmiydoygv0002unh05hagqcvw",
+      "role": "viewer",
+      "createdAt": "2025-12-09T09:29:01.676Z"
+    },
+    {
+      "id": "cmiydoyjw002ounh0kjarp83k",
+      "noteId": "cmiydoyix001munh04ujbet4x",
+      "userId": "cmiydoygv0002unh05hagqcvw",
+      "role": "editor",
+      "createdAt": "2025-12-09T09:29:01.677Z"
+    },
+    {
+      "id": "cmiydoyjx002qunh0llvqlkyg",
+      "noteId": "cmiydoyj5001uunh008jgussa",
+      "userId": "cmiydoygv0002unh05hagqcvw",
+      "role": "viewer",
+      "createdAt": "2025-12-09T09:29:01.677Z"
+    },
+    {
+      "id": "cmiydoyjy002sunh0cp31qtet",
+      "noteId": "cmiydoyjb0020unh05xkp6i3j",
+      "userId": "cmiydoygv0002unh05hagqcvw",
+      "role": "editor",
+      "createdAt": "2025-12-09T09:29:01.678Z"
+    },
+    {
+      "id": "cmiydoyjz002uunh0oy303oew",
+      "noteId": "cmiydoyji0028unh0sh10gtw8",
+      "userId": "cmiydoygv0002unh05hagqcvw",
+      "role": "viewer",
+      "createdAt": "2025-12-09T09:29:01.679Z"
+    },
+    {
+      "id": "cmiydoyk0002wunh02ss1uyfd",
+      "noteId": "cmiydoyjo002gunh0egtsovko",
+      "userId": "cmiydoygv0002unh05hagqcvw",
+      "role": "editor",
+      "createdAt": "2025-12-09T09:29:01.680Z"
+    },
+    {
+      "id": "2bd5e670-7d65-48d9-84f5-86483358c133",
+      "noteId": "cmizesk3n0009une8orvdgaih",
+      "userId": "cmiydoygv0002unh05hagqcvw",
+      "role": "editor",
+      "createdAt": "2025-12-11T02:04:21.399Z"
+    }
+  ],
+  "noteVersions": [
+    {
+      "id": "cmiydoyid0018unh0b54xzdn3",
+      "noteId": "cmiydoyhy0016unh0fo7ta6q8",
+      "content": "{\"type\":\"doc\",\"content\":[{\"type\":\"heading\",\"attrs\":{\"level\":1},\"content\":[{\"type\":\"text\",\"text\":\"Project Overview\"}]},{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"This is a comprehensive project plan with key milestones and deliverables.\"}]},{\"type\":\"bulletList\",\"content\":[{\"type\":\"listItem\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Phase 1: Research and Planning\"}]}]},{\"type\":\"listItem\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Phase 2: Development\"}]}]},{\"type\":\"listItem\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Phase 3: Testing and Deployment\"}]}]}]}]}",
+      "title": "Project Planning 1 (v1)",
+      "userId": "cmiydoyg90000unh0js5b7egz",
+      "createdAt": "2025-12-09T09:29:01.622Z"
+    },
+    {
+      "id": "cmiydoyiu001iunh0wv2vi70h",
+      "noteId": "cmiydoyir001gunh02c6f3vcz",
+      "content": "{\"type\":\"doc\",\"content\":[{\"type\":\"heading\",\"attrs\":{\"level\":1},\"content\":[{\"type\":\"text\",\"text\":\"Project Overview\"}]},{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"This is a comprehensive project plan with key milestones and deliverables.\"}]},{\"type\":\"bulletList\",\"content\":[{\"type\":\"listItem\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Phase 1: Research and Planning\"}]}]},{\"type\":\"listItem\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Phase 2: Development\"}]}]},{\"type\":\"listItem\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Phase 3: Testing and Deployment\"}]}]}]}]}",
+      "title": "Ideas for Next Quarter 1 (v1)",
+      "userId": "cmiydoygv0002unh05hagqcvw",
+      "createdAt": "2025-12-09T09:29:01.638Z"
+    },
+    {
+      "id": "cmiydoyj4001sunh0pf149iu3",
+      "noteId": "cmiydoyj2001qunh08eormscw",
+      "content": "{\"type\":\"doc\",\"content\":[{\"type\":\"heading\",\"attrs\":{\"level\":1},\"content\":[{\"type\":\"text\",\"text\":\"Project Overview\"}]},{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"This is a comprehensive project plan with key milestones and deliverables.\"}]},{\"type\":\"bulletList\",\"content\":[{\"type\":\"listItem\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Phase 1: Research and Planning\"}]}]},{\"type\":\"listItem\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Phase 2: Development\"}]}]},{\"type\":\"listItem\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Phase 3: Testing and Deployment\"}]}]}]}]}",
+      "title": "Sprint Retrospective 1 (v1)",
+      "userId": "cmiydoygy0004unh0zfohds18",
+      "createdAt": "2025-12-09T09:29:01.648Z"
+    },
+    {
+      "id": "cmiydoyjd0022unh0jdu9y272",
+      "noteId": "cmiydoyjb0020unh05xkp6i3j",
+      "content": "{\"type\":\"doc\",\"content\":[{\"type\":\"heading\",\"attrs\":{\"level\":1},\"content\":[{\"type\":\"text\",\"text\":\"Project Overview\"}]},{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"This is a comprehensive project plan with key milestones and deliverables.\"}]},{\"type\":\"bulletList\",\"content\":[{\"type\":\"listItem\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Phase 1: Research and Planning\"}]}]},{\"type\":\"listItem\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Phase 2: Development\"}]}]},{\"type\":\"listItem\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Phase 3: Testing and Deployment\"}]}]}]}]}",
+      "title": "Research Findings 2 (v1)",
+      "userId": "cmiydoyg90000unh0js5b7egz",
+      "createdAt": "2025-12-09T09:29:01.658Z"
+    },
+    {
+      "id": "cmiydoyjl002cunh09pebu79d",
+      "noteId": "cmiydoyjk002aunh08pc4kaxn",
+      "content": "{\"type\":\"doc\",\"content\":[{\"type\":\"heading\",\"attrs\":{\"level\":1},\"content\":[{\"type\":\"text\",\"text\":\"Project Overview\"}]},{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"This is a comprehensive project plan with key milestones and deliverables.\"}]},{\"type\":\"bulletList\",\"content\":[{\"type\":\"listItem\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Phase 1: Research and Planning\"}]}]},{\"type\":\"listItem\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Phase 2: Development\"}]}]},{\"type\":\"listItem\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Phase 3: Testing and Deployment\"}]}]}]}]}",
+      "title": "Design Concepts 2 (v1)",
+      "userId": "cmiydoygv0002unh05hagqcvw",
+      "createdAt": "2025-12-09T09:29:01.666Z"
+    },
+    {
+      "id": "cmj04rihz0001unl81d61awq0",
+      "noteId": "cmizas4gz0016un2snmczukg4",
+      "content": "# CSS Grid 布局完全指南\n\n## 基础概念\n\n```css\n.container {\n  display: grid;\n  grid-template-columns: 1fr 2fr 1fr;\n  gap: 20px;\n}\n```",
+      "title": "CSS Grid 布局完全指南",
+      "userId": "cmiydoyg90000unh0js5b7egz",
+      "createdAt": "2025-12-10T14:54:36.644Z"
+    },
+    {
+      "id": "cmj04ycyp0003unl8w44h69xy",
+      "noteId": "cmizesk3n0009une8orvdgaih",
+      "content": "# 你好\n\n$$\n(a+b)^n = \\sum_{k=0}^{n} \\binom{n}{k} a^{n-k} b^k\n$$\n\n这是我的数学公式。",
+      "title": "数学笔记",
+      "userId": "cmiydoyg90000unh0js5b7egz",
+      "createdAt": "2025-12-10T14:59:56.065Z"
+    },
+    {
+      "id": "cmj05v0240005unl8nyplzsbp",
+      "noteId": "cmizas4g7000sun2srty702ub",
+      "content": "# 每周工作计划\n\n## 本周目标\n- [ ] 完成项目 A 的需求分析\n- [ ] 代码审查 3 个 PR\n- [ ] 参加周三的技术分享会",
+      "title": "每周工作计划模板",
+      "userId": "cmiydoyg90000unh0js5b7egz",
+      "createdAt": "2025-12-10T15:25:18.987Z"
+    },
+    {
+      "id": "cmj0pg3oj0001unck8kyy60wj",
+      "noteId": "cmizesk3n0009une8orvdgaih",
+      "content": "# 你好\r\n\r\n$$\r\n(a+b)^n = \\sum_{k=0}^{n} \\binom{n}{k} a^{n-k} b^k\r\n$$\r\n\r\n这是我的数学公式。",
+      "title": "数学笔记",
+      "userId": "cmiydoyg90000unh0js5b7egz",
+      "createdAt": "2025-12-11T00:33:36.161Z"
+    },
+    {
+      "id": "cmj0pkmea0003unckjr7iima2",
+      "noteId": "cmizesk3n0009une8orvdgaih",
+      "content": "# 引言\n\n$$\n(a+b)^n = \\sum_{k=0}^{n} \\binom{n}{k} a^{n-k} b^k\n$$\n\n此公式为二项式定理的数学表达式。",
+      "title": "数学笔记",
+      "userId": "cmiydoyg90000unh0js5b7egz",
+      "createdAt": "2025-12-11T00:37:07.042Z"
+    },
+    {
+      "id": "cmj0pqnc70005unckv0veqj90",
+      "noteId": "cmizesk3n0009une8orvdgaih",
+      "content": "# 引言\n\n$$\n(a+b)^n = \\sum_{k=0}^{n} \\binom{n}{k} a^{n-k} b^k\n$$\n\n此公式为二项式定理的数学表达式。",
+      "title": "数学笔记",
+      "userId": "cmiydoyg90000unh0js5b7egz",
+      "createdAt": "2025-12-11T00:41:48.199Z"
+    },
+    {
+      "id": "cmj0rlmcp0007unckxoaqpeqf",
+      "noteId": "cmizesk3n0009une8orvdgaih",
+      "content": "# 引言\n\n$$\n(a+b)^n = \\sum_{k=0}^{n} \\binom{n}{k} a^{n-k} b^k\n$$\n\n此公式为二项式定理的数学表达式。\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
+      "title": "数学笔记",
+      "userId": "cmiydoyg90000unh0js5b7egz",
+      "createdAt": "2025-12-11T01:33:52.871Z"
+    },
+    {
+      "id": "cmj0rls9u0009unck48uug1lq",
+      "noteId": "cmizesk3n0009une8orvdgaih",
+      "content": "# 引言\n\n在代数学中，二项式定理是一个基础而重要的公式，它描述了二项式幂的展开形式。具体来说，对于任意实数 $a$ 和 $b$ 以及非负整数 $n$，二项式定理的数学表达式为：\n\n$$\n(a+b)^n = \\sum_{k=0}^{n} \\binom{n}{k} a^{n-k} b^k\n$$\n\n其中，符号 $\\binom{n}{k}$ 表示二项式系数，其计算公式为 $\\binom{n}{k} = \\frac{n!}{k!(n-k)!}$，它代表了从 $n$ 个不同元素中选取 $k$ 个元素的组合数。这个系数在展开式中决定了每一项的权重。\n\n二项式定理不仅具有理论意义，还在多个领域有广泛的应用。例如，在概率论中，它用于计算二项分布的概率；在组合数学中，它帮助解决计数问题；在数值分析中，它可以用于近似计算。历史上，二项式定理的发现可以追溯到古代印度和阿拉伯数学家，但现代形式主要由艾萨克·牛顿在17世纪推广到非整数指数情形。\n\n为了更直观地理解，考虑一个简单例子：当 $n=3$ 时，根据二项式定理展开 $(a+b)^3$：\n$$\n(a+b)^3 = \\binom{3}{0}a^3b^0 + \\binom{3}{1}a^2b^1 + \\binom{3}{2}a^1b^2 + \\binom{3}{3}a^0b^3 = a^3 + 3a^2b + 3ab^2 + b^3\n$$\n这个展开式清晰地展示了各项系数与组合数的对应关系。\n\n此外，二项式定理还与帕斯卡三角形（杨辉三角）紧密相关，三角形中的每一行数字正好对应二项式展开的系数。例如，当 $n=4$ 时，展开系数为 1, 4, 6, 4, 1，这正是帕斯卡三角形的第五行。\n\n总之，二项式定理作为数学中的一个核心工具，其简洁而强大的表达式为许多学科提供了理论基础，值得我们深入学习和应用。",
+      "title": "数学笔记",
+      "userId": "cmiydoyg90000unh0js5b7egz",
+      "createdAt": "2025-12-11T01:34:00.546Z"
+    },
+    {
+      "id": "cmj0rn5el000bunckscwjq9wz",
+      "noteId": "cmizesk3n0009une8orvdgaih",
+      "content": "# 引言\n\n在代数学中，二项式定理是一个基础而重要的公式，它描述了二项式幂的展开形式。具体来说，对于任意实数 $a$ 和 $b$ 以及非负整数 $n$，二项式定理的数学表达式为：\n\n$$\n(a+b)^n = \\sum_{k=0}^{n} \\binom{n}{k} a^{n-k} b^k\n$$\n\n其中，符号 $\\binom{n}{k}$ 表示二项式系数，其计算公式为 $\\binom{n}{k} = \\frac{n!}{k!(n-k)!}$，它代表了从 $n$ 个不同元素中选取 $k$ 个元素的组合数。这个系数在展开式中决定了每一项的权重。\n\n二项式定理不仅具有理论意义，还在多个领域有广泛的应用。例如：\n\n- 在概率论中，它用于计算二项分布的概率；\n- 在组合数学中，它帮助解决计数问题；\n- 在数值分析中，它可以用于近似计算。\n\n历史上，二项式定理的发现可以追溯到古代印度和阿拉伯数学家，但现代形式主要由艾萨克·牛顿在17世纪推广到非整数指数情形。\n\n为了更直观地理解，考虑一个简单例子：当 $n=3$ 时，根据二项式定理展开 $(a+b)^3$：\n\n$$\n(a+b)^3 = \\binom{3}{0}a^3b^0 + \\binom{3}{1}a^2b^1 + \\binom{3}{2}a^1b^2 + \\binom{3}{3}a^0b^3 = a^3 + 3a^2b + 3ab^2 + b^3\n$$\n\n这个展开式清晰地展示了各项系数与组合数的对应关系。\n\n此外，二项式定理还与帕斯卡三角形（杨辉三角）紧密相关，三角形中的每一行数字正好对应二项式展开的系数。例如，当 $n=4$ 时，展开系数为 1, 4, 6, 4, 1，这正是帕斯卡三角形的第五行。\n\n总之，二项式定理作为数学中的一个核心工具，其简洁而强大的表达式为许多学科提供了理论基础，值得我们深入学习和应用。",
+      "title": "数学笔记",
+      "userId": "cmiydoyg90000unh0js5b7egz",
+      "createdAt": "2025-12-11T01:35:04.221Z"
+    },
+    {
+      "id": "cmj0ro53d000funcky5xh67dm",
+      "noteId": "cmizesk3n0009une8orvdgaih",
+      "content": "# 引言\r\n\r\n在代数学中，二项式定理是一个基础而重要的公式，它描述了二项式幂的展开形式。具体来说，对于任意实数 $a$ 和 $b$ 以及非负整数 $n$，二项式定理的数学表达式为：\r\n\r\n$$\r\n(a+b)^n = \\sum_{k=0}^{n} \\binom{n}{k} a^{n-k} b^k\r\n$$\r\n\r\n其中，符号 $\\binom{n}{k}$ 表示二项式系数，其计算公式为 $\\binom{n}{k} = \\frac{n!}{k!(n-k)!}$，它代表了从 $n$ 个不同元素中选取 $k$ 个元素的组合数。这个系数在展开式中决定了每一项的权重。\r\n\r\n二项式定理不仅具有理论意义，还在多个领域有广泛的应用。例如：\r\n\r\n- 在概率论中，它用于计算二项分布的概率；\r\n- 在组合数学中，它帮助解决计数问题；\r\n- 在数值分析中，它可以用于近似计算。\r\n\r\n历史上，二项式定理的发现可以追溯到古代印度和阿拉伯数学家，但现代形式主要由艾萨克·牛顿在17世纪推广到非整数指数情形。\r\n\r\n为了更直观地理解，考虑一个简单例子：当 $n=3$ 时，根据二项式定理展开 $(a+b)^3$：\r\n\r\n$$\r\n(a+b)^3 = \\binom{3}{0}a^3b^0 + \\binom{3}{1}a^2b^1 + \\binom{3}{2}a^1b^2 + \\binom{3}{3}a^0b^3 = a^3 + 3a^2b + 3ab^2 + b^3\r\n$$\r\n\r\n这个展开式清晰地展示了各项系数与组合数的对应关系。\r\n\r\n此外，二项式定理还与帕斯卡三角形（杨辉三角）紧密相关，三角形中的每一行数字正好对应二项式展开的系数。例如，当 $n=4$ 时，展开系数为 1, 4, 6, 4, 1，这正是帕斯卡三角形的第五行。\r\n\r\n总之，二项式定理作为数学中的一个核心工具，其简洁而强大的表达式为许多学科提供了理论基础，值得我们深入学习和应用。",
+      "title": "数学笔记",
+      "userId": "cmiydoyg90000unh0js5b7egz",
+      "createdAt": "2025-12-11T01:35:50.473Z"
+    },
+    {
+      "id": "cmj0rvb5e000hunckp8p1xizk",
+      "noteId": "cmizesk3n0009une8orvdgaih",
+      "content": "# 引言\r\n\r\n在代数学中，二项式定理是一个基础而重要的公式，它描述了二项式幂的展开形式。具体来说，对于任意实数 $a$ 和 $b$ 以及非负整数 $n$，二项式定理的数学表达式为：\r\n\r\n$$\r\n(a+b)^n = \\sum_{k=0}^{n} \\binom{n}{k} a^{n-k} b^k\r\n$$\r\n\r\n其中，符号 $\\binom{n}{k}$ 表示二项式系数，其计算公式为 $\\binom{n}{k} = \\frac{n!}{k!(n-k)!}$，它代表了从 $n$ 个不同元素中选取 $k$ 个元素的组合数。这个系数在展开式中决定了每一项的权重。\r\n\r\n二项式定理不仅具有理论意义，还在多个领域有广泛的应用。例如：\r\n\r\n- 在概率论中，它用于计算二项分布的概率；\r\n- 在组合数学中，它帮助解决计数问题；\r\n- 在数值分析中，它可以用于近似计算。\r\n\r\n历史上，二项式定理的发现可以追溯到古代印度和阿拉伯数学家，但现代形式主要由艾萨克·牛顿在17世纪推广到非整数指数情形。\r\n\r\n为了更直观地理解，考虑一个简单例子：当 $n=3$ 时，根据二项式定理展开 $(a+b)^3$：\r\n\r\n$$\r\n(a+b)^3 = \\binom{3}{0}a^3b^0 + \\binom{3}{1}a^2b^1 + \\binom{3}{2}a^1b^2 + \\binom{3}{3}a^0b^3 = a^3 + 3a^2b + 3ab^2 + b^3\r\n$$\r\n\r\n这个展开式清晰地展示了各项系数与组合数的对应关系。\r\n\r\n此外，二项式定理还与帕斯卡三角形（杨辉三角）紧密相关，三角形中的每一行数字正好对应二项式展开的系数。例如，当 $n=4$ 时，展开系数为 1, 4, 6, 4, 1，这正是帕斯卡三角形的第五行。\r\n\r\n总之，二项式定理作为数学中的一个核心工具，其简洁而强大的表达式为许多学科提供了理论基础，值得我们深入学习和应用。",
+      "title": "数学笔记",
+      "userId": "cmiydoyg90000unh0js5b7egz",
+      "createdAt": "2025-12-11T01:41:24.914Z"
+    },
+    {
+      "id": "cmj0sow320001unyse6ihdmr6",
+      "noteId": "cmizesk3n0009une8orvdgaih",
+      "content": "# 引言\r\n\r\n在代数学中，二项式定理是一个基础而重要的公式，它描述了二项式幂的展开形式。具体来说，对于任意实数 $a$ 和 $b$ 以及非负整数 $n$，二项式定理的数学表达式为：\r\n\r\n$$\r\n(a+b)^n = \\sum_{k=0}^{n} \\binom{n}{k} a^{n-k} b^k\r\n$$\r\n\r\n其中，符号 $\\binom{n}{k}$ 表示二项式系数，其计算公式为 $\\binom{n}{k} = \\frac{n!}{k!(n-k)!}$，它代表了从 $n$ 个不同元素中选取 $k$ 个元素的组合数。这个系数在展开式中决定了每一项的权重。\r\n\r\n二项式定理不仅具有理论意义，还在多个领域有广泛的应用。例如：\r\n\r\n- 在概率论中，它用于计算二项分布的概率；\r\n- 在组合数学中，它帮助解决计数问题；\r\n- 在数值分析中，它可以用于近似计算。\r\n\r\n历史上，二项式定理的发现可以追溯到古代印度和阿拉伯数学家，但现代形式主要由艾萨克·牛顿在17世纪推广到非整数指数情形。\r\n\r\n为了更直观地理解，考虑一个简单例子：当 $n=3$ 时，根据二项式定理展开 $(a+b)^3$：\r\n\r\n$$\r\n(a+b)^3 = \\binom{3}{0}a^3b^0 + \\binom{3}{1}a^2b^1 + \\binom{3}{2}a^1b^2 + \\binom{3}{3}a^0b^3 = a^3 + 3a^2b + 3ab^2 + b^3\r\n$$\r\n\r\n这个展开式清晰地展示了各项系数与组合数的对应关系。\r\n\r\n此外，二项式定理还与帕斯卡三角形（杨辉三角）紧密相关，三角形中的每一行数字正好对应二项式展开的系数。例如，当 $n=4$ 时，展开系数为 1, 4, 6, 4, 1，这正是帕斯卡三角形的第五行。\r\n\r\n总之，二项式定理作为数学中的一个核心工具，其简洁而强大的表达式为许多学科提供了理论基础，值得我们深入学习和应用。",
+      "title": "数学笔记",
+      "userId": "cmiydoyg90000unh0js5b7egz",
+      "createdAt": "2025-12-11T02:04:25.046Z"
+    },
+    {
+      "id": "cmj0v4lcq0003unyssv3w3qw6",
+      "noteId": "cmizesk3n0009une8orvdgaih",
+      "content": "# 引言11111\n\n在代数学中，二项式定理是一个基础而重要的公式，它描述了二项式幂的展开形式。具体来说，对于任意实数 $a$ 和 $b$ 以及非负整数 $n$，二项式定理的数学表达式为：\n\n$$\n(a+b)^n = \\sum_{k=0}^{n} \\binom{n}{k} a^{n-k} b^k\n$$\n\n其中，符号 $\\binom{n}{k}$ 表示二项式系数，其计算公式为 $\\binom{n}{k} = \\frac{n!}{k!(n-k)!}$，它代表了从 $n$ 个不同元素中选取 $k$ 个元素的组合数。这个系数在展开式中决定了每一项的权重。\n\n二项式定理不仅具有理论意义，还在多个领域有广泛的应用。例如：\n\n- 在概率论中，它用于计算二项分布的概率；\n- 在组合数学中，它帮助解决计数问题；\n- 在数值分析中，它可以用于近似计算。\n\n历史上，二项式定理的发现可以追溯到古代印度和阿拉伯数学家，但现代形式主要由艾萨克·牛顿在17世纪推广到非整数指数情形。\n\n为了更直观地理解，考虑一个简单例子：当 $n=3$ 时，根据二项式定理展开 $(a+b)^3$：\n\n$$\n(a+b)^3 = \\binom{3}{0}a^3b^0 + \\binom{3}{1}a^2b^1 + \\binom{3}{2}a^1b^2 + \\binom{3}{3}a^0b^3 = a^3 + 3a^2b + 3ab^2 + b^3\n$$\n\n这个展开式清晰地展示了各项系数与组合数的对应关系。\n\n此外，二项式定理还与帕斯卡三角形（杨辉三角）紧密相关，三角形中的每一行数字正好对应二项式展开的系数。例如，当 $n=4$ 时，展开系数为 1, 4, 6, 4, 1，这正是帕斯卡三角形的第五行。\n\n总之，二项式定理作为数学中的一个核心工具，其简洁而强大的表达式为许多学科提供了理论基础，值得我们深入学习和应用。",
+      "title": "数学笔记",
+      "userId": "cmiydoyg90000unh0js5b7egz",
+      "createdAt": "2025-12-11T03:12:36.887Z"
+    },
+    {
+      "id": "cmj15yzey0001unaki80nlkpr",
+      "noteId": "cmizesk3n0009une8orvdgaih",
+      "content": "AQOI9f3NBQAHAQdkZWZhdWx0AwlwYXJhZ3JhcGgHAIj1/c0FAAYEAIj1/c0FAaMNIyDlvJXoqIAxMTExMSDlnKjku6PmlbDlrabkuK3vvIzkuozpobnlvI/lrprnkIbmmK/kuIDkuKrln7rnoYDogIzph43opoHnmoTlhazlvI/vvIzlroPmj4/ov7DkuobkuozpobnlvI/luYLnmoTlsZXlvIDlvaLlvI/jgILlhbfkvZPmnaXor7TvvIzlr7nkuo7ku7vmhI/lrp7mlbAgJGEkIOWSjCAkYiQg5Lul5Y+K6Z2e6LSf5pW05pWwICRuJO+8jOS6jOmhueW8j+WumueQhueahOaVsOWtpuihqOi+vuW8j+S4uu+8miAkJCAoYStiKV5uID0gXHN1bV97az0wfV57bn0gXGJpbm9te259e2t9IGFee24ta30gYl5rICQkIOWFtuS4re+8jOespuWPtyAkXGJpbm9te259e2t9JCDooajnpLrkuozpobnlvI/ns7vmlbDvvIzlhbborqHnrpflhazlvI/kuLogJFxiaW5vbXtufXtrfSA9IFxmcmFje24hfXtrIShuLWspIX0k77yM5a6D5Luj6KGo5LqG5LuOICRuJCDkuKrkuI3lkIzlhYPntKDkuK3pgInlj5YgJGskIOS4quWFg+e0oOeahOe7hOWQiOaVsOOAgui/meS4quezu+aVsOWcqOWxleW8gOW8j+S4reWGs+WumuS6huavj+S4gOmhueeahOadg+mHjeOAgiDkuozpobnlvI/lrprnkIbkuI3ku4XlhbfmnInnkIborrrmhI/kuYnvvIzov5jlnKjlpJrkuKrpoobln5/mnInlub/ms5vnmoTlupTnlKjjgILkvovlpoLvvJogLSDlnKjmpoLnjoforrrkuK3vvIzlroPnlKjkuo7orqHnrpfkuozpobnliIbluIPnmoTmpoLnjofvvJsgLSDlnKjnu4TlkIjmlbDlrabkuK3vvIzlroPluK7liqnop6PlhrPorqHmlbDpl67popjvvJsgLSDlnKjmlbDlgLzliIbmnpDkuK3vvIzlroPlj6/ku6XnlKjkuo7ov5HkvLzorqHnrpfjgIIg5Y6G5Y+y5LiK77yM5LqM6aG55byP5a6a55CG55qE5Y+R546w5Y+v5Lul6L+95rqv5Yiw5Y+k5Luj5Y2w5bqm5ZKM6Zi/5ouJ5Lyv5pWw5a2m5a6277yM5L2G546w5Luj5b2i5byP5Li76KaB55Sx6Im+6JCo5YWLwrfniZvpob/lnKgxN+S4lue6quaOqOW5v+WIsOmdnuaVtOaVsOaMh+aVsOaDheW9ouOAgiDkuLrkuobmm7Tnm7Top4LlnLDnkIbop6PvvIzogIPomZHkuIDkuKrnroDljZXkvovlrZDvvJrlvZMgJG49MyQg5pe277yM5qC55o2u5LqM6aG55byP5a6a55CG5bGV5byAICQoYStiKV4zJO+8miAkJCAoYStiKV4zID0gXGJpbm9tezN9ezB9YV4zYl4wICsgXGJpbm9tezN9ezF9YV4yYl4xICsgXGJpbm9tezN9ezJ9YV4xYl4yICsgXGJpbm9tezN9ezN9YV4wYl4zID0gYV4zICsgM2FeMmIgKyAzYWJeMiArIGJeMyAkJCDov5nkuKrlsZXlvIDlvI/muIXmmbDlnLDlsZXnpLrkuoblkITpobnns7vmlbDkuI7nu4TlkIjmlbDnmoTlr7nlupTlhbPns7vjgIIg5q2k5aSW77yM5LqM6aG55byP5a6a55CG6L+Y5LiO5biV5pav5Y2h5LiJ6KeS5b2i77yI5p2o6L6J5LiJ6KeS77yJ57Sn5a+G55u45YWz77yM5LiJ6KeS5b2i5Lit55qE5q+P5LiA6KGM5pWw5a2X5q2j5aW95a+55bqU5LqM6aG55byP5bGV5byA55qE57O75pWw44CC5L6L5aaC77yM5b2TICRuPTQkIOaXtu+8jOWxleW8gOezu+aVsOS4uiAxLCA0LCA2LCA0LCAx77yM6L+Z5q2j5piv5biV5pav5Y2h5LiJ6KeS5b2i55qE56ys5LqU6KGM44CCIOaAu+S5i++8jOS6jOmhueW8j+WumueQhuS9nOS4uuaVsOWtpuS4reeahOS4gOS4quaguOW/g+W3peWFt++8jOWFtueugOa0geiAjOW8uuWkp+eahOihqOi+vuW8j+S4uuiuuOWkmuWtpuenkeaPkOS+m+S6hueQhuiuuuWfuuehgO+8jOWAvOW+l+aIkeS7rOa3seWFpeWtpuS5oOWSjOW6lOeUqOOAggA=",
+      "title": "数学笔记",
+      "userId": "cmiydoygv0002unh05hagqcvw",
+      "createdAt": "2025-12-11T08:16:10.952Z"
+    },
+    {
+      "id": "cmj164p5s0003unakrcej2zum",
+      "noteId": "cmizesk3n0009une8orvdgaih",
+      "content": "# 引言\n\n在代数学中，二项式定理是一个基础而重要的公式，它描述了二项式幂的展开形式。具体来说，对于任意实数 $a$ 和 $b$ 以及非负整数 $n$，二项式定理的数学表达式为：\n\n$$\n(a+b)^n = \\sum_{k=0}^{n} \\binom{n}{k} a^{n-k} b^k\n$$\n\n其中，符号 $\\binom{n}{k}$ 表示二项式系数，其计算公式为 $\\binom{n}{k} = \\frac{n!}{k!(n-k)!}$，它代表了从 $n$ 个不同元素中选取 $k$ 个元素的组合数。这个系数在展开式中决定了每一项的权重。\n\n二项式定理不仅具有理论意义，还在多个领域有广泛的应用。例如：\n\n- 在概率论中，它用于计算二项分布的概率；\n- 在组合数学中，它帮助解决计数问题；\n- 在数值分析中，它可以用于近似计算。\n\n历史上，二项式定理的发现可以追溯到古代印度和阿拉伯数学家，但现代形式主要由艾萨克·牛顿在17世纪推广到非整数指数情形。\n\n为了更直观地理解，考虑一个简单例子：当 $n=3$ 时，根据二项式定理展开 $(a+b)^3$：\n\n$$\n(a+b)^3 = \\binom{3}{0}a^3b^0 + \\binom{3}{1}a^2b^1 + \\binom{3}{2}a^1b^2 + \\binom{3}{3}a^0b^3 = a^3 + 3a^2b + 3ab^2 + b^3\n$$\n\n这个展开式清晰地展示了各项系数与组合数的对应关系。\n\n此外，二项式定理还与帕斯卡三角形（杨辉三角）紧密相关，三角形中的每一行数字正好对应二项式展开的系数。例如，当 $n=4$ 时，展开系数为 1, 4, 6, 4, 1，这正是帕斯卡三角形的第五行。\n\n总之，二项式定理作为数学中的一个核心工具，其简洁而强大的表达式为许多学科提供了理论基础，值得我们深入学习和应用。",
+      "title": "数学笔记",
+      "userId": "cmiydoyg90000unh0js5b7egz",
+      "createdAt": "2025-12-11T08:20:37.601Z"
+    }
+  ],
+  "noteTemplates": [
+    {
+      "id": "cmiydoyk1002xunh06qrrws8y",
+      "name": "Meeting Notes",
+      "description": "Template for recording meeting notes",
+      "content": "{\"type\":\"doc\",\"content\":[{\"type\":\"heading\",\"attrs\":{\"level\":1},\"content\":[{\"type\":\"text\",\"text\":\"Meeting Notes\"}]},{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Date: \"}]},{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Attendees: \"}]},{\"type\":\"heading\",\"attrs\":{\"level\":2},\"content\":[{\"type\":\"text\",\"text\":\"Agenda\"}]},{\"type\":\"paragraph\"},{\"type\":\"heading\",\"attrs\":{\"level\":2},\"content\":[{\"type\":\"text\",\"text\":\"Discussion\"}]},{\"type\":\"paragraph\"},{\"type\":\"heading\",\"attrs\":{\"level\":2},\"content\":[{\"type\":\"text\",\"text\":\"Action Items\"}]},{\"type\":\"bulletList\",\"content\":[{\"type\":\"listItem\",\"content\":[{\"type\":\"paragraph\"}]}]}]}",
+      "userId": "cmiydoyg90000unh0js5b7egz",
+      "usageCount": 0,
+      "createdAt": "2025-12-09T09:29:01.682Z",
+      "updatedAt": "2025-12-09T09:29:01.682Z"
+    },
+    {
+      "id": "cmiydoyk4002yunh0ryr6au40",
+      "name": "Project Plan",
+      "description": "Template for project planning",
+      "content": "{\"type\":\"doc\",\"content\":[{\"type\":\"heading\",\"attrs\":{\"level\":1},\"content\":[{\"type\":\"text\",\"text\":\"Project Plan\"}]},{\"type\":\"heading\",\"attrs\":{\"level\":2},\"content\":[{\"type\":\"text\",\"text\":\"Overview\"}]},{\"type\":\"paragraph\"},{\"type\":\"heading\",\"attrs\":{\"level\":2},\"content\":[{\"type\":\"text\",\"text\":\"Goals\"}]},{\"type\":\"bulletList\",\"content\":[{\"type\":\"listItem\",\"content\":[{\"type\":\"paragraph\"}]}]},{\"type\":\"heading\",\"attrs\":{\"level\":2},\"content\":[{\"type\":\"text\",\"text\":\"Timeline\"}]},{\"type\":\"paragraph\"},{\"type\":\"heading\",\"attrs\":{\"level\":2},\"content\":[{\"type\":\"text\",\"text\":\"Resources\"}]},{\"type\":\"paragraph\"}]}",
+      "userId": "cmiydoygv0002unh05hagqcvw",
+      "usageCount": 4,
+      "createdAt": "2025-12-09T09:29:01.684Z",
+      "updatedAt": "2025-12-09T09:29:01.684Z"
+    }
+  ],
+  "userPreferences": [
+    {
+      "id": "cmiydoyga0001unh0erklwqsz",
+      "userId": "cmiydoyg90000unh0js5b7egz",
+      "sortBy": "updatedAt",
+      "sortOrder": "desc",
+      "createdAt": "2025-12-09T09:29:01.543Z",
+      "updatedAt": "2025-12-09T09:29:01.543Z"
+    },
+    {
+      "id": "cmiydoygv0003unh0r2txg3l9",
+      "userId": "cmiydoygv0002unh05hagqcvw",
+      "sortBy": "updatedAt",
+      "sortOrder": "desc",
+      "createdAt": "2025-12-09T09:29:01.568Z",
+      "updatedAt": "2025-12-09T09:29:01.568Z"
+    },
+    {
+      "id": "cmiydoygy0005unh0ykztx6e6",
+      "userId": "cmiydoygy0004unh0zfohds18",
+      "sortBy": "updatedAt",
+      "sortOrder": "desc",
+      "createdAt": "2025-12-09T09:29:01.571Z",
+      "updatedAt": "2025-12-09T09:29:01.571Z"
+    }
+  ]
+}
