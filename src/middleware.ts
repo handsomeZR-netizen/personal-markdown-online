@@ -57,18 +57,20 @@ export default auth((req) => {
   const response = NextResponse.next()
 
   // Content Security Policy
+  // 允许 Vercel Analytics、Cloudflare、Neon 和必要的外部连接
   response.headers.set(
     'Content-Security-Policy',
     [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://static.cloudflareinsights.com https://vercel.live https://*.vercel-scripts.com",
       "style-src 'self' 'unsafe-inline'",
-      "img-src 'self' data: https:",
-      "font-src 'self' data:",
-      "connect-src 'self'",
+      "img-src 'self' data: https: blob:",
+      "font-src 'self' data: https:",
+      "connect-src 'self' https://*.vercel-insights.com https://*.vercel.app https://vercel.live wss://*.vercel.live https://static.cloudflareinsights.com https://*.supabase.co wss://*.supabase.co https://*.neon.tech wss://*.neon.tech",
       "frame-ancestors 'none'",
       "base-uri 'self'",
       "form-action 'self'",
+      "worker-src 'self' blob:",
     ].join('; ')
   )
 

@@ -83,7 +83,7 @@ function OptimizedNoteCardComponent({ note, onNavigate, onDelete }: NoteCardProp
 
     const handleEdit = useCallback((e: React.MouseEvent) => {
         e.stopPropagation()
-        router.push(`/notes/${note.id}`)
+        router.push(`/notes/${note.id}/edit`)
     }, [note.id, router])
 
     return (
