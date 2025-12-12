@@ -38,8 +38,8 @@ docker-compose --version
 ### 步骤 1: 克隆项目
 
 ```bash
-git clone https://github.com/your-username/note-app.git
-cd note-app
+git clone https://github.com/handsomeZR-netizen/personal-markdown-online.git
+cd personal-markdown-online/note-app
 ```
 
 ### 步骤 2: 配置环境变量
@@ -440,7 +440,5 @@ docker-compose exec app npx prisma migrate deploy
 
 ## 相关文档 / Related Documentation
 
-- [本地数据库设置](./LOCAL_DATABASE_SETUP.md)
-- [数据库模式说明](./DATABASE_MODES.md)
-- [Vercel 部署指南](./DEPLOYMENT_GUIDE.md)
-- [Google Cloud 部署](./GOOGLE_CLOUD_DEPLOYMENT.md)
+- [README - 项目说明](./README.md)
+- [.env.docker.example - 环境变量模板](./.env.docker.example)

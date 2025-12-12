@@ -40,8 +40,8 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 
-# 安装运行时依赖
-RUN apk add --no-cache libc6-compat
+# 安装运行时依赖（包括健康检查需要的 wget）
+RUN apk add --no-cache libc6-compat wget
 
 # 创建非 root 用户
 RUN addgroup --system --gid 1001 nodejs
