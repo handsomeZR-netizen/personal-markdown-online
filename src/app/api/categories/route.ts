@@ -15,8 +15,10 @@ export async function GET() {
     return NextResponse.json({ success: true, data: categories });
   } catch (error) {
     console.error('获取分类失败:', error);
+    // 返回更详细的错误信息用于调试
+    const errorMessage = error instanceof Error ? error.message : '未知错误';
     return NextResponse.json(
-      { success: false, error: '获取分类列表失败' },
+      { success: false, error: '获取分类列表失败', details: errorMessage },
       { status: 500 }
     );
   }

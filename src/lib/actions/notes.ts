@@ -54,6 +54,7 @@ export async function getNote(id: string) {
         updatedAt: new Date(note.updatedAt),
         tags: note.tags || [],
         category: note.category || null,
+        categoryId: note.categoryId || null,
     }
 }
 
