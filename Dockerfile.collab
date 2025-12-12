@@ -1,0 +1,65 @@
+# ================================
+# Hocuspocus Collaboration Server
+# ================================
+# 用于部署独立的 WebSocket 协作服务
+# 支持 Fly.io / Render / 自托管
+
+# 构建阶段
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+
+# 安装构建依赖
+RUN apk add --no-cache libc6-compat python3 make g++
+
+# 复制依赖文件
+COPY package*.json ./
+COPY prisma ./prisma/
+
+# 安装所有依赖
+RUN npm ci
+
+# 生成 Prisma Client
+RUN npx prisma generate
+
+# 复制源代码
+COPY src ./src
+COPY server ./server
+COPY tsconfig.json ./
+
+# ================================
+# 生产阶段
+# ================================
+FROM node:20-alpine AS runner
+
+WORKDIR /app
+
+ENV NODE_ENV=production
+
+# 安装运行时依赖
+RUN apk add --no-cache libc6-compat
+
+# 创建非 root 用户
+RUN addgroup --system --gid 1001 nodejs && \
+    adduser --system --uid 1001 hocuspocus
+
+# 从 builder 复制必要文件
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/package*.json ./
+COPY --from=builder /app/prisma ./prisma
+COPY --from=builder /app/src ./src
+COPY --from=builder /app/server ./server
+COPY --from=builder /app/tsconfig.json ./
+
+# 切换用户
+USER hocuspocus
+
+# 暴露端口
+EXPOSE 1234
+
+# 健康检查 - TCP 连接测试
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+  CMD node -e "require('net').connect(1234, 'localhost').on('error', () => process.exit(1)).end()"
+
+# 启动服务
+CMD ["npx", "tsx", "server/collab-server.ts"]

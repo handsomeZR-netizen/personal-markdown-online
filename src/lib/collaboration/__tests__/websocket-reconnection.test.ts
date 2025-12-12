@@ -14,7 +14,7 @@ import { YjsProvider, ConnectionStatus } from '../yjs-provider';
 
 // Mock HocuspocusProvider
 vi.mock('@hocuspocus/provider', () => ({
-  HocuspocusProvider: vi.fn().mockImplementation((config) => {
+  HocuspocusProvider: vi.fn(function MockProvider(config) {
     const mockProvider = {
       synced: false,
       shouldConnect: true,
@@ -24,15 +24,15 @@ vi.mock('@hocuspocus/provider', () => ({
       on: vi.fn(),
       off: vi.fn(),
     };
-    
+
     // 模拟连接成功
     setTimeout(() => {
-      if (config.onConnect) config.onConnect();
-      if (config.onStatus) config.onStatus({ status: 'connected' });
+      config?.onConnect?.();
+      config?.onStatus?.({ status: 'connected' });
       mockProvider.synced = true;
-      if (config.onSynced) config.onSynced();
+      config?.onSynced?.();
     }, 10);
-    
+
     return mockProvider;
   }),
 }));

@@ -1,0 +1,27 @@
+# render.yaml - Render 部署配置
+# 协作服务 (Hocuspocus WebSocket Server)
+
+services:
+  - type: web
+    name: noteapp-collab
+    env: docker
+    dockerfilePath: ./Dockerfile.collab
+    region: singapore  # 新加坡，离中国近
+    plan: starter  # $7/月
+    healthCheckPath: /  # TCP 检查
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: COLLAB_SERVER_PORT
+        value: "1234"
+      - key: COLLAB_SERVER_HOST
+        value: "0.0.0.0"
+      - key: COLLAB_STORE_DEBOUNCE_MS
+        value: "750"
+      # 以下变量需要在 Render Dashboard 手动设置
+      - key: DATABASE_URL
+        sync: false
+      - key: COLLAB_SERVER_SECRET
+        sync: false
+      - key: COLLAB_ALLOWED_ORIGINS
+        sync: false

@@ -1,0 +1,42 @@
+# fly.toml - Fly.io 配置
+# 协作服务 (Hocuspocus WebSocket Server)
+# 部署命令: fly deploy --dockerfile Dockerfile.collab
+
+app = "noteapp-collab"
+primary_region = "nrt"  # 东京，离中国近
+
+[build]
+  dockerfile = "Dockerfile.collab"
+
+[env]
+  NODE_ENV = "production"
+  COLLAB_SERVER_PORT = "1234"
+  COLLAB_SERVER_HOST = "0.0.0.0"
+  COLLAB_STORE_DEBOUNCE_MS = "750"
+
+# WebSocket 服务配置
+[http_service]
+  internal_port = 1234
+  force_https = true
+  auto_stop_machines = false  # 保持常驻，WebSocket 需要持久连接
+  auto_start_machines = true
+  min_machines_running = 1
+
+  [http_service.concurrency]
+    type = "connections"
+    hard_limit = 1000
+    soft_limit = 800
+
+# 虚拟机配置
+[[vm]]
+  cpu_kind = "shared"
+  cpus = 1
+  memory_mb = 512
+
+# TCP 健康检查
+[checks]
+  [checks.tcp]
+    port = 1234
+    type = "tcp"
+    interval = "15s"
+    timeout = "5s"

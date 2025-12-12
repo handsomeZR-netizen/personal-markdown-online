@@ -1,0 +1,26 @@
+# Caddyfile - Caddy 反向代理配置
+# 自动申请和续期 Let's Encrypt SSL 证书
+
+# 将 collab.xzr5.top 替换为你的实际域名
+collab.xzr5.top {
+    # 反向代理到协作服务
+    reverse_proxy collab:1234
+
+    # 日志
+    log {
+        output file /var/log/caddy/collab.log
+        format json
+    }
+
+    # 安全头
+    header {
+        # 启用 HSTS
+        Strict-Transport-Security "max-age=31536000; includeSubDomains"
+        # 防止点击劫持
+        X-Frame-Options "DENY"
+        # XSS 保护
+        X-Content-Type-Options "nosniff"
+        # 移除 Server 头
+        -Server
+    }
+}

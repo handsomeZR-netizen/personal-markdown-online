@@ -59,6 +59,9 @@ export function useCollaboration(config: UseCollaborationConfig): UseCollaborati
   
   const providerRef = useRef<YjsProvider | null>(null);
 
+  // Store cleanup functions in a ref to avoid async cleanup issues
+  const cleanupFnsRef = useRef<(() => void)[]>([]);
+
   // Initialize provider
   useEffect(() => {
     if (!enabled || !noteId || !userId) {
@@ -66,11 +69,11 @@ export function useCollaboration(config: UseCollaborationConfig): UseCollaborati
     }
 
     let mounted = true;
+    cleanupFnsRef.current = [];
 
     async function initProvider() {
       try {
-        // Get JWT token from session
-        const token = await getAuthToken();
+        const token = await fetchCollabToken();
         
         if (!mounted) return;
 
@@ -82,6 +85,12 @@ export function useCollaboration(config: UseCollaborationConfig): UseCollaborati
           token,
           websocketUrl: process.env.NEXT_PUBLIC_COLLAB_SERVER_URL || 'ws://localhost:1234',
         });
+
+        if (!mounted) {
+          // Component unmounted during async operation
+          newProvider.destroy();
+          return;
+        }
 
         providerRef.current = newProvider;
         setProvider(newProvider);
@@ -108,26 +117,41 @@ export function useCollaboration(config: UseCollaborationConfig): UseCollaborati
           }
         });
 
-        // Cleanup function
-        return () => {
-          mounted = false;
-          unsubscribeStatus();
-          unsubscribeSynced();
-          unsubscribeAwareness();
-          newProvider.destroy();
-        };
+        // Store cleanup functions
+        cleanupFnsRef.current = [
+          unsubscribeStatus,
+          unsubscribeSynced,
+          unsubscribeAwareness,
+          () => newProvider.destroy(),
+        ];
       } catch (error) {
         console.error('Failed to initialize collaboration:', error);
-        if (onError) {
+        if (mounted && onError) {
           onError(error as Error);
         }
       }
     }
 
-    const cleanup = initProvider();
+    initProvider();
 
+    // Synchronous cleanup function
     return () => {
-      cleanup.then(fn => fn?.());
+      mounted = false;
+      // Execute all cleanup functions synchronously
+      cleanupFnsRef.current.forEach((fn) => {
+        try {
+          fn();
+        } catch (e) {
+          console.error('Cleanup error:', e);
+        }
+      });
+      cleanupFnsRef.current = [];
+      providerRef.current = null;
+      setProvider(null);
+      setIsReady(false);
+      setIsSynced(false);
+      setOnlineUsers([]);
+      setStatus('disconnected');
     };
   }, [noteId, userId, userName, userColor, enabled, onError]);
 
@@ -150,34 +174,17 @@ export function useCollaboration(config: UseCollaborationConfig): UseCollaborati
   };
 }
 
-/**
- * Get authentication token for WebSocket connection
- */
-async function getAuthToken(): Promise<string> {
+async function fetchCollabToken(): Promise<string> {
   try {
-    // Fetch session from NextAuth
-    const response = await fetch('/api/auth/session');
-    const session = await response.json();
-    
-    if (!session?.user) {
-      throw new Error('No active session');
+    const response = await fetch('/api/collab/token', { cache: 'no-store' });
+    if (!response.ok) {
+      throw new Error(`Failed to fetch collab token: ${response.status}`);
     }
-
-    // In a real implementation, you would generate a proper JWT token
-    // For now, we'll create a simple token with user info
-    const tokenPayload = {
-      sub: session.user.id,
-      userId: session.user.id,
-      name: session.user.name || '',
-      email: session.user.email || '',
-      iat: Math.floor(Date.now() / 1000),
-      exp: Math.floor(Date.now() / 1000) + (60 * 60), // 1 hour
-    };
-
-    // Simple base64 encoding (in production, use proper JWT signing)
-    const token = `header.${Buffer.from(JSON.stringify(tokenPayload)).toString('base64')}.signature`;
-    
-    return token;
+    const data = await response.json();
+    if (!data?.token) {
+      throw new Error('Invalid token response');
+    }
+    return data.token as string;
   } catch (error) {
     console.error('Failed to get auth token:', error);
     throw error;
