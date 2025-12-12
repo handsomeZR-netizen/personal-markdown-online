@@ -197,8 +197,12 @@ export async function createNote(noteData: CreateNoteData) {
   // Local mode: use Prisma
   if (!isSupabaseMode()) {
     try {
+      const { createId } = await import('@paralleldrive/cuid2')
+      const noteId = createId()
+      
       const note = await prisma.note.create({
         data: {
+          id: noteId,
           title: noteData.title,
           content: noteData.content,
           summary: noteData.summary,
@@ -206,6 +210,7 @@ export async function createNote(noteData: CreateNoteData) {
           userId: noteData.userId,
           ownerId: noteData.userId,
           categoryId: noteData.categoryId,
+          updatedAt: new Date(),
         },
       })
       return { data: note, error: null }

@@ -204,14 +204,19 @@ export async function createNoteFromTemplate(
   }
 
   // Create note from template and increment usage count
+  const { createId } = await import('@paralleldrive/cuid2');
+  const noteId = createId();
+  
   const [note] = await prisma.$transaction([
     prisma.note.create({
       data: {
+        id: noteId,
         title,
         content: template.content,
         userId: session.user.id,
         ownerId: session.user.id,
         folderId,
+        updatedAt: new Date(),
       },
     }),
     prisma.noteTemplate.update({
