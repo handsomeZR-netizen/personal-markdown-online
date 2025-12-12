@@ -66,14 +66,22 @@ export function sanitizeString(input: string): string {
 }
 
 /**
- * 验证 CUID 格式
+ * 验证 CUID/CUID2 格式
  * @param id CUID 字符串
  * @returns 是否有效
  */
 export function isValidCuid(id: string): boolean {
-  // CUID 格式: c + 时间戳 + 计数器 + 随机字符串
+  // CUID2 格式: 小写字母开头 + 字母数字，长度 21-32 字符
+  // CUID 格式: c + 24个字符
+  // 兼容两种格式
+  if (!id || typeof id !== 'string') {
+    return false
+  }
+  // CUID2: 以小写字母开头，只包含小写字母和数字，长度 21-32
+  const cuid2Regex = /^[a-z][a-z0-9]{20,31}$/
+  // 旧版 CUID: c + 24个字符
   const cuidRegex = /^c[a-z0-9]{24}$/
-  return cuidRegex.test(id)
+  return cuid2Regex.test(id) || cuidRegex.test(id)
 }
 
 /**
