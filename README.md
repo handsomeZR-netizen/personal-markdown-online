@@ -1,4 +1,34 @@
-# 📝 智能笔记管理系统
+# Personal Markdown Online
+
+<!-- PORTFOLIO-SNAPSHOT:START -->
+<p align="left">
+  <img src="https://img.shields.io/badge/category-Frontend%20or%20full--stack%20web%20project-blue" alt="Category" />
+  <img src="https://img.shields.io/badge/status-Public%20portfolio%20artifact-2ea44f" alt="Status" />
+</p>
+
+> AI-assisted Markdown knowledge base with Next.js, authentication, database integrations, deployment scripts, and collaboration notes.
+
+## Project Snapshot
+
+- Category: Frontend or full-stack web project
+- Stack: TypeScript, ai, fullstack, knowledge-base, markdown, nextjs
+- Status: Public portfolio artifact
+
+## What This Demonstrates
+
+- Presents the project with a clear purpose, technology stack, and review path.
+- Shows applied AI workflow design in a concrete product or learning scenario.
+- Demonstrates frontend delivery, deployment awareness, and user-facing product structure.
+
+## Quick Start
+
+```bash
+npm install && npm run build
+```
+
+<!-- PORTFOLIO-SNAPSHOT:END -->
+
+## Original Documentation
 
 <div align="center">
 
@@ -705,4 +735,3 @@ setTheme('dark') // 或 'light'
 | `Esc` | 关闭对话框 |
 
 ---
-
